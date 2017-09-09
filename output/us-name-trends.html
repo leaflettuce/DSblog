@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>US Name Trends - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://localhost:8000/us-name-trends.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="D3.js,interactive" />
+        <meta name="description" content="Interactive D3.js visualization which allows for the input of several names and plots popularity of these names over time. Data obtained from kaggle.com &#39;US baby names&#39; dataset. While this chat is interesting, it does not necessarily provide a deep look into the trends of names throughout the US and was primarily done for practice utilizing D3.js&#39;s interactive options. I also found I get an absurd amount of enjoyment in comparing name popularity after finishing this project." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="US Name Trends"/>
+        <meta property="og:url" content="http://localhost:8000/us-name-trends.html"/>
+        <meta property="og:description" content="Interactive D3.js visualization which allows for the input of several names and plots popularity of these names over time. Data obtained from kaggle.com &#39;US baby names&#39; dataset. While this chat is interesting, it does not necessarily provide a deep look into the trends of names throughout the US and was primarily done for practice utilizing D3.js&#39;s interactive options. I also found I get an absurd amount of enjoyment in comparing name popularity after finishing this project."/>
+        <meta property="article:published_time" content="2017-09-03" />
+            <meta property="article:section" content="Data Visualization" />
+            <meta property="article:tag" content="D3.js" />
+            <meta property="article:tag" content="interactive" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://localhost:8000/theme/css/bootstrap.journal.min.css" type="text/css"/>
+    <link href="http://localhost:8000/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://localhost:8000/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://localhost:8000/theme/css/style.css" type="text/css"/>
+        <link href="http://localhost:8000/static/custom.css" rel="stylesheet">
+
+
+
+
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://localhost:8000/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://localhost:8000/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://localhost:8000/us-name-trends.html"
+                       rel="bookmark"
+                       title="Permalink to US Name Trends">
+                        US Name Trends
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-09-03T22:28:00-05:00"> Sun 03 September 2017</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="http://localhost:8000/category/data-visualization.html">Data Visualization</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://localhost:8000/tag/d3js.html">D3.js</a>
+        /
+	<a href="http://localhost:8000/tag/interactive.html">interactive</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/statistical-modeling.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Statistical Modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/interactive.html">
+                            interactive
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/survey.html">
+                            survey
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/cleaning.html">
+                            cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/tdwp.html">
+                            TDWP
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://localhost:8000/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://localhost:8000/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://localhost:8000/theme/js/respond.min.js"></script>
+
+    <script src="http://localhost:8000/theme/js/bodypadding.js"></script>
+
+</body>
+</html>

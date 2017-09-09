@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" href="../extra/names_search.css">
+<head>
+
+<title>US Name Trends</title>
+<meta name="tags" content="D3.js, interactive" />
+        <meta name="date" content="2017-09-03 22:28" />
+		<meta name="name" content="Name Trends" />
+		<meta name="category" content="Data Visualization"/>
+        <meta name="author" content="Andrew Trick" />
+        <meta name="summary" content="Interactive D3.js visualization which allows for the input of several names and plots popularity of these names over time.  Data obtained from kaggle.com 'US baby names' dataset. While this chat is interesting, it does not necessarily provide a deep look into the trends of names throughout the US and was primarily done for practice utilizing D3.js's interactive options. I also found I get an absurd amount of enjoyment in comparing name popularity after finishing this project.<br>" />
+
+
+
+<h1><div class='title'>U.S. Name Trends</div></h1> 
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../jquery-3.2.1.min.js"></script>
+</head>
+
+<body>
+
+I've had some trouble integrating D3.js visualizations onto this site.  I plan to update this soon!
+<form>
+<textarea id='input_names' rows="5" cols="42" onfocus="clearContents(this);">Please enter up to twenty first names, separated by (',') comma's...</textarea>
+<input type='button' class = 'button' value ='Submit' onclick="return update_data(document.getElementById('input_names').value)">
+</form>
+
+<div class='text'><p>Another interersting way to look at the baby names dataset.  Enter a name into the text box below to view a graph of the popularity of given names in the United States.  Data covers 1910 to 2014 and was obtained from <a href='http://kaggle.com'>Kaggle.com</a>. Try entering multiple names to compare up to twenty separate names at a time. You'll have to eparate the names in the textbox via comma's.</p></div>
+
+
+<script src="../js/d3.v3.min.js"></script>
+<script type="text/javascript">
+/////////////Variable intializing
+var margin = {top: 20, right: 150, bottom: 30, left: 70},
+    width = 1020 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+var names_list = []
+var x = d3.scale.linear()
+    .range([0, width]);
+var y = d3.scale.linear()
+    .range([height, 0]);
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+	.tickFormat(d3.format("d"));
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+var helpercheck = 0;
+var line = d3.svg.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.count); });
+	
+var legendRectSize = 18;                                  // NEW
+var legendSpacing = 4;                                    // NEW
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	/////helper functions
+function clearContents(element) {
+	if (helpercheck == 0) {
+  element.value = '';
+  helpercheck = 1;
+  }
+  else { return};
+};
+	
+	////////////////////import data
+d3.csv('../data/names.csv', type, function(error, data) {
+  if (error) throw error;
+  
+  //filter only in names list
+  data = data.filter(function(d){
+        if (names_list.indexOf(d.name) >= 0) {
+            return true;
+			}
+		else{
+        return false;
+		}
+		});
+		
+		////set domains
+  x.domain(d3.extent(data, function(d) { return d.year; }));
+  y.domain(d3.extent(data, function(d) { return d.count; }));
+ // Nest the entries by symbol
+    var dataNest = d3.nest()
+        .key(function(d) {return d.name;})
+        .entries(data);
+	
+		 // set the colour scale
+    var color = d3.scale.category10(); 
+	
+    // Loop through each and nest
+    dataNest.forEach(function(d) {
+        var path = svg.append("path")
+            .attr("class", "line")
+            .style("stroke", function() { // Add dynamically
+                return d.color = color(d.key); })
+            .attr("d", line(d.values));
+			var totalLength = path.node().getTotalLength();
+			path.attr("stroke-dasharray", totalLength + " " + totalLength)
+			.attr("stroke-dashoffset", totalLength)
+			.transition()
+			.duration(2000)
+			.ease("linear")
+			.attr("stroke-dashoffset", 0);
+			
+    });
+	//set axis
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+	  .append('text')
+	  .attr("y", -12)
+	  .attr("x", 800)
+      .attr("dy", ".71em")
+	  .style("text-anchor", "end")
+	  .text('year');
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Count");
+	//set legend
+	var legend = svg.selectAll('.legend')                     
+          .data(color.domain())                                  
+          .enter()                                                
+          .append('g')                                           
+          .attr('class', 'legend')                                
+          .attr('transform', function(d, i) {                    
+            var height = legendRectSize + legendSpacing;          
+            var offset =  height * color.domain().length / 2;     
+            var horz =  legendRectSize +15;                      
+            var vert = i * height - offset + 12 * color.domain().length;                       
+            return 'translate(' + horz + ',' + vert + ')';        
+          });                                                     
+		  
+		  legend.append('rect')                                   
+          .attr('width', legendRectSize)                          
+          .attr('height', legendRectSize)                        
+          .style('fill', color)                               
+          .style('stroke', color);                               
+          
+        legend.append('text')                                  
+          .attr('x', legendRectSize + legendSpacing)          
+          .attr('y', legendRectSize - legendSpacing)              
+          .text(function(d) { return d; });                       
+		  
+		  
+});
+function type(d) {
+  d.year = +d.year;
+  d.count = +d.count;
+  d.name = d.name;
+  return d;
+};
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+//update data
+function update_data(new_names){
+///split new_names_list first
+var new_names_list = new_names.replace(/ /g,'').split(',');
+var new_names_list2 = []
+new_names_list.forEach(function(entry) {
+	var in_name = toTitleCase(entry)
+	new_names_list2.push(in_name)
+});
+var svg = d3.select('g');
+//remove old paths
+d3.select('svg').selectAll('.line').remove();
+		////////////////////import data
+d3.csv('../data/names.csv', type, function(error, data) {
+  
+  if (error) throw error;
+  
+  //filter only in names list
+  data = data.filter(function(d){
+        if (new_names_list2.indexOf(d.name) >= 0) {
+            return true;
+			}
+		else{
+        return false;
+		}
+		});
+		
+		////set domains
+  x.domain(d3.extent(data, function(d) { return d.year; }));
+  y.domain(d3.extent(data, function(d) { return d.count; }));
+ // Nest the entries by symbol
+    var dataNest = d3.nest()
+        .key(function(d) {return d.name;})
+        .entries(data);
+	
+	
+		 // set the colour scale
+    var color = d3.scale.category20(); 
+	
+    // Loop through each and nest
+    dataNest.forEach(function(d) {
+         var path = svg.append("path")
+            .attr("class", "line")
+            .style("stroke", function() { // Add dynamically
+                return d.color = color(d.key); })
+            .attr("d", line(d.values));
+			var totalLength = path.node().getTotalLength();
+			path.attr("stroke-dasharray", totalLength + " " + totalLength)
+			.attr("stroke-dashoffset", totalLength)
+			.transition()
+			.duration(2000)
+			.ease("linear")
+			.attr("stroke-dashoffset", 0);
+			
+			
+    });
+	//set axis
+  svg.select('.x.axis')
+      .transition()
+	  .duration(1800)
+      .call(xAxis)
+  svg.select('.y.axis')
+	  .transition()
+	  .duration(1800)
+      .call(yAxis)
+	//set legend
+	var legend = svg.selectAll('.legend')
+          .data(color.domain());
+		  
+		  legend.exit().remove();
+		  legend.enter().append('g')                                           
+          .attr('class', 'legend');
+		  
+		  legend.transition()
+			.duration(1800)                             
+          .attr('transform', function(d, i) {                     
+            var height = legendRectSize + legendSpacing;         
+            var offset =  height * color.domain().length / 2;     
+            var horz =  legendRectSize +15;                       
+            var vert = i * height - offset + 12 * color.domain().length;                      
+            return 'translate(' + horz + ',' + vert + ')';       
+          });                                                    
+		  
+		  legend.append('rect')                                   
+          .attr('width', legendRectSize)                          
+          .attr('height', legendRectSize)                         
+          .style('fill', color)                                  
+          .style('stroke', color);                                
+         
+		legend.selectAll('text').remove();
+        legend.append('text')                                    
+          .attr('x', legendRectSize + legendSpacing)              
+          .attr('y', legendRectSize - legendSpacing)              
+          .text(function(d) { return d; });       
+		  
+		
+		///add on hover	  
+		// append a g for all the mouse over nonsense
+var mouseG = svg.append("g")
+  .attr("class", "mouse-over-effects");
+// this is the vertical line
+mouseG.append("path")
+  .attr("class", "mouse-line")
+  .style("stroke", "black")
+  .style("stroke-width", "1px")
+  .style("opacity", "0");
+// keep a reference to all our lines
+var lines = document.getElementsByClassName('line');
+// g for each circle and text on the line
+var mousePerLine = mouseG.selectAll('.mouse-per-line')
+  .data(dataNest)
+  .enter()
+  .append("g")
+  .attr("class", "mouse-per-line");
+// the circle
+mousePerLine.append("circle")
+  .attr("r", 7)
+  .style("stroke", 'black')
+  .style("fill", "none")
+  .style("stroke-width", "1px")
+  .style("opacity", "0");
+// the text
+mousePerLine.append("text")
+  .attr("transform", "translate(10,3)");
+// rect to capture mouse movements
+mouseG.append('svg:rect')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('fill', 'none')
+  .attr('pointer-events', 'all')
+  .on('mouseout', function() { // on mouse out hide line, circles and text
+    d3.select(".mouse-line")
+      .style("opacity", "0");
+    d3.selectAll(".mouse-per-line circle")
+      .style("opacity", "0");
+    d3.selectAll(".mouse-per-line text")
+      .style("opacity", "0");
+  })
+  .on('mouseover', function() { // on mouse in show line, circles and text
+    d3.select(".mouse-line")
+      .style("opacity", "1");
+    d3.selectAll(".mouse-per-line circle")
+      .style("opacity", "1");
+    d3.selectAll(".mouse-per-line text")
+      .style("opacity", "1");
+  })
+  .on('mousemove', function() { // mouse moving over canvas
+    var mouse = d3.mouse(this);
+    // move the vertical line
+    d3.select(".mouse-line")
+      .attr("d", function() {
+        var d = "M" + mouse[0] + "," + height;
+        d += " " + mouse[0] + "," + 0;
+        return d;
+      });
+    // position the circle and text
+    d3.selectAll(".mouse-per-line")
+      .attr("transform", function(d, i) {
+        var xDate = x.invert(mouse[0]),
+            bisect = d3.bisector(function(d) { return d.year; }).right;
+            idx = bisect(d.values, xDate);
+        // since we are use curve fitting we can't relay on finding the points like I had done in my last answer
+        // this conducts a search using some SVG path functions
+        // to find the correct position on the line
+        // from http://bl.ocks.org/duopixel/3824661
+        var beginning = 0,
+            end = lines[i].getTotalLength(),
+            target = null;
+        while (true){
+          target = Math.floor((beginning + end) / 2);
+          pos = lines[i].getPointAtLength(target);
+          if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+              break;
+          }
+          if (pos.x > mouse[0])      end = target;
+          else if (pos.x < mouse[0]) beginning = target;
+          else break; //position found
+        }
+        // update the text with y value
+        d3.select(this).select('text')
+          .text(Math.round(y.invert(pos.y).toFixed(2)));  //d.key for name?
+        // return position
+        return "translate(" + mouse[0] + "," + pos.y +")";
+      });
+  });
+  
+  
+});
+};
+</script>

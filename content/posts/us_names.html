@@ -1,0 +1,1583 @@
+
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>US Birth Rates</title>
+<meta name="tags" content="D3.js, interactive" />
+        <meta name="date" content="2017-09-03 22:28" />
+		<meta name="name" content="US Birth Rates" />
+		<meta name="category" content="Data Visualization"/>
+        <meta name="author" content="Andrew Trick" />
+        <meta name="summary" content="Created for practice with D3.js after exploring US baby name dataset obtained from Kaggle.com.  Thought it would be interesting to view the birth rates of the population in the US, split by region and state.  Also included a hover function to display the most popular names in each of these respective subsets per year.<br>" />
+
+<link rel="stylesheet" href="../extra/us_names.css">
+</head>
+
+<body>
+I've had some trouble integrating D3.js visualizations onto this site.  I plan to update this soon!
+<div class=title_font>
+<h1>U.S. Birthrates <i>(1910-2010)</i></h1>
+</div>
+
+<div class=info>
+<p>Exploring birth rates in the Unites States between the years 1910 and 2014. Interesting look at the birth rates during the great depression, baby boom, and the slow drop american births since. Percent views also gives a good idea of how populated each state/region is in comparison to rest of US. My second try at D3.js. Dataset obtained from <a href='http://kaggle.com'>kaggle.com</a>.</p>
+</div>
+<div class=room></div>
+<button name="play" id="play" onclick=playit()>Play</button>
+
+<form>
+  <input id='datatype1' type="radio" name="datatype" value="regions" checked onClick=dataChange(value)> Region View</input>
+  
+  <input id='datatype2' type="radio" name="datatype" value="states" onClick=dataChange(value)> State View</input>
+</form>	
+<form class=form2>
+  <input id='y_type1' type="radio" name="y_type" value="Birth Totals" checked onClick=changeAxis(value)> Birth Totals</input>
+  
+  <input id='y_type2' type="radio" name="y_type" value="Percentages" onClick=changeAxis(value)> Percentages</input>
+</form>	
+
+
+<div id="chart"> </div>
+
+<div class=yearbar>
+<p id="year-value">1910</p>
+<input type="range" min="1910" max="2010" id="year">
+<p id="year-value2">2010</p>
+</div>
+
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+
+//intialize vars
+var margin = {top: 20, right: 30, bottom: 30, left: 70},
+    width = 1080 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+	
+var reg = '';
+
+var topNames = [];
+
+
+var colorScale = d3.scale.ordinal()
+       //.range(["#64067a","#880000","#300099","#006633"])
+	   .range(["#943156","#AA5239","#28784D","#699A33"])
+	   
+var current = 1910;
+
+var dataType = 'regions';
+
+var y_type = 'Birth Totals';
+
+var intervalHandle = null;
+ 
+ var running = false;
+ 
+ 
+ //tooltip
+ var tooltip = d3.select("body")
+    .append("div")
+	.attr('id', 'tooltip')
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .text("a simple tooltip");
+	
+//tooltip text
+
+function nameslist(element){
+	for (i = 0; i <= topNames.length; i++){
+		if (topNames[i].key == current+'-'+d3.select(element).attr('state')){
+			return topNames[i].value.replace(new RegExp(',', 'g'),'<br>').replace(']','').replace('[','').replace(new RegExp('\'', 'g'),'');
+		};
+	};
+};
+function stateslist(element){
+if (d3.select(element).attr('region') == 'West'){
+	return  'Alaska <br>' + 
+			'Arizonia <br>' + 
+			'California <br>' + 
+		    'Colorado <br>' + 
+			'Hawaii <br>' + 
+			'Idaho <br>' + 
+			'Montana <br>' + 
+			'Nevada <br>' + 
+			'New Mexico <br>' +
+			'Oregon <br>' + 
+			'Utah <br>' + 
+			'Washington <br>' + 
+			'Wyoming <br>'		
+}
+
+else if (d3.select(element).attr('region') == 'South'){
+	 return 'Alabama <br>' + 
+			'Arkansas <br>' + 
+			'Delaware <br>' + 
+		    'Florida <br>' + 
+			'Georgia <br>' + 
+			'Kentucky <br>' + 
+			'Louisiana <br>' + 
+			'Maryland <br>' + 
+			'Mississippi <br>' +
+			'North Cariolina <br>' + 
+			'Oklahoma <br>' + 
+			'South Carolina <br>' + 
+			'Tennessee <br>' +
+			'Texas <br>' +
+			'Virginia <br>' +
+			'Washington D.C. <br>' +
+			'West Virginia'
+}
+
+else if (d3.select(element).attr('region') == 'Northeast'){
+	return 'Connecticut <br>' + 
+			'Maine <br>' + 
+			'Massachusetts <br>' + 
+		    'New Hampshire <br>' + 
+			'New Jersey <br>' + 
+			'New York <br>' + 
+			'Pennsylvania <br>' + 
+			'Rhode Island <br>' + 
+			'Vermont <br>' 
+}
+
+else if (d3.select(element).attr('region') == 'Midwest'){
+	return 'Illinois <br>' + 
+			'Indiana <br>' + 
+			'Iowa <br>' + 
+		    'Kansas <br>' + 
+			'Michigan <br>' + 
+			'Minnesota <br>' + 
+			'Missouri <br>' + 
+			'Nebraska <br>' + 
+			'North Dakota <br>' +
+			'Ohio <br>' + 
+			'South Dakota <br>' + 
+			'Wisconsin <br>'
+}
+};
+
+function tooltip_text(element){
+	
+   if(y_type == 'Birth Totals'){
+	return 'Region : ' + d3.select(element).attr('region') +  "<br>" +
+		   'Births : ' + numberWithCommas(Math.round(d3.select(element).attr('births'))) +  "<br><br>" +
+		   'States Included' + '<br>'  +
+		   '---------------' + '<br>' +
+		   stateslist(element);
+		   }
+	else if (y_type == 'Percentages'){
+		return 'Region : ' + d3.select(element).attr('region') +  "<br>" +
+		   'Percent : ' + Math.round(d3.select(element).attr('births')) + '%' + "<br><br>" +
+		   'States Included' + '<br>'  +
+		   '---------------' + '<br>' +
+		   stateslist(element);
+	};
+};
+	
+	
+function tooltip_text_state(element){
+	
+   if(y_type == 'Birth Totals'){
+	return 'State : ' + d3.select(element).attr('state') +  "<br>" +
+			'Region : ' + d3.select(element).attr('region') +  "<br>" +
+		   'Births : ' + numberWithCommas(Math.round(d3.select(element).attr('births'))) +  "<br><br>" +
+		   'Top Five Names' + '<br>'  +
+		   '---------------' + '<br>' +
+		   nameslist(element);
+		   }
+	else if (y_type == 'Percentages'){
+		return 'State : ' + d3.select(element).attr('state') +  "<br>" +
+				'Region : ' + d3.select(element).attr('region') +  "<br>" +
+		   'Percent : ' + Math.round(d3.select(element).attr('births')) + '%' + "<br><br>" +
+		   'Top Five Names' + '<br>'  +
+		   '---------------' + '<br>' +
+		   nameslist(element);
+	};
+};
+
+
+//intialize svg - g
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+		
+		
+/////////////////slider call///////////////////////////
+
+d3.select("#year").on("change", function() {
+            update(+this.value);
+			updateData(+this.value)
+            });  
+
+            update(current);
+         
+             // update the year
+            function update(year) { 
+            console.log(this.value)
+        
+    // adjust the text on the year slider
+ d3.select("#year").property("value", year);}
+
+
+
+	///////////////////////////
+	///////First Data Binding
+	///////////////////////////
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+
+  // change string (from CSV) into numbers format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year
+});
+		 
+		 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(data.map(function(d) { return d.region; }));
+  y.domain([0, 1250000]);
+  }
+if (y_type == 'Percentages'){
+	x.domain(data.map(function(d) { return d.region; }));
+	y.domain([0, 100]);
+  }
+
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest births by region
+  var new_data = d3.nest()
+
+				.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+		
+  //axis appends
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+	  
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+	  .append('text')
+	  .text('Birth Count')
+	  .attr('class' , 'yaxistext')
+	  .attr('x', -65)
+	  .attr('y' , 15)
+	  .attr("transform", "rotate(270)");
+
+	  //bar appends
+  var bar = svg.selectAll(".bar");
+      
+	  bar.data(new_data)
+    .enter().append("rect")
+      .attr("class", "bar")
+	  .attr('id', function(d){return d.region})
+      .attr("x", function(d) { return x(d.region); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('rx', 5)
+	  .attr('ry', 5)
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region})
+	  .on("mouseover", function(){
+			d3.select(this).style('opacity', .65);
+			reg = d3.select(this).attr('region');
+			return tooltip.style("visibility", "visible");})
+	  .on("mousemove", function(){return tooltip.style("top",
+             (d3.event.pageY)-280+"px")
+			 .style("left",(d3.event.pageX)-10+"px")
+			 .html(tooltip_text(this));})
+	.on("mouseout", function(){
+		d3.select(this).style('opacity', 1);
+		return tooltip.style("visibility", "hidden");});
+	  
+	  //text appends
+  var text = svg.selectAll(".text");
+  
+    text.data(new_data)
+	.enter()
+  .append("text")
+    .attr("class","text")
+    .attr("text-anchor", "right")
+    .attr("x", function(d) { return x(d.region) + 5; })
+    .attr("y", height - 3.5)
+    .attr("font-family", "sans-serif") 
+    .attr("font-size", "30px")
+    .attr("fill", "lightgrey")
+    .text(function(d) {
+    return numberWithCommas(d.births);
+});
+
+//year text intialize
+svg.append('text')
+	.attr("class","year_text")
+    .attr("text-anchor", "right")
+    .attr("x", width - 430)
+    .attr("y", 110)
+    .attr("font-family", "sans-serif") 
+    .attr("font-size", "150px")
+    .attr("fill", "#DCDCDC")
+    .text(current);
+	
+	
+});
+
+
+	////set year num to string with ','s
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+
+	///////////////////////////
+	///////update function
+	///////////////////////////
+	
+function updateData(new_year) {
+
+current = new_year;
+	 
+var svg = d3.select('g');
+	 
+	if (dataType == 'regions'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+});
+	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(data.map(function(d) { return d.region; }));
+  y.domain([0, 1250000]);
+  }
+  else{
+	x.domain(data.map(function(d) { return d.region; }));
+	y.domain([0, 50]);
+  };
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  };
+			
+  
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+		bars.exit().remove();
+		
+		bars.transition()
+			.duration(350)
+      .attr("x", function(d) { return x(d.region); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region});
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(600)
+	.style('opacity', 0);
+	
+	if (y_type == 'Birth Totals'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births);
+		});
+		}, 950);
+	}
+	if (y_type == 'Percentages'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births) + '%';
+		});
+		}, 950);
+	};
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(300)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(500)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+
+	//tooltip update
+	if (reg == 'West'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text('.bar[region=West]'));
+	  }
+	  
+	 else if (reg == 'South'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text('.bar[region=South]'));
+	  }
+	  
+	   else if (reg == 'Northeast'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text('.bar[region=Northeast]'));
+	  }
+	  
+	   else if (reg == 'Midwest'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text('.bar[region=Midwest]'));
+	  };
+});}
+
+//////////////////////////////////////////////////////////////
+else if (dataType == 'states'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+});
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  };
+			
+ 	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+  y.domain([0, 550000]);
+  }
+  else{
+	x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+	y.domain([0, 16]);
+  };
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+				bars.exit();
+				bars.enter().append('rect');
+		
+		bars.transition()
+			.duration(350)
+      .attr("x", function(d) { return x(d.state); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region})
+	  .attr('class', 'bar');
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(300)
+	.style('opacity', 0.0);
+	
+
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(300)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(500)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+	//tooltip update//////////////////////////////////////////////////
+	
+	check_state_name(reg);
+	
+});};
+};
+
+
+	///////////////////////////
+	///////change axis
+	///////////////////////////
+	
+function changeAxis(axis_type) {
+
+y_type = axis_type;
+	 
+var svg = d3.select('g');
+ 
+	if (dataType == 'regions'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+});
+	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(data.map(function(d) { return d.region; }));
+  y.domain([0, 1250000]);
+  }
+  else{
+	x.domain(data.map(function(d) { return d.region; }));
+	y.domain([0, 50]);
+  };
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  };
+			
+  
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+		bars.exit().remove();
+		
+		bars.transition()
+			.duration(750)
+      .attr("x", function(d) { return x(d.region); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region});
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(600)
+	.style('opacity', 0);
+	
+	if (y_type == 'Birth Totals'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births);
+		});
+		}, 950);
+	}
+	if (y_type == 'Percentages'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births) + '%';
+		});
+		}, 950);
+	};
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(900)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(900)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+});}
+
+//////////////////////////////////////////////////////////////
+else if (dataType == 'states'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+});
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  };
+			
+ 	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+  y.domain([0, 550000]);
+  }
+  else{
+	x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+	y.domain([0, 16]);
+  };
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+				bars.exit();
+				bars.enter().append('rect');
+		
+		bars.transition()
+			.duration(750)
+      .attr("x", function(d) { return x(d.state); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region})
+	  .attr('class', 'bar');
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(300)
+	.style('opacity', 0.0);
+	
+
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(900)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(900)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+});};
+};
+/////////////////////////////////////
+///////REDRAW OVER TIME////
+///////////////////////////////
+
+function redraw() {
+	
+	document.getElementById("year").value = current+1;
+	updateData(current+1);
+
+};
+
+
+function play(){
+
+if (current == 2010 || running == false){
+clearInterval(intervalHandle);
+running = false; 
+}
+
+else{
+intervalHandle = setInterval(function(){
+	if (running == true && current < 2010){
+	redraw();
+	}
+	else {
+	clearInterval(intervalHandle);
+	running = false; 
+	d3.select('#play').text('Play')
+	return;
+	};
+	} , 300)
+};
+};
+
+function playit(){
+
+if (current == 2010){
+	current = 1909;
+	document.getElementById("year").value = current+1;
+	updateData(current+1);
+};
+
+if (running == false) {
+running = true;
+d3.select('#play').text('Stop')
+play();
+}
+
+else if (current == 2010 ||running == true) {
+running = false;
+clearInterval(intervalHandle);
+d3.select('#play').text('Play')
+};
+};
+
+
+/////////////////
+///////change data type
+/////////////////////
+function dataChange(datatype) {
+
+dataType = datatype;
+	 
+var svg = d3.select('g');
+                                             	 
+	 
+if (datatype == 'regions'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+});
+	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(data.map(function(d) { return d.region; }));
+  y.domain([0, 1250000]);
+  }
+  else{
+	x.domain(data.map(function(d) { return d.region; }));
+	y.domain([0, 50]);
+  };
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.region = d.key
+		d.births = d.values['births'];
+		console.log(d)
+		});
+  };
+			
+  
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+		bars.exit().remove();
+		
+		bars.transition()
+			.duration(750)
+      .attr("x", function(d) { return x(d.region); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region});
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(600)
+	.style('opacity', 0);
+	
+	if (y_type == 'Birth Totals'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births);
+		});
+		}, 950);
+	}
+	if (y_type == 'Percentages'){
+		setTimeout(function(){
+		text.style('opacity', 1)
+		.text(function(d) {
+		return numberWithCommas(d.births) + '%';
+		});
+		}, 950);
+	};
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(900)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(900)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+});}
+
+//////////////////////////////////////////////////////////////
+else if (datatype == 'states'){
+	 
+	 // Get the data again
+d3.csv("../data/birthrates.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.births = +d.births;
+	d.year = +d.year;
+	d.percent = Math.round(+d.percent);
+	topNames.push({key: d.year + '-' + d.state, value : d.topFive});
+});
+  
+  //filter by year
+  data = data.filter(function(d){
+        if(d.year != current){
+            return false;
+			}
+		else{
+        return true;
+		}
+		});
+
+
+   //nest new data by regions
+	if (y_type == 'Birth Totals'){
+		var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.births;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  }
+  else{
+	var new_data = d3.nest()
+		.key(function(d) {return d.state})
+		.key(function(d) {return d.region})
+				.rollup(function(v) {return {
+				   topFive : v.topFive,
+				   births : d3.sum(v, function(d){return d.percent;})
+				   }; }).entries(data);
+					
+	new_data.forEach(function(d) {
+		d.state = d.key;
+		d.region = d.values[0].key;
+		d.births = d.values[0].values['births'];
+		d.topFive = d.values[0].values['topFive'];
+		console.log(d)
+		});
+  };
+			
+ 	//domains
+	 ///set scale
+if (y_type == 'Birth Totals'){
+  x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+  y.domain([0, 550000]);
+  }
+  else{
+	x.domain(['AK', 'AZ', 'CA', 'CO', 'HI', 'ID', 'MT', 'NV', 'NM', 'OR',
+			'UT', 'WA', 'WY', 'AL', 'AR', 'DE', 'FL', 'GA', 'KY', 'LA', 
+			'MD', 'MS', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA', 'WV',
+			'CT', 'ME', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT', 'IL',
+			'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD',
+			'WI']);
+	y.domain([0, 16]);
+  };
+  
+// Make the changes (bars)
+        var bars = svg.selectAll(".bar") 
+				.data(new_data);
+				bars.exit();
+				bars.enter().append('rect')
+				.attr('state', function(d){return d.state})
+				.on("mouseover", function(){
+					d3.select(this).style('opacity', .65);
+					reg = d3.select(this).attr('state');
+					return tooltip.style("visibility", "visible");})
+				.on("mousemove", function(){return tooltip.style("top",
+					(d3.event.pageY)-250+"px")
+					.style("left",(d3.event.pageX)-10+"px")
+			 .		html(tooltip_text_state(this));})
+				.on("mouseout", function(){
+					d3.select(this).style('opacity', 1);
+					return tooltip.style("visibility", "hidden");});
+		
+		bars.transition()
+			.duration(750)
+      .attr("x", function(d) { return x(d.state); })
+      .attr("y", function(d) { return y(d.births); })
+	  .style("fill", function(d) { return  colorScale(d.region); })
+      .attr("height", function(d) { return height - y(d.births); })
+      .attr("width", x.rangeBand())
+	  .attr('births', function(d){return d.births})
+	  .attr('region', function(d) {return d.region})
+	  .attr('class', 'bar');
+		
+		
+		
+	  	//make the changes (text)
+	var text = svg.selectAll(".text")
+				.data(new_data);
+				
+	text.transition()
+	.duration(300)
+	.style('opacity', 0.0);
+	
+
+	///year text
+	var year_text = svg.select('.year_text')
+		.transition()
+		.duration(300)
+		.text(current);
+	
+	//tooltip change
+	check_state_name(reg);
+	
+	///change axis
+	svg.selectAll("g.y.axis")
+	.transition()
+	.duration(900)
+    .call(yAxis);
+	
+	svg.selectAll("g.x.axis")
+	.transition()
+	.duration(900)
+    .call(xAxis);
+	
+	
+if (y_type == 'Birth Totals'){
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Birth Count')
+	.attr('x', -65);
+	}
+if (y_type == 'Percentages') {
+	d3.select('#chart > svg > g > g.y.axis > text')
+	.transition()
+	.duration(900)
+	.text('Percentages')
+	.attr('x', -75);
+	};
+	
+});};
+};
+
+function check_state_name(reg){
+if (reg == 'AK'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=AK]'));
+	  }
+	  
+	 else if (reg == 'AZ'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=AZ]'));
+	  }
+	  
+	   else if (reg == 'CA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=CA]'));
+	  }
+	  
+	   else if (reg == 'CO'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=CO]'));
+	  }
+	  
+	  else if (reg == 'HI'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=HI]'));
+	  }
+	  
+	  else if (reg == 'ID'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=ID]'));
+	  }
+	  
+	  else if (reg == 'MT'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MT]'));
+	  }
+	  
+	   else if (reg == 'NV'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NV]'));
+	  }
+	  
+	   else if (reg == 'NM'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NM]'));
+	  }
+	  
+	  else if (reg == 'OR'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=OR]'));
+	  }
+	  
+	  else if (reg == 'UT'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=UT]'));
+	  }
+	  else if (reg == 'WA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=WA]'));
+	  }
+	  
+	   else if (reg == 'WY'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=WY]'));
+	  }
+	  
+	   else if (reg == 'AL'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=AL]'));
+	  }
+	  
+	  else if (reg == 'AR'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=AR]'));
+	  }
+	  
+	  else if (reg == 'DE'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=DE]'));
+	  }
+	  else if (reg == 'FL'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=FL]'));
+	  }
+	  
+	   else if (reg == 'GA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=GA]'));
+	  }
+	  
+	   else if (reg == 'KY'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=KY]'));
+	  }
+	  
+	  else if (reg == 'LA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=LA]'));
+	  }
+	  
+	  else if (reg == 'MD'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MD]'));
+	  }
+	  else if (reg == 'MS'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MS]'));
+	  }
+	  
+	   else if (reg == 'NC'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NC]'));
+	  }
+	  
+	   else if (reg == 'OK'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=OK]'));
+	  }
+	  
+	  else if (reg == 'SC'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=SC]'));
+	  }
+	  
+	  else if (reg == 'TN'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=TN]'));
+	  }
+	  else if (reg == 'TX'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=TX]'));
+	  }
+	  
+	   else if (reg == 'VA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=VA]'));
+	  }
+	  
+	   else if (reg == 'WV'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=WV]'));
+	  }
+	  
+	  else if (reg == 'CT'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=CT]'));
+	  }
+	  
+	  else if (reg == 'ME'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=ME]'));
+	  }
+	  else if (reg == 'MA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MA]'));
+	  }
+	  
+	   else if (reg == 'NH'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NH]'));
+	  }
+	  
+	   else if (reg == 'NJ'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NJ]'));
+	  }
+	  
+	  else if (reg == 'NY'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NY]'));
+	  }
+	  
+	  else if (reg == 'PA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=PA]'));
+	  }
+	  else if (reg == 'RI'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=RI]'));
+	  }
+	  else if (reg == 'VT'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=VT]'));
+	  }
+	  else if (reg == 'IL'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=IL]'));
+	  }
+	  else if (reg == 'IN'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=IN]'));
+	  }
+	  else if (reg == 'IA'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=IA]'));
+	  }
+	  else if (reg == 'KS'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=KS]'));
+	  }
+	  else if (reg == 'MI'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MI]'));
+	  }
+	  else if (reg == 'MN'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MN]'));
+	  }
+	  else if (reg == 'MO'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=MO]'));
+	  }
+	  else if (reg == 'NE'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=NE]'));
+	  }
+	  else if (reg == 'ND'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=ND]'));
+	  }
+	  else if (reg == 'OH'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=OH]'));
+	  }
+	  else if (reg == 'SD'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=SD]'));
+	  }
+	  else if (reg == 'WI'){
+	 var tt = d3.select('#tooltip')
+	  .html(tooltip_text_state('.bar[state=WI]'));
+	  }
+	  };
+
+</script>

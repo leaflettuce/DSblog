@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Predicting a Country's Happiness - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://localhost:8000/predicting-a-countrys-happiness.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="regression,modeling,reporting" />
+        <meta name="description" content="A look at the world happiness index and an evaluation of the factors that contribute to the general happiness of a countries population. Variables were primarily focused on economic, political, and elegantarian factors. Originally conducted as a project for my SNHU Applied Stats II class. As it ended at around 30 pages, included is only a subset of the full project." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Predicting a Country&#39;s Happiness"/>
+        <meta property="og:url" content="http://localhost:8000/predicting-a-countrys-happiness.html"/>
+        <meta property="og:description" content="A look at the world happiness index and an evaluation of the factors that contribute to the general happiness of a countries population. Variables were primarily focused on economic, political, and elegantarian factors. Originally conducted as a project for my SNHU Applied Stats II class. As it ended at around 30 pages, included is only a subset of the full project."/>
+        <meta property="article:published_time" content="2017-09-06" />
+            <meta property="article:section" content="Statistical Modeling" />
+            <meta property="article:tag" content="regression" />
+            <meta property="article:tag" content="modeling" />
+            <meta property="article:tag" content="reporting" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://localhost:8000/theme/css/bootstrap.journal.min.css" type="text/css"/>
+    <link href="http://localhost:8000/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://localhost:8000/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://localhost:8000/theme/css/style.css" type="text/css"/>
+        <link href="http://localhost:8000/static/custom.css" rel="stylesheet">
+
+
+
+
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://localhost:8000/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://localhost:8000/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://localhost:8000/predicting-a-countrys-happiness.html"
+                       rel="bookmark"
+                       title="Permalink to Predicting a Country's Happiness">
+                        Predicting a Country's Happiness
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-09-06T18:53:00-05:00"> Wed 06 September 2017</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="http://localhost:8000/category/statistical-modeling.html">Statistical Modeling</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://localhost:8000/tag/regression.html">regression</a>
+        /
+	<a href="http://localhost:8000/tag/modeling.html">modeling</a>
+        /
+	<a href="http://localhost:8000/tag/reporting.html">reporting</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h5>The full version of this regression analysis is available for download <a href="../data/at_happiness_full.pdf" download>here</a><br><br></h5>
+<h3>Introduction</h3>
+<p>The World Happiness Report, published by the United Nation’s Sustainable Development Solutions Network, is an annual survey whose findings reflect the state of happiness of people, split by country, throughout the world. Happiness is rated on a 0-10 scale in which countries can be evaluated and compared to one another. These ratings are created by considering the economic, social, health, and democratic factors within a country and normalizing, typically into a percentage of population or, sometimes, a more subjective 0-1 rating. While this happiness score found by the United Nations to quantify well-being is obviously strongly correlated to the independent variables they used to quantify it, only the final happiness scores were used in the dataset for this project.  The primary goal of this analysis is to determine if there is any kind of relationship between a country’s happiness index with other specific key factors chosen, and if this relationship can allow for future prediction of a country’s happiness level.</p>
+<h3>Quantitative Predictors</h3>
+<p>Quantitative values include ‘GDP’, ‘Life Expectancy”, ‘Births per 1000’, ‘Infant Mortality per 1000’, ‘Urban Percentage’, ‘Female Workforce Percent’, and ‘Inequality gini’. GDP is the gross domestic product per capita.  Life expectancy is the average healthy expected life span of a person from the country in years. Births per 1000 is the birthrate of the country per 1000 people, while infant mortality per 1000 is the death rate of children under the age of one per 1000 births. Urban percentage is the percent of the country’s population that lives within an urbanized area and female workplace percent is the percentage of the workforce in a country that is female. Finally, inequality gini displays the wealth distribution of a country, where 0 equates to perfect equality and 1 would represent a vast disproportion where the overwhelming majority of wealth is in the hands of a select few. </p>
+<h3>Qualitative Predictors</h3>
+<p>Variables ‘democracy’ and ‘LGBT freedom’ represent the two qualitative fields in the project.  Democracy is split categorically into varying levels of democratic freedom of a country.  Levels in this field, in descending order of freedom, are: full, flawed, hybrid, and authoritarian.  LGBT freedom represents the amount of laws passed in a country which protect the civil rights of lesbian, gay, bisexual, and transgender people. The levels for this variable are: high, some, and low. These levels were primarily determined based on marriage, adoption, military service, anti-discrimination, and gender identity laws a country has passed.</p>
+<h3>EDA</h3>
+<p>Visually exploring the data can provide several insights into how to proceed with regression analysis for this particular dataset.  Below is a subset of the data- the top five ‘happiest’ countries- to give an idea of what the sample looks like.  Scandinavia dominates.</p>
+<p>Country    GPD Happiness score Life Expectancy Births per 1000 Infant Mortality per 1000   Urban Percent   Female Workforce Percent    Democracy Score LGBT freedom    Inequality Gini
+Denmark 51989.293   7.526   80.548  10.1    2.9 87.676  47.687  full    high    29.1
+Switzerland 80945.079   7.508   82.848  10.2    3.4 73.912  46.151  full    some    31.6
+Iceland 50173.339   7.500   82.060  13.4    1.6 94.137  47.627  full    high    26.9
+Norway  74400.369   7.498   81.751  11.5    2   80.473  47.110  full    high    25.9
+Finland 42311.036   7.413   81.129  10.5    1.9 84.221  47.740  full    high    27.1</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/1.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/2.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/3.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/4.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/5.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/6.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/7.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/8.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/9.png" style="width: 500px;"/><br><br></p>
+<p>Visually inspecting these plots shows that most of the single-order variables have at least some level of effect on happiness of a country.  Inequality gini and female workforce percentage appear to have little to no correlation, while the other six quantitative predictors depict a strong relationship, be it linear or curvilinear. The qualitative variable boxplots also seem to display an expected, significant relationship amongst each fields respective categories.</p>
+<h3>Least-Squares Regression</h3>
+<p>HAPPINESS SCORE = 0.27 + 0.000011 GDP + 0.0605 LIFE EXPECTANCY - 0.0080 BIRTHS PER 1000  + 0.00418 INFANT MORTALITY PER 1000
++ 0.00839 URBAN PERCENTAGE - 0.00979 FEMALE WORKPLACE PERCENT + 0.01202 INEQUALITY GINI + 0.065 DEMOCRACY (FLAWED) 
++ 0.438 DEMOCRACY (FULL)- 0.100 DEMOCRACY (HYBRID) 
++ 0.406 LGBT FREEDOM (HIGH) + 0.142 LGBT FREEDOM (LOW)</p>
+<p>Looking deeper into the variables, T-tests provide methods of determining the direct significance of each independent variable to the dependent.  GDP, LIFE EXPECTANCY, and URBAN PERCENT are by far the strongest predictors of happiness in this model.  The weakest appearing to be BIRTHS PER 1000 and INFANT MORTALITY PER 1000. The qualitative predictors encompassing the democracy type also have high p-values, yet should not necessarily be thrown out as they could provide added strength to the model, particularly when introducing interaction terms. </p>
+<h3>Interaction EDA</h3>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/9.png" style="width: 500px;"/><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/happiness/10.png" style="width: 500px;"/><br></p>
+<p>The matrix plot above gives a quick view of which predictors may have an effect on each other, (not necessarily in regards to happiness though). It is important to keep in mind that, while these scatterplots give an idea of relationships between independent variables, they may in fact be additive and not necessarily interactive. Female workforce percent and inequality gini both appear to have very little connection with other variables.  The remaining five look to each have some type of linear or curvilinear relationship with other independent variables. While this implies some form of covariance, care must be taken watch for multicollinearity.</p>
+<h3>Stepwise Regression takes place here..</h3>
+<p>I opted to exclude this from the final write up for the site. A full version is available for download <a href="../data/at_happiness_full.pdf" download>here</a></p>
+<h3>Final Model</h3>
+<p>Analysis of Variance</p>
+<p>Source                       DF   Adj SS   Adj MS  F-Value  P-Value
+Regression                    8  143.374  17.9217    55.07    0.000
+  GPD                         1   17.388  17.3877    53.43    0.000
+  Births per 1000             1    2.172   2.1720     6.67    0.011
+  Female Workforce Percent    1    4.057   4.0574    12.47    0.001
+  GDP^2                       1    7.704   7.7038    23.67    0.000
+  births^2                    1    4.244   4.2440    13.04    0.000
+  female^2                    1    5.076   5.0756    15.60    0.000
+  LGBT freedom                2    2.576   1.2880     3.96    0.021
+Error                       129   41.980   0.3254
+Total                       137  185.353</p>
+<p>Model Summary</p>
+<p>S    R-sq  R-sq(adj)  R-sq(pred)
+0.570459  77.35%     75.95%    74.26% </p>
+<p>Coefficients</p>
+<p>Term                           Coef   SE Coef  T-Value  P-Value 
+Constant                      2.197     0.802     2.74    0.007
+GPD                        0.000072  0.000010     7.31    0.000<br />
+Births per 1000              0.0750    0.0290     2.58    0.011<br />
+Female Workforce Percent     0.1365    0.0386     3.53    0.001<br />
+GDP^2                     -0.000000  0.000000    -4.87    0.000<br />
+births^2                  -0.001861  0.000515    -3.61    0.000<br />
+female^2                  -0.002146  0.000543    -3.95    0.000<br />
+LGBT freedom
+  high                        0.540     0.197     2.74    0.007 <br />
+  some                        0.296     0.153     1.93    0.056   </p>
+<p>Regression Equation</p>
+<p>Happiness score = 2.197 + 0.000072 GPD + 0.0750 Births per 1000
++ 0.1365 Female Workforce Percent - 0.000000 GDP^2 - 0.001861 births^2 
+- 0.002146 female^2 + 0.540 LGBT freedom_high + 0.296 LGBT freedom_some</p>
+<h3>Conclusion</h3>
+<p>In this model, the significant indicators of a country’s happiness score are based on three quantitative predictors, GDP per capita, births per 1000, and female workplace percentage, and one qualitative terms, LGBT freedoms- which is split into three categories (low, some, high). It also takes all three of the quantitative predictors second-order terms into account when determining a final happiness score.  With a model F-score of 55.07, P-value of &lt; 0.000, and R2(adj) of 75.95, we can, with 99% confidence, explain around 76% the variance of the happiness score of a country based solely on these input. Furthermore, we can predict the future results of happiness of a country based on these same variables with an accuracy of around 74%, based on our final r-sq(pred) score. Finally, a standard error of .57 indicates that 95% of the actual results will fall within 1.14 points of the model’s predicted score.
+In regards to this regression, GDP and LGTB freedom are both strong, positive indicators of the happiness of a country, while births and female workplace tend to a slight, negative correlation with the final score once reaching their specific, curvilinear maxes. Although the female workplace^2’s coefficient may bring the validity of full civil liberties into question, this regression does appear to imply that the stronger the economy and more robust the civil liberties of a country, the happier it’s population.... as long as there are not too many babies being born.</p>
+<p>References <br>
+The Economist Intelligence Unit. (2015). Democracy Index 2015. Retrieved from http://www.yabiladi.com/img/content/EIU-Democracy-Index-2015.pdf.
+<br>The World Bank. (2016). World Bank Open Data. Retrieved from http://data.worldbank.org/.
+<br>United Nations. (2016). Edited by John Helliwelll, Richard Layard, and Jeffrey Sachs. World Happiness Report 2016. Retrieved from http://worldhappiness.report/ed/2016/.
+<br>Zhong, Raymond. (2015). ‘In Bhutan, Gross National Happiness Trumps Gross National Product.’ The Wall Street Journal. Retrieved from http://www.wsj.com/articles/in-bhutan-gross-national-happiness-trumps-gross-national-product-1450318359</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/statistical-modeling.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Statistical Modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/interactive.html">
+                            interactive
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/survey.html">
+                            survey
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/cleaning.html">
+                            cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/tdwp.html">
+                            TDWP
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://localhost:8000/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://localhost:8000/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://localhost:8000/theme/js/respond.min.js"></script>
+
+    <script src="http://localhost:8000/theme/js/bodypadding.js"></script>
+
+</body>
+</html>

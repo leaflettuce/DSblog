@@ -1,0 +1,137 @@
+
+body {
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    /*font-size: 16px;*/
+    line-height: 1.42857143;
+    color: #444444;
+}
+
+
+
+/* TDWP SHOWS */
+
+text.popup {
+	font-family: 'Arial';
+	font-size: 42px;
+}
+
+rect.background {
+  fill: none;
+  pointer-events: all;
+  stroke: black;
+  stroke-width: 5;
+}
+
+rect.poprect {
+	background-color: rgba(254,240,217, 0.8);
+	border-radius: 5px;
+    border: 2px solid black;
+    padding: 3px; 
+}
+#states .active {
+  opacity: .75;
+}
+
+div.tooltip {
+	color: black;
+	font-size: 16px;
+}
+
+#state-borders {
+  fill: none;
+  stroke: grey;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+svg {
+background-color : grey;
+	font-size: 20px;
+	font-family: Arial;
+	color: white;
+}
+
+.button {
+	width: 6.5em;
+	height: 2em;
+	border-radius: 5px; 
+	-moz-border-radius: 5px; 
+	-webkit-border-radius: 5px; 
+	border: 2px solid #000000;
+	font-size: 14px;
+	font-weight: 600;
+	margin: 1.8px;
+}
+
+
+
+/* Name Trend Graph Search
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+h1 {
+font-size : 42px;
+position : relative;
+margin-left : 0px;
+margin-top : -5px;
+}
+
+
+form {
+position : absolute;
+margin-left : 240px;
+margin-top : 120px;
+}
+
+input {
+position : absolute;
+margin-left : 173px;
+margin-top : 5px;
+}
+
+.legend {
+position : absolute;
+margin-left : 500px;
+}
+
+.button {
+position : absolute;
+margin-left : 125px;
+margin-top : 5px;
+width: 5em;  
+height: 2.5em;
+}
+svg {
+position : absolute ;
+margin-top : 340px;
+margin-left : 20px;
+}
+.title {
+position : relative;
+margin-left:160px;
+}
+.text{
+position :relative;
+margin-left: 75px;
+margin-top:15px;
+font-size : 16px;
+width : 650px;
+}
+*/

@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Injured Worker Causes - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://localhost:8000/InjuredWorkers.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="EDA,Python,cleaning" />
+        <meta name="description" content="Quick and dirty look at the causes of workplace injuries. Data obtained from Kaggle.com and, while not a very comprehensive list (sample size is only 537), I&#39;m using this as more of an experiment with Jupyter notebook and pelican." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Injured Worker Causes"/>
+        <meta property="og:url" content="http://localhost:8000/InjuredWorkers.html"/>
+        <meta property="og:description" content="Quick and dirty look at the causes of workplace injuries. Data obtained from Kaggle.com and, while not a very comprehensive list (sample size is only 537), I&#39;m using this as more of an experiment with Jupyter notebook and pelican."/>
+        <meta property="article:published_time" content="2017-09-08" />
+            <meta property="article:section" content="Exploratory Data Analysis" />
+            <meta property="article:tag" content="EDA" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:tag" content="cleaning" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://localhost:8000/theme/css/bootstrap.journal.min.css" type="text/css"/>
+    <link href="http://localhost:8000/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://localhost:8000/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://localhost:8000/theme/css/style.css" type="text/css"/>
+        <link href="http://localhost:8000/static/custom.css" rel="stylesheet">
+
+
+
+
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://localhost:8000/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://localhost:8000/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="http://localhost:8000/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://localhost:8000/InjuredWorkers.html"
+                       rel="bookmark"
+                       title="Permalink to Injured Worker Causes">
+                        Injured Worker Causes
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-09-08T20:00:00-05:00"> Fri 08 September 2017</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="http://localhost:8000/category/exploratory-data-analysis.html">Exploratory Data Analysis</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://localhost:8000/tag/eda.html">EDA</a>
+        /
+	<a href="http://localhost:8000/tag/python.html">Python</a>
+        /
+	<a href="http://localhost:8000/tag/cleaning.html">cleaning</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI colors. */
+.ansibold {
+  font-weight: bold;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  border-left-width: 1px;
+  padding-left: 5px;
+  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #90CAF9;
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected {
+  border-color: #ababab;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  div.cell.selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected.jupyter-soft-selected {
+  border-left-width: 0;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  padding: 0.4em;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
+  /* .CodeMirror-lines */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+.rendered_html pre,
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+.rendered_html td,
+
+
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Quick and dirty look at the causes of workplace injuries. Data obtained from Kaggle.com and, while not a very comprehensive list (sample size is only 537), I'm using this as more of an experiment with Jupyter notebook and pelican.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../data/injuries.csv'</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">','</span><span class="p">)</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    
+    <span class="n">injury_collection</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">row_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+        <span class="n">row_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">injury_type</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">injury_type</span> <span class="ow">in</span> <span class="n">injury_collection</span><span class="p">:</span>
+            <span class="n">injury_collection</span><span class="p">[</span><span class="n">injury_type</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">injury_collection</span><span class="p">[</span><span class="n">injury_type</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        
+    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">injury_collection</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">'Total injury types:'</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">injury_collection</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">'Rows in csv file:'</span><span class="p">,</span> <span class="n">row_count</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{'Aircraft crash due to low-altitude entanglement ': 1,
+ 'Aircraft crash during takeoff or landing ': 1,
+ 'Aircraft crash during takeoff or landing, n.e.c. ': 1,
+ 'Aircraft crash during takeoff or landing, unspecified': 1,
+ 'Aircraft crash during takeoff or landing\x97between air vehicles': 1,
+ 'Aircraft crash during takeoff or landing\x97due to mechanical failure': 1,
+ 'Aircraft crash during takeoff or landing\x97into structure, object, or ground': 1,
+ 'Aircraft crash during takeoff or landing\x97with ground vehicle': 1,
+ 'Aircraft incident, n.e.c.': 1,
+ 'Aircraft incident, unspecified': 1,
+ 'Aircraft incidents': 1,
+ 'Animal and insect related incidents ': 1,
+ 'Animal and insect related incidents, n.e.c.': 1,
+ 'Animal and insect related incidents, unspecified': 1,
+ 'Animal and other non-motorized vehicle transportation incident,  n.e.c. ': 1,
+ 'Animal and other non-motorized vehicle transportation incident, unspecified': 1,
+ 'Animal and other non-motorized vehicle transportation incidents': 1,
+ 'Animal transportation collision in nonroadway area': 1,
+ 'Animal transportation collision in roadway': 1,
+ 'Animal transportation incident': 1,
+ 'Animal transportation incident, n.e.c.': 1,
+ 'Animal transportation incident, unspecified': 1,
+ 'Animal transportation\x97struck bump, hole, or other rough terrain': 1,
+ 'Bending, crawling, reaching, twisting, climbing, stepping': 1,
+ 'Bending, crawling, reaching, twisting, climbing, stepping, unspecified': 1,
+ 'Bending, crawling, reaching, twisting\x97repetitive or prolonged': 1,
+ 'Bending, crawling, reaching, twisting\x97single episode': 1,
+ 'Bites and stings': 1,
+ 'Bites and stings, n.e.c.': 1,
+ 'Bites and stings, unspecified': 1,
+ 'Bitten and struck by animal': 1,
+ 'Boarding, alighting\x97excluding slip, trip, fall': 1,
+ 'Boarding, alighting\x97excluding slip, trip, fall, unspecified': 1,
+ 'Boarding, alighting\x97excluding slip, trip, fall\x97repetitive or prolonged': 1,
+ 'Boarding, alighting\x97excluding slip, trip, fall\x97single episode': 1,
+ 'Bodily conditions, n.e.c.': 1,
+ 'Bombing, arson': 1,
+ 'CONTACT WITH OBJECTS AND EQUIPMENT': 1,
+ 'Capsized or sinking water vehicle': 1,
+ 'Caught between rolling powered vehicle and other object': 1,
+ 'Caught in or compressed by equipment or objects': 1,
+ 'Caught in or compressed by equipment or objects, n.e.c.': 1,
+ 'Caught in or compressed by equipment or objects, unspecified': 1,
+ 'Caught in running equipment or machinery': 1,
+ 'Caught in running equipment or machinery during maintenance, cleaning ': 1,
+ 'Caught in running equipment or machinery during regular operation': 1,
+ 'Caught in running equipment or machinery, n.e.c.': 1,
+ 'Caught in running equipment or machinery, unspecified': 1,
+ 'Choking on object or substance': 1,
+ 'Climbing or stepping up or down\x97repetitive or prolonged': 1,
+ 'Climbing or stepping up or down\x97single episode': 1,
+ 'Collapsing building, structure, or structural element during fire': 1,
+ 'Collision between a moving and standing vehicle, nonroadway': 1,
+ 'Collision between rail and roadway vehicles': 1,
+ 'Collision between rail vehicle and another vehicle ': 1,
+ 'Collision between two rail vehicles': 1,
+ 'Collision between water vehicle and object': 1,
+ 'Collision between water vehicles': 1,
+ 'Compressed or pinched between two stationary objects': 1,
+ 'Compressed or pinched by shifting objects or equipment': 1,
+ 'Contact with cold objects or substances': 1,
+ 'Contact with hot objects or substances': 1,
+ 'Contact with objects and equipment, n.e.c.': 1,
+ 'Contact with objects and equipment, unspecified': 1,
+ 'Cutting, stabbing\x97intentional self-harm': 1,
+ 'Demolition or blasting explosion ': 1,
+ 'Depletion of oxygen': 1,
+ 'Derailment': 1,
+ 'Direct exposure to electricity': 1,
+ 'Direct exposure to electricity, 220 volts or less': 1,
+ 'Direct exposure to electricity, greater than 220 volts': 1,
+ 'Direct exposure to electricity, unspecified': 1,
+ 'Drowning, submersion, n.e.c.': 1,
+ 'Drug overdose\x97intent unknown': 1,
+ 'Drug overdose\x97intentional self-harm': 1,
+ 'Dust explosion': 1,
+ 'EXPOSURE TO HARMFUL SUBSTANCES OR ENVIRONMENTS': 1,
+ 'Engulfment in other collapsing material': 1,
+ 'Entangled in other object or equipment': 1,
+ 'Excavation or trenching cave-in': 1,
+ 'Explosion of nonpressurized vapors, gases, or liquids': 1,
+ 'Explosion of pressure vessel, piping, or tire': 1,
+ 'Explosion or fire on aircraft': 1,
+ 'Explosion or fire on rail vehicle\x97transportation incident': 1,
+ 'Explosion or fire on water vehicle': 1,
+ 'Explosion, n.e.c.': 1,
+ 'Explosion, unspecified': 1,
+ 'Explosions': 1,
+ 'Exposure through intact skin, eyes, or other exposed tissue': 1,
+ 'Exposure through medical injection ': 1,
+ 'Exposure through scratch or other open wound': 1,
+ 'Exposure through skin, eyes, or other exposed tissue, n.e.c.': 1,
+ 'Exposure through unintentional needlestick or sharp injury ': 1,
+ 'Exposure to air and water pressure change': 1,
+ 'Exposure to air and water pressure change, unspecified': 1,
+ 'Exposure to change in air pressure ': 1,
+ 'Exposure to change in water pressure': 1,
+ 'Exposure to electricity': 1,
+ 'Exposure to electricity, unspecified': 1,
+ 'Exposure to environmental cold': 1,
+ 'Exposure to environmental heat': 1,
+ 'Exposure to harmful substance through skin, eyes, or other exposed tissue': 1,
+ 'Exposure to harmful substance through skin, eyes, or other exposed tissue, unspecified': 1,
+ 'Exposure to harmful substances or environments, n.e.c.': 1,
+ 'Exposure to harmful substances or environments, unspecified': 1,
+ 'Exposure to light ': 1,
+ 'Exposure to light and other radiation': 1,
+ 'Exposure to light and other radiation, unspecified': 1,
+ 'Exposure to noise': 1,
+ 'Exposure to noise, n.e.c.': 1,
+ 'Exposure to noise, unspecified': 1,
+ 'Exposure to other harmful substances': 1,
+ 'Exposure to other harmful substances, n.e.c.': 1,
+ 'Exposure to other harmful substances, unspecified': 1,
+ 'Exposure to other harmful substance\x97multiple routes of exposure': 1,
+ 'Exposure to other radiation': 1,
+ 'Exposure to oxygen deficiency, n.e.c.': 1,
+ 'Exposure to oxygen deficiency, unspecified': 1,
+ 'Exposure to radiation and noise': 1,
+ 'Exposure to radiation and noise, unspecified': 1,
+ 'Exposure to temperature extremes': 1,
+ 'Exposure to temperature extremes, unspecified': 1,
+ 'Exposure to traumatic or stressful event, n.e.c. ': 1,
+ 'FALLS, SLIPS, TRIPS': 1,
+ 'FIRES AND EXPLOSIONS': 1,
+ 'Fall from collapsing structure or equipment': 1,
+ 'Fall from collapsing structure or equipment 11 to 15 feet ': 1,
+ 'Fall from collapsing structure or equipment 16 to 20 feet': 1,
+ 'Fall from collapsing structure or equipment 21 to 25 feet ': 1,
+ 'Fall from collapsing structure or equipment 26 to 30 feet': 1,
+ 'Fall from collapsing structure or equipment 6 to 10 feet': 1,
+ 'Fall from collapsing structure or equipment less than 6 feet': 1,
+ 'Fall from collapsing structure or equipment more than 30 feet': 1,
+ 'Fall from collapsing structure or equipment, unspecified': 1,
+ 'Fall from pedal cycle': 1,
+ 'Fall on aircraft during transport': 1,
+ 'Fall on rail vehicle\x97transportation incident': 1,
+ 'Fall on same level due to slipping ': 1,
+ 'Fall on same level due to tripping': 1,
+ 'Fall on same level due to tripping on uneven surface': 1,
+ 'Fall on same level due to tripping over an object ': 1,
+ 'Fall on same level due to tripping over self': 1,
+ 'Fall on same level due to tripping, n.e.c.': 1,
+ 'Fall on same level due to tripping, unspecified': 1,
+ 'Fall on same level while climbing stairs, steps, or curbs ': 1,
+ 'Fall on same level, n.e.c. ': 1,
+ 'Fall on same level, unspecified': 1,
+ 'Fall on water vehicle': 1,
+ 'Fall onto or against object on same level, n.e.c.': 1,
+ 'Fall or jump and struck by water vehicle': 1,
+ 'Fall or jump curtailed by personal fall arrest system ': 1,
+ 'Fall or jump from and struck by another vehicle in normal operation, nonroadway': 1,
+ 'Fall or jump from and struck by another vehicle in normal operation, roadway': 1,
+ 'Fall or jump from and struck by rail vehicle\x97transportation incident ': 1,
+ 'Fall or jump from and struck by same vehicle in normal operation, nonroadway': 1,
+ 'Fall or jump from and struck by same vehicle in normal operation, roadway': 1,
+ 'Fall or jump from rail vehicle\x97transportation incident ': 1,
+ 'Fall or jump from vehicle in normal operation, nonroadway': 1,
+ 'Fall or jump from vehicle in normal operation, roadway': 1,
+ 'Fall or jump from water vehicle': 1,
+ 'Fall through surface or existing opening': 1,
+ 'Fall through surface or existing opening 11 to 15 feet ': 1,
+ 'Fall through surface or existing opening 16 to 20 feet': 1,
+ 'Fall through surface or existing opening 21 to 25 feet ': 1,
+ 'Fall through surface or existing opening 26 to 30 feet': 1,
+ 'Fall through surface or existing opening 6 to 10 feet': 1,
+ 'Fall through surface or existing opening less than 6 feet': 1,
+ 'Fall through surface or existing opening more than 30 feet': 1,
+ 'Fall through surface or existing opening, unspecified': 1,
+ 'Fall to lower level, unspecified': 1,
+ 'Fall while sitting': 1,
+ 'Fall, slip, trip, n.e.c.': 1,
+ 'Fall, slip, trip, unspecified ': 1,
+ 'Falls on same level ': 1,
+ 'Falls to lower level': 1,
+ 'Fire or explosion, unspecified ': 1,
+ 'Fire, unspecified': 1,
+ 'Fires': 1,
+ 'Forest or brush fire': 1,
+ 'Gored or rammed by animal': 1,
+ 'Hanging, strangulation, asphyxiation\x97intentional self-harm': 1,
+ 'Hitting, kicking, beating, shoving': 1,
+ 'Ignition of clothing from controlled heat source': 1,
+ 'Ignition of vapors, gases, or liquids': 1,
+ 'Indirect exposure to electricity': 1,
+ 'Indirect exposure to electricity, 220 volts or less': 1,
+ 'Indirect exposure to electricity, greater than 220 volts': 1,
+ 'Indirect exposure to electricity, unspecified': 1,
+ 'Ingestion of harmful substance': 1,
+ 'Inhalation of harmful substance ': 1,
+ 'Inhalation of harmful substance, unspecified': 1,
+ 'Inhalation of harmful substance\x97multiple episodes': 1,
+ 'Inhalation of harmful substance\x97single episode ': 1,
+ 'Inhalation of substance\x97intentional self-harm': 1,
+ 'Injured by handheld object or equipment': 1,
+ 'Injured by handheld object or equipment, n.e.c.': 1,
+ 'Injured by handheld object or equipment, unspecified': 1,
+ 'Injured by object breaking in hand ': 1,
+ 'Injured by physical contact during horseplay ': 1,
+ 'Injured by physical contact with other person in sporting event or physical training': 1,
+ 'Injured by physical contact with person while moving that person\x97unintentional ': 1,
+ 'Injured by physical contact with person while restraining, subduing\x97unintentional': 1,
+ 'Injured by slipping or swinging object held by injured worker': 1,
+ 'Injured by slipping or swinging object held by other person': 1,
+ 'Injury by other person\x97unintentional or intent unknown': 1,
+ 'Injury by other person\x97unintentional or intent unknown, n.e.c.': 1,
+ 'Injury by other person\x97unintentional or intent unknown, unspecified  ': 1,
+ 'Injury by person\x97unintentional or intent unknown': 1,
+ 'Injury by person\x97unintentional or intent unknown, n.e.c.': 1,
+ 'Injury by person\x97unintentional or intent unknown, unspecified': 1,
+ 'Intentional injury by other person': 1,
+ 'Intentional injury by other person, n.e.c.': 1,
+ 'Intentional injury by other person, unspecified': 1,
+ 'Intentional injury by person': 1,
+ 'Intentional injury by person, unspecified': 1,
+ 'Jack-knifed or overturned, nonroadway': 1,
+ 'Jack-knifed or overturned, roadway': 1,
+ 'Jump from collapsing structure or equipment': 1,
+ 'Jump from collapsing structure or equipment 11 to 15 feet ': 1,
+ 'Jump from collapsing structure or equipment 16 to 20 feet': 1,
+ 'Jump from collapsing structure or equipment 21 to 25 feet ': 1,
+ 'Jump from collapsing structure or equipment 26 to 30 feet': 1,
+ 'Jump from collapsing structure or equipment 6 to 10 feet': 1,
+ 'Jump from collapsing structure or equipment less than 6 feet': 1,
+ 'Jump from collapsing structure or equipment more than 30 feet': 1,
+ 'Jump from collapsing structure or equipment, unspecified': 1,
+ 'Jump to lower level, unspecified': 1,
+ 'Jumping from building or other structure\x97intentional self-harm': 1,
+ 'Jumps to lower level': 1,
+ 'Kicked by animal': 1,
+ 'Kneeling, kneeling down': 1,
+ 'Kneeling, kneeling down, unspecified': 1,
+ 'Kneeling, kneeling down\x97repetitive or prolonged': 1,
+ 'Kneeling, kneeling down\x97single episode': 1,
+ 'Landslide': 1,
+ 'Machinery or equipment incident on water vehicle': 1,
+ 'Mauled, clawed, or scratched by animal': 1,
+ 'Mine collapse or cave-in': 1,
+ 'Moving in opposite directions, oncoming, nonroadway': 1,
+ 'Moving in same direction, nonroadway': 1,
+ 'Multiple types of animal and insect incidents': 1,
+ 'Multiple types of animal and insect incidents, n.e.c. ': 1,
+ 'Multiple types of animal and insect incidents, unspecified': 1,
+ 'Multiple types of exertions and bodily reactions': 1,
+ 'Multiple types of exposures through skin, eyes, or other exposed tissue': 1,
+ 'Multiple types of overexertion involving outside sources': 1,
+ 'Multiple types of overexertions and bodily reactions': 1,
+ 'Multiple types of repetitive motions': 1,
+ 'Multiple unintentional injuries by other person': 1,
+ 'Multiple violent acts by other person': 1,
+ 'Needlestick without exposure to harmful substance': 1,
+ 'Nonclassifiable': 1,
+ 'Nonmedical use of drugs or alcohol\x97unintentional overdose ': 1,
+ 'Nonroadway collision with object other than vehicle, n.e.c.': 1,
+ 'Nonroadway collision with object other than vehicle, unspecified': 1,
+ 'Nonroadway collision with other vehicle': 1,
+ 'Nonroadway collision with other vehicle, n.e.c.': 1,
+ 'Nonroadway collision with other vehicle, unspecified': 1,
+ 'Nonroadway collisions with object other than vehicle': 1,
+ 'Nonroadway incident involving motorized land vehicle, n.e.c.': 1,
+ 'Nonroadway incident involving motorized land vehicle, unspecified': 1,
+ 'Nonroadway incidents involving motorized land vehicles ': 1,
+ 'Nonroadway noncollision incident': 1,
+ 'Nonroadway noncollision incident, n.e.c.': 1,
+ 'Nonroadway noncollision incident, unspecified': 1,
+ 'Nonstructural fire, n.e.c.': 1,
+ 'Nonvenomous insect bites ': 1,
+ 'OVEREXERTION AND BODILY REACTION': 1,
+ 'Other animal bites, nonvenomous': 1,
+ 'Other cave-in': 1,
+ 'Other exertions or bodily reactions': 2,
+ 'Other exertions or bodily reactions, n.e.c.': 1,
+ 'Other exertions or bodily reactions, unspecified': 1,
+ 'Other fall to lower level': 1,
+ 'Other fall to lower level 11 to 15 feet ': 1,
+ 'Other fall to lower level 16 to 20 feet': 1,
+ 'Other fall to lower level 21 to 25 feet ': 1,
+ 'Other fall to lower level 26 to 30 feet': 1,
+ 'Other fall to lower level 6 to 10 feet': 1,
+ 'Other fall to lower level less than 6 feet': 1,
+ 'Other fall to lower level more than 30 feet': 1,
+ 'Other fall to lower level, unspecified': 1,
+ 'Other in-flight crash': 1,
+ 'Other in-flight crash between air vehicles': 1,
+ 'Other in-flight crash due to mechanical failure': 1,
+ 'Other in-flight crash into structure, object, or ground': 1,
+ 'Other in-flight crash, n.e.c. ': 1,
+ 'Other in-flight crash, unspecified': 1,
+ 'Other jump to lower level': 1,
+ 'Other jump to lower level 11 to 15 feet ': 1,
+ 'Other jump to lower level 16 to 20 feet': 1,
+ 'Other jump to lower level 21 to 25 feet ': 1,
+ 'Other jump to lower level 26 to 30 feet': 1,
+ 'Other jump to lower level 6 to 10 feet': 1,
+ 'Other jump to lower level less than 6 feet': 1,
+ 'Other jump to lower level more than 30 feet': 1,
+ 'Other jump to lower level, unspecified': 1,
+ 'Other oxygen deficiency, n.e.c.': 1,
+ 'Other structural fire without collapse  ': 1,
+ 'Overexertion and bodily reaction and exertion, n.e.c.': 1,
+ 'Overexertion and bodily reaction, unspecified': 1,
+ 'Overexertion in catching\x97multiple episodes': 1,
+ 'Overexertion in catching\x97single episode': 1,
+ 'Overexertion in holding, carrying, or wielding': 1,
+ 'Overexertion in holding, carrying, or wielding, unspecified': 1,
+ 'Overexertion in holding, carrying, or wielding\x97multiple episodes': 1,
+ 'Overexertion in holding, carrying, or wielding\x97single episode': 1,
+ 'Overexertion in lifting, lowering': 1,
+ 'Overexertion in lifting, lowering, unspecified': 1,
+ 'Overexertion in lifting\x97multiple episodes': 1,
+ 'Overexertion in lifting\x97single episode': 1,
+ 'Overexertion in lowering\x97multiple episodes': 1,
+ 'Overexertion in lowering\x97single episode': 1,
+ 'Overexertion in pushing, pulling, or turning': 1,
+ 'Overexertion in pushing, pulling, or turning, unspecified': 1,
+ 'Overexertion in pushing, pulling, or turning\x97multiple episodes': 1,
+ 'Overexertion in pushing, pulling, or turning\x97single episode': 1,
+ 'Overexertion in throwing, catching': 1,
+ 'Overexertion in throwing, catching, unspecified': 1,
+ 'Overexertion in throwing\x97multiple episodes': 1,
+ 'Overexertion in throwing\x97single episode': 1,
+ 'Overexertion involving outside sources': 1,
+ 'Overexertion involving outside sources, n.e.c.': 1,
+ 'Overexertion involving outside sources, unspecified': 1,
+ 'Parachuting incident': 1,
+ 'Part of occupant\x92s body caught between vehicle and other object in nonroadway transport incident': 1,
+ 'Pedal cycle collision in nonroadway area': 1,
+ 'Pedal cycle collision in roadway': 1,
+ 'Pedal cycle incident': 1,
+ 'Pedal cycle incident, n.e.c': 1,
+ 'Pedal cycle incident, unspecified': 1,
+ 'Pedal cycle struck bump, hole, or other rough terrain': 1,
+ 'Pedestrian struck by aircraft or propeller': 1,
+ 'Pedestrian struck by forward-moving vehicle in nonroadway area': 1,
+ 'Pedestrian struck by forward-moving vehicle in roadway': 1,
+ 'Pedestrian struck by forward-moving vehicle in work zone ': 1,
+ 'Pedestrian struck by forward-moving vehicle on side of road': 1,
+ 'Pedestrian struck by rail vehicle\x97transportation incident': 1,
+ 'Pedestrian struck by vehicle backing up in nonroadway area': 1,
+ 'Pedestrian struck by vehicle backing up in roadway': 1,
+ 'Pedestrian struck by vehicle backing up in work zone ': 1,
+ 'Pedestrian struck by vehicle backing up on side of road': 1,
+ 'Pedestrian struck by vehicle in nonroadway area ': 1,
+ 'Pedestrian struck by vehicle in nonroadway area, n.e.c.': 1,
+ 'Pedestrian struck by vehicle in nonroadway area, unspecified': 1,
+ 'Pedestrian struck by vehicle in roadway': 1,
+ 'Pedestrian struck by vehicle in roadway, n.e.c.': 1,
+ 'Pedestrian struck by vehicle in roadway, unspecified': 1,
+ 'Pedestrian struck by vehicle in work zone': 1,
+ 'Pedestrian struck by vehicle in work zone, n.e.c.': 1,
+ 'Pedestrian struck by vehicle in work zone, unspecified': 1,
+ 'Pedestrian struck by vehicle on side of road': 1,
+ 'Pedestrian struck by vehicle on side of road, n.e.c.': 1,
+ 'Pedestrian struck by vehicle on side of road, unspecified': 1,
+ 'Pedestrian struck by vehicle propelled by another vehicle in  nonroadway area': 1,
+ 'Pedestrian struck by vehicle propelled by another vehicle in roadway': 1,
+ 'Pedestrian struck by vehicle propelled by another vehicle in work zone': 1,
+ 'Pedestrian struck by vehicle propelled by another vehicle on side of road': 1,
+ 'Pedestrian vehicular incident, n.e.c.': 1,
+ 'Pedestrian vehicular incident, unspecified': 1,
+ 'Pedestrian vehicular incidents': 1,
+ 'Rail vehicle collision, n.e.c.': 1,
+ 'Rail vehicle collision, unspecified': 1,
+ 'Rail vehicle incident, n.e.c.': 1,
+ 'Rail vehicle incident, unspecified': 1,
+ 'Rail vehicle incidents': 1,
+ 'Ran off driving surface, nonroadway': 1,
+ 'Ran off roadway': 1,
+ 'Rape, sexual assault ': 1,
+ 'Repeated exposure to noise': 1,
+ 'Repetitive grasping, placing, or moving objects, except tools': 1,
+ 'Repetitive motions involving microtasks': 1,
+ 'Repetitive motions involving microtasks, n.e.c.': 1,
+ 'Repetitive motions involving microtasks, unspecified': 1,
+ 'Repetitive use of hands, not involving tools ': 1,
+ 'Repetitive use of tools, instruments': 1,
+ 'Roadway collision with object other than vehicle': 1,
+ 'Roadway collision with object other than vehicle, n.e.c.': 1,
+ 'Roadway collision with object other than vehicle, unspecified': 1,
+ 'Roadway collision with other vehicle': 1,
+ 'Roadway collision with other vehicle, n.e.c.': 1,
+ 'Roadway collision with other vehicle, unspecified': 1,
+ 'Roadway collision\x97moving and standing vehicle in roadway': 1,
+ 'Roadway collision\x97moving and standing vehicle on side of roadway': 1,
+ 'Roadway collision\x97moving in opposite directions, oncoming': 1,
+ 'Roadway collision\x97moving in same direction': 1,
+ 'Roadway collision\x97moving perpendicularly ': 1,
+ 'Roadway incident involving motorized land vehicle, n.e.c.': 1,
+ 'Roadway incident involving motorized land vehicle, unspecified': 1,
+ 'Roadway incidents involving motorized land vehicle': 1,
+ 'Roadway noncollision incident': 1,
+ 'Roadway noncollision incident, n.e.c.': 1,
+ 'Roadway noncollision incident, unspecified': 1,
+ 'Rubbed or abraded by foreign matter in eye': 1,
+ 'Rubbed or abraded by friction or pressure': 1,
+ 'Rubbed or abraded by friction or pressure, n.e.c.': 1,
+ 'Rubbed or abraded by friction or pressure, unspecified': 1,
+ 'Rubbed or abraded by kneeling on surface': 1,
+ 'Rubbed or abraded by objects being handled ': 1,
+ 'Rubbed or abraded by shoes, apparel, or accessories': 1,
+ 'Rubbed, abraded, or jarred by other machine or equipment vibration': 1,
+ 'Rubbed, abraded, or jarred by vehicle or mobile equipment vibration': 1,
+ 'Rubbed, abraded, or jarred by vibration': 1,
+ 'Rubbed, abraded, or jarred by vibration, n.e.c.': 1,
+ 'Rubbed, abraded, or jarred by vibration, unspecified': 1,
+ 'Running, without other incident': 1,
+ 'Running, without other incident, unspecified': 1,
+ 'Running, without other incident\x97repetitive or prolonged': 1,
+ 'Running, without other incident\x97single episode': 1,
+ 'Self-inflicted injury\x97intentional ': 1,
+ 'Self-inflicted injury\x97intentional, n.e.c.': 1,
+ 'Self-inflicted injury\x97intentional, unspecified': 1,
+ 'Self-inflicted injury\x97unintentional or intent unknown': 1,
+ 'Self-inflicted injury\x97unintentional or intent unknown, n.e.c.': 1,
+ 'Self-inflicted injury\x97unintentional or intent unknown, unspecified': 1,
+ 'Self-inflicted shooting\x97intent unknown': 1,
+ 'Self-inflicted shooting\x97unintentional': 1,
+ 'Self-tasered\x97unintentional': 1,
+ 'Shooting by other person\x97intentional': 1,
+ 'Shooting by other person\x97unintentional ': 1,
+ 'Shooting\x97intentional self-harm': 1,
+ 'Single, brief exposure to noise': 1,
+ 'Single, prolonged exposure to noise': 1,
+ 'Sitting, sitting down': 1,
+ 'Sitting, sitting down, unspecified': 1,
+ 'Sitting, sitting down\x97repetitive or prolonged': 1,
+ 'Sitting, sitting down\x97single episode': 1,
+ 'Slip on substance without fall': 1,
+ 'Slip on vehicle without fall\x97nontransport  ': 1,
+ 'Slip or trip without fall': 1,
+ 'Slip or trip without fall, n.e.c.': 1,
+ 'Slip or trip without fall, unspecified': 1,
+ 'Slip without fall': 1,
+ 'Slip without fall, n.e.c. ': 1,
+ 'Slip without fall, unspecified': 1,
+ 'Small-scale (limited) fire ': 1,
+ 'Stabbing, cutting, slashing, piercing': 1,
+ 'Standing, standing up': 1,
+ 'Standing, standing up, unspecified': 1,
+ 'Standing, standing up\x97repetitive or prolonged': 1,
+ 'Standing, standing up\x97single episode': 1,
+ 'Stepped on object ': 1,
+ 'Stings and venomous bites': 1,
+ 'Strangulation by other person': 1,
+ 'Struck against moving object or equipment': 1,
+ 'Struck against moving object or equipment, n.e.c.': 1,
+ 'Struck against moving object or equipment, unspecified': 1,
+ 'Struck against moving part of machinery or equipment': 1,
+ 'Struck against object or equipment': 1,
+ 'Struck against object or equipment while moving it': 1,
+ 'Struck against object or equipment, n.e.c.': 1,
+ 'Struck against object or equipment, unspecified': 1,
+ 'Struck against stationary object or equipment': 1,
+ 'Struck against stationary object or equipment while rising': 1,
+ 'Struck against stationary object or equipment, n.e.c.': 1,
+ 'Struck against stationary object or equipment, unspecified': 1,
+ 'Struck bump, hole, or rough terrain in road surface': 1,
+ 'Struck bump, hole, rough terrain on driving surface, nonroadway': 1,
+ 'Struck by animal ': 1,
+ 'Struck by animal, n.e.c.': 1,
+ 'Struck by animal, unspecified': 1,
+ 'Struck by discharged object or substance': 1,
+ 'Struck by discharged or flying object': 1,
+ 'Struck by discharged or flying object, n.e.c.': 1,
+ 'Struck by discharged or flying object, unspecified': 1,
+ 'Struck by dislodged flying object, particle': 1,
+ 'Struck by falling object or equipment, n.e.c.': 1,
+ 'Struck by falling object or equipment, unspecified': 1,
+ 'Struck by falling object or equipment\x97other than powered vehicle ': 1,
+ 'Struck by falling part of powered vehicle still attached': 1,
+ 'Struck by object falling from vehicle or machinery\x97other than vehicle part': 1,
+ 'Struck by object or equipment': 1,
+ 'Struck by object or equipment dropped by injured worker': 1,
+ 'Struck by object or equipment dropped by other person': 1,
+ 'Struck by object or equipment rolling freely': 1,
+ 'Struck by object or equipment, n.e.c.': 1,
+ 'Struck by object or equipment, unspecified': 1,
+ 'Struck by or caught in swinging door or gate': 1,
+ 'Struck by other falling powered vehicle': 1,
+ 'Struck by powered vehicle tipping over\x97nontransport': 1,
+ 'Struck by powered vehicle\x97nontransport': 1,
+ 'Struck by powered vehicle\x97nontransport, n.e.c.': 1,
+ 'Struck by powered vehicle\x97nontransport, unspecified': 1,
+ 'Struck by rolling object or equipment being pushed by another  person': 1,
+ 'Struck by rolling object or equipment being pushed by injured worker': 1,
+ 'Struck by rolling object or equipment\x97other than powered vehicle ': 1,
+ 'Struck by rolling object or equipment\x97other than powered vehicle, n.e.c.': 1,
+ 'Struck by rolling object or equipment\x97other than powered vehicle, unspecified': 1,
+ 'Struck by shifting load during transport, nonroadway': 1,
+ 'Struck by shifting load during transport, roadway': 1,
+ 'Struck by swinging or slipping object, other than handheld': 1,
+ 'Struck by swinging or slipping object, other than handheld, n.e.c.': 1,
+ 'Struck by swinging or slipping object, other than handheld, unspecified  ': 1,
+ 'Struck by swinging part of powered vehicle': 1,
+ 'Struck by thrown object\x97unintentional injury': 1,
+ 'Struck or run over by rolling powered vehicle': 1,
+ 'Struck, caught, or crushed in collapsing structure, equipment, or material': 1,
+ 'Struck, caught, or crushed in collapsing structure, equipment, or material, n.e.c.': 1,
+ 'Struck, caught, or crushed in collapsing structure, equipment, or material, unspecified': 1,
+ 'Struck, caught, or crushed in other collapsing structure or equipment': 1,
+ 'Sudden start or stop, nonroadway': 1,
+ 'Sudden start or stop, roadway': 1,
+ 'Sustained viewing': 1,
+ 'TRANSPORTATION INCIDENTS': 1,
+ 'Threat, verbal assault': 1,
+ 'Thrown, fell, or jumped from animal being ridden': 1,
+ 'Thrown, tipped, or fell from animal-drawn vehicle': 1,
+ 'Trampled by or stepped on by animal': 1,
+ 'Transportation incident, n.e.c.': 1,
+ 'Transportation incident, unspecified': 1,
+ 'Trip from stepping into a hole without fall ': 1,
+ 'Trip on uneven surface without fall': 1,
+ 'Trip on vehicle without fall\x97nontransport ': 1,
+ 'Trip over an object without fall': 1,
+ 'Trip over self without fall': 1,
+ 'Trip without fall': 1,
+ 'Trip without fall, n.e.c.': 1,
+ 'Trip without fall, unspecified': 1,
+ 'Typing, key entry, texting, or mousing': 1,
+ 'VIOLENCE AND OTHER INJURIES BY PERSONS OR ANIMALS': 1,
+ 'Vehicle or machinery fire': 1,
+ 'Vehicle struck by falling or flying object\x97roadway': 1,
+ 'Vehicle struck object or animal in roadway': 1,
+ 'Vehicle struck object or animal on side of roadway': 1,
+ 'Violence and other injuries by persons or animals, unspecified': 1,
+ 'Walking, without other incident': 1,
+ 'Walking, without other incident, unspecified': 1,
+ 'Walking, without other incident\x97repetitive or prolonged': 1,
+ 'Walking, without other incident\x97single episode': 1,
+ 'Water vehicle collision, n.e.c.': 1,
+ 'Water vehicle collision, unspecified': 1,
+ 'Water vehicle collisions': 1,
+ 'Water vehicle incident, n.e.c.': 1,
+ 'Water vehicle incident, unspecified': 1,
+ 'Water vehicle incidents': 1,
+ 'Water vehicle or propeller struck person': 1}
+Total injury types: 536
+Rows in csv file: 537
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It appears the dataset needs a lot of cleaning.. Pretty much every singlke entry is a unique type of injury.. I'll do more soon!</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://localhost:8000/category/statistical-modeling.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Statistical Modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/interactive.html">
+                            interactive
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/survey.html">
+                            survey
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/cleaning.html">
+                            cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/tdwp.html">
+                            TDWP
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="http://localhost:8000/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://localhost:8000/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://localhost:8000/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://localhost:8000/theme/js/respond.min.js"></script>
+
+    <script src="http://localhost:8000/theme/js/bodypadding.js"></script>
+
+</body>
+</html>
