@@ -1,1 +1,0 @@
-@"e:\blog\dsblog\scripts\python.exe" "e:\blog\dsblog\Scripts\markdown_py" %*
