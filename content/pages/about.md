@@ -9,7 +9,7 @@ Title: About
  
 ####About Me
 
-My name is Andy Trick and I'm based out of Chicago, IL. I've been touring around as the bassist of the metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a> for the past 12 years. When not playing music, I spend my time learning data science through both traditional (Southern New hampshire University) and somewhat nontraditional (Udacity, Udemy) methods. I enjoy looking into the hidden patterns found in data and visualizing these in interesting ways.
+My name is Andy Trick and I'm based out of Chicago, IL. I've been touring around as the bassist of the metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a> for the past 12 years. When not playing music, I spend my time learning data science through both traditional (Southern New Hampshire University) and somewhat nontraditional (Udacity, Udemy) methods. I enjoy looking into the hidden patterns found in data and visualizing these in interesting ways. I also enjoy training <a href="http://www.japaneseculturecenter.com/">Aikido</a>.
  
 <br>
 ####About this website

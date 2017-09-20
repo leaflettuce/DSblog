@@ -1100,7 +1100,7 @@ h6:hover .anchor-link {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [1]:</div>
+<div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
@@ -1367,40 +1367,54 @@ h6:hover .anchor-link {
 <div class="output">
 <div class="output_area">
 <div class="prompt"></div>
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
-<span class="ansi-green-intense-fg ansi-bold"><ipython-input-1-1fc54d521c95></span> in <span class="ansi-cyan-fg"><module></span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">      5</span> 
-<span class="ansi-green-fg">      6</span> <span class="ansi-green-intense-fg ansi-bold">from</span> feature_format <span class="ansi-green-intense-fg ansi-bold">import</span> featureFormat<span class="ansi-yellow-intense-fg ansi-bold">,</span> targetFeatureSplit
-<span class="ansi-green-intense-fg ansi-bold">----> 7</span><span class="ansi-yellow-intense-fg ansi-bold"> </span><span class="ansi-green-intense-fg ansi-bold">from</span> tester <span class="ansi-green-intense-fg ansi-bold">import</span> test_classifier<span class="ansi-yellow-intense-fg ansi-bold">,</span> dump_classifier_and_data
-<span class="ansi-green-fg">      8</span> <span class="ansi-green-intense-fg ansi-bold">from</span> sklearn<span class="ansi-yellow-intense-fg ansi-bold">.</span>cross_validation <span class="ansi-green-intense-fg ansi-bold">import</span> train_test_split
-<span class="ansi-green-fg">      9</span> <span class="ansi-green-intense-fg ansi-bold">import</span> matplotlib<span class="ansi-yellow-intense-fg ansi-bold">.</span>pyplot <span class="ansi-green-intense-fg ansi-bold">as</span> plt
-
-<span class="ansi-green-intense-fg ansi-bold">E:\blog\content\data\tester.py</span> in <span class="ansi-cyan-fg"><module></span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">      2</span> <span class="ansi-green-intense-fg ansi-bold">import</span> pickle
-<span class="ansi-green-fg">      3</span> <span class="ansi-green-intense-fg ansi-bold">import</span> sys
-<span class="ansi-green-intense-fg ansi-bold">----> 4</span><span class="ansi-yellow-intense-fg ansi-bold"> </span><span class="ansi-green-intense-fg ansi-bold">from</span> sklearn<span class="ansi-yellow-intense-fg ansi-bold">.</span>cross_validation <span class="ansi-green-intense-fg ansi-bold">import</span> StratifiedShuffleSplit
-<span class="ansi-green-fg">      5</span> sys<span class="ansi-yellow-intense-fg ansi-bold">.</span>path<span class="ansi-yellow-intense-fg ansi-bold">.</span>append<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">"../tools/"</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">      6</span> <span class="ansi-green-intense-fg ansi-bold">from</span> feature_format <span class="ansi-green-intense-fg ansi-bold">import</span> featureFormat<span class="ansi-yellow-intense-fg ansi-bold">,</span> targetFeatureSplit
-
-<span class="ansi-green-intense-fg ansi-bold">e:\blog\dsblog\lib\site-packages\sklearn\__init__.py</span> in <span class="ansi-cyan-fg"><module></span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">    132</span> <span class="ansi-green-intense-fg ansi-bold">else</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">    133</span>     <span class="ansi-green-intense-fg ansi-bold">from</span> <span class="ansi-yellow-intense-fg ansi-bold">.</span> <span class="ansi-green-intense-fg ansi-bold">import</span> __check_build
-<span class="ansi-green-intense-fg ansi-bold">--> 134</span><span class="ansi-yellow-intense-fg ansi-bold">     </span><span class="ansi-green-intense-fg ansi-bold">from</span> <span class="ansi-yellow-intense-fg ansi-bold">.</span>base <span class="ansi-green-intense-fg ansi-bold">import</span> clone
-<span class="ansi-green-fg">    135</span>     __check_build  <span class="ansi-red-intense-fg ansi-bold"># avoid flakes unused variable error</span>
-<span class="ansi-green-fg">    136</span> 
-
-<span class="ansi-green-intense-fg ansi-bold">e:\blog\dsblog\lib\site-packages\sklearn\base.py</span> in <span class="ansi-cyan-fg"><module></span><span class="ansi-blue-intense-fg ansi-bold">()</span>
-<span class="ansi-green-fg">      8</span> 
-<span class="ansi-green-fg">      9</span> <span class="ansi-green-intense-fg ansi-bold">import</span> numpy <span class="ansi-green-intense-fg ansi-bold">as</span> np
-<span class="ansi-green-intense-fg ansi-bold">---> 10</span><span class="ansi-yellow-intense-fg ansi-bold"> </span><span class="ansi-green-intense-fg ansi-bold">from</span> scipy <span class="ansi-green-intense-fg ansi-bold">import</span> sparse
-<span class="ansi-green-fg">     11</span> <span class="ansi-green-intense-fg ansi-bold">from</span> <span class="ansi-yellow-intense-fg ansi-bold">.</span>externals <span class="ansi-green-intense-fg ansi-bold">import</span> six
-<span class="ansi-green-fg">     12</span> <span class="ansi-green-intense-fg ansi-bold">from</span> <span class="ansi-yellow-intense-fg ansi-bold">.</span>utils<span class="ansi-yellow-intense-fg ansi-bold">.</span>fixes <span class="ansi-green-intense-fg ansi-bold">import</span> signature
-
-<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: No module named scipy</pre>
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>E:\Anaconda\lib\site-packages\sklearn\cross_validation.py:44: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. Also note that the interface of the new CV iterators are different from that of this module. This module will be removed in 0.20.
+  "This module will be removed in 0.20.", DeprecationWarning)
+</pre>
 </div>
+</div>
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>146
+[ True  True  True False False False False False]
+[ 18.28968404  20.79225205  24.81507973  16.57961842   9.92218601
+   6.09417331   2.1263278    8.76567569]
+accuracy: 0.860465
+Precision: 0.500000
+</pre>
+</div>
+</div>
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>E:\Anaconda\lib\site-packages\sklearn\grid_search.py:43: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. This module will be removed in 0.20.
+  DeprecationWarning)
+</pre>
+</div>
+</div>
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Recall: 0.333333
+F1 score: 0.400000
+True Positives: 2
+True Negatives: 35
+False Positive: 2
+False Negative: 4
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span> 
+</pre></div>
 </div>
 </div>
 </div>
@@ -1492,28 +1506,23 @@ h6:hover .anchor-link {
             <li class="list-group-item"><a href="http://localhost:8000/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
+                        <a href="http://localhost:8000/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
                         <a href="http://localhost:8000/tag/eda.html">
                             EDA
                         </a>
                     </li>
-                    <li class="list-group-item tag-1">
-                        <a href="http://localhost:8000/tag/d3js.html">
-                            D3.js
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/modeling.html">
+                            Modeling
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
                         <a href="http://localhost:8000/tag/python.html">
                             Python
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://localhost:8000/tag/reporting.html">
-                            reporting
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://localhost:8000/tag/interactive.html">
-                            interactive
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -1527,8 +1536,13 @@ h6:hover .anchor-link {
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://localhost:8000/tag/modeling.html">
-                            Modeling
+                        <a href="http://localhost:8000/tag/interactive.html">
+                            interactive
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="http://localhost:8000/tag/reporting.html">
+                            reporting
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
