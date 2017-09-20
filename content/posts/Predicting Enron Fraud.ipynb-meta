@@ -1,0 +1,7 @@
+Title: Predicting Enron Fraud
+Slug: EnronFraud
+Date: 2017-09-07 20:00
+Category: Machine Learning
+Tags: Modeling, Python, regression, clustering
+Author: Andrew Trick
+Summary: Testing and evaluating numerous machine learning techniques to determine best option for predicting fruad occurances in Enron email dataset.  The most efficient predictor ended up being an Adaboost algorithm with 50 n_estimators.  This method using decision tree as a 'weak learner' came out with about 85% accuracy, p-value of 39, and an r-squared of around 32.  Originally conducted for Udacity Nanodegree project.

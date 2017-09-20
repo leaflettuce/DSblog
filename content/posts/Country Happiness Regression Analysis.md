@@ -2,7 +2,7 @@ Date: 2017-09-06 18:53
 Author: Andrew Trick 
 Title: Predicting a Country's Happiness
 Name: Country Happiness Regression Analysis
-Category: Statistical Modeling
+Category: Machine Learning
 Tags: regression, modeling, reporting
 Summary: A look at the world happiness index and an evaluation of the factors that contribute to the general happiness of a countries population.  Variables were primarily focused on economic, political, and elegantarian factors. Originally conducted as a project for my SNHU Applied Stats II class. As it ended at around 30 pages, included is only a subset of the full project. <br>
 
