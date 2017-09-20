@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Andrew Trick'
 
 SITENAME = u'Andrew Trick'
-SITEURL = 'http://localhost:8000'
+SITEURL = 'http://andrewtrick.com'
 BANNER_SUBTITLE = u"Projects and explorations into the subjects of data science."
 
 
@@ -94,6 +94,8 @@ FEED_USE_SUMMARY = True
 #DISABLE_SIDEBAR_TITLE_ICONS = True
 
 DISPLAY_TAGS_INLINE = False
+
+GOOGLE_ANALYTICS = "UA-106731472-1"
 
 CUSTOM_CSS = 'static/custom.css'
 EXTRA_PATH_METADATA = {'extra/custom.css':{'path':'static/custom.css'},
