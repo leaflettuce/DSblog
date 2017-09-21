@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
@@ -9,19 +7,20 @@
 		<meta name="name" content="US Birth Rates" />
 		<meta name="category" content="Data Visualization"/>
         <meta name="author" content="Andrew Trick" />
-        <meta name="summary" content="<b>(CURRENTLY NOT LOADING, SORRY!)</b><br>Created for practice with D3.js after exploring US baby name dataset obtained from Kaggle.com.  Thought it would be interesting to view the birth rates of the population in the US, split by region and state.  Also included a hover function to display the most popular names in each of these respective subsets per year.<br>" />
-
-<link rel="stylesheet" href="../extra/us_names.css">
+        <meta name="summary" content="Created for practice with D3.js after exploring US baby name dataset obtained from Kaggle.com.  Thought it would be interesting to view the birth rates of the population in the US, split by region and state.  Also included a hover function to display the most popular names in each of these respective subsets per year.<br>" />
 </head>
 
 <body>
-I've had some trouble integrating D3.js visualizations onto this site.  I plan to update this soon!
 <div class=title_font>
 <h1>U.S. Birthrates <i>(1910-2010)</i></h1>
 </div>
 
 <div class=info>
 <p>Exploring birth rates in the Unites States between the years 1910 and 2014. Interesting look at the birth rates during the great depression, baby boom, and the slow drop american births since. Percent views also gives a good idea of how populated each state/region is in comparison to rest of US. My second try at D3.js. Dataset obtained from <a href='http://kaggle.com'>kaggle.com</a>.</p>
+<br>
+<h5>---- I'm currently working on fixing format errors.. Please Scroll Down ----</h5>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
 </div>
 <div class=room></div>
 <button name="play" id="play" onclick=playit()>Play</button>
@@ -41,9 +40,8 @@ I've had some trouble integrating D3.js visualizations onto this site.  I plan t
 <div id="chart"> </div>
 
 <div class=yearbar>
-<p id="year-value">1910</p>
+<p id="year-value">1910 - 2010</p>
 <input type="range" min="1910" max="2010" id="year">
-<p id="year-value2">2010</p>
 </div>
 
 <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -95,6 +93,10 @@ var intervalHandle = null;
     .style("position", "absolute")
     .style("z-index", "10")
     .style("visibility", "hidden")
+	.style('background-color', 'lightgrey')
+	.style('border', '2px solid black')
+	.style('border-radius', '4px')
+	.style('opacity', '.8')
     .text("a simple tooltip");
 	
 //tooltip text
@@ -289,11 +291,13 @@ if (y_type == 'Percentages'){
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
+	  .style('font-size', '12px')
       .call(xAxis);
 
 	  
   svg.append("g")
       .attr("class", "y axis")
+	  .style('font-size', '12px')
       .call(yAxis)
 	  .append('text')
 	  .text('Birth Count')
@@ -1581,3 +1585,4 @@ if (reg == 'AK'){
 	  };
 
 </script>
+</body>

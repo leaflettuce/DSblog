@@ -48,7 +48,7 @@ var yearTotal = 106;
 var total = ' Total : ' + yearTotal	
 	//tooltip vars
 var div = d3.select("body").append("div")   
-  .attr("class", "tooltip")               
+  .attr("class", "shows_tooltip")               
   .style("opacity", 1)
   .text(' Year : ' + yearSet + ' |' + total);
   
@@ -61,11 +61,15 @@ var rateById = {};
 	//initialize background rect
 var svg = d3.select("body").append("svg")
     .attr("width", width)
+	.attr('id', 'shows_svg')
     .attr("height", height);
 svg.append("rect")
-    .attr("class", "background")
+    .attr("class", "shows_background")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+	.style('fill', 'grey')
+	.style('stroke', 'black')
+	.style('stroke-width', 5);
 	
 	//create g
 var g = svg.append("g");
@@ -109,7 +113,7 @@ queue()
 	
 	//popup background set
 	var poprect = svg.append('rect')
-		.attr('class', 'poprect')
+		.attr('class', 'shows_poprect')
 		.attr("x", 770)
 		.attr("y", 355)
 		.attr('rx', 5)   //rounds corners
@@ -126,23 +130,25 @@ queue()
 		
 		//popup text
 	var popup = svg.append("text")
-    .attr("class", "popup")
+    .attr("class", "shows_popup")
 	.attr("x", 775)
 	.attr("y", 395)
 	.style('opacity', 0)
 	popup.text(d3.select(this).attr('id') + " : " + rateById[d3.select(this).attr('id')])
 	.transition()
     .duration(150)
-	.style('opacity', 1);
+	.style('opacity', 1)
+	.style('padding-left', '10px')
+	.style('padding-bottom', '5px');
 	
   })
       //mouseout clear
   .on("mouseout", function(d) {
     d3.select(this)
     .transition().duration(300).style("opacity", 1);
-    d3.select('text.popup')
+    d3.select('text.shows_popup')
 	.remove()
-	d3.select('rect.poprect')
+	d3.select('rect.shows_poprect')
 	.remove()
   })
          //check and set yearTotal//tooltip

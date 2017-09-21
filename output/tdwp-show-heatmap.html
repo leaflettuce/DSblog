@@ -9,7 +9,7 @@
 
 
 
-<link rel="canonical" href="http://andrewtrick.com/tdwp-show-heatmap.html">
+<link rel="canonical" href="/tdwp-show-heatmap.html">
 
         <meta name="author" content="Andrew Trick" />
         <meta name="keywords" content="D3.js,TDWP" />
@@ -18,7 +18,7 @@
         <meta property="og:site_name" content="Andrew Trick" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="TDWP Show Heatmap"/>
-        <meta property="og:url" content="http://andrewtrick.com/tdwp-show-heatmap.html"/>
+        <meta property="og:url" content="/tdwp-show-heatmap.html"/>
         <meta property="og:description" content="Chloropleth of my band, The Devil Wears Prada&#39;s shows over several years. Interesting to see the states which tend to see the most shows, and the progression of show count over the years. My first d3.js project which was originally conducted for Udacity.com&#39;s data visualization class as part of their data analysis nanodegree program."/>
         <meta property="article:published_time" content="2017-08-28" />
             <meta property="article:section" content="Data Visualization" />
@@ -28,12 +28,12 @@
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://andrewtrick.com/theme/css/bootstrap.journal.min.css" type="text/css"/>
-    <link href="http://andrewtrick.com/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://andrewtrick.com/theme/css/pygments/friendly.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://andrewtrick.com/theme/css/style.css" type="text/css"/>
-        <link href="http://andrewtrick.com/static/custom.css" rel="stylesheet">
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
 
 
 
@@ -53,18 +53,18 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://andrewtrick.com/" class="navbar-brand">
+            <a href="/" class="navbar-brand">
 Andrew Trick            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                         <li><a href="http://andrewtrick.com/pages/about.html">
+                         <li><a href="/pages/about.html">
                              About
                           </a></li>
-                         <li><a href="http://andrewtrick.com/pages/datasets.html">
+                         <li><a href="/pages/datasets.html">
                              Datasets
                           </a></li>
-                         <li><a href="http://andrewtrick.com/pages/resume.html">
+                         <li><a href="/pages/resume.html">
                              Resume
                           </a></li>
             </ul>
@@ -83,7 +83,7 @@ Andrew Trick            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://andrewtrick.com/tdwp-show-heatmap.html"
+                    <a href="/tdwp-show-heatmap.html"
                        rel="bookmark"
                        title="Permalink to TDWP Show Heatmap">
                         TDWP Show Heatmap
@@ -102,13 +102,13 @@ Andrew Trick            </a>
 
 
         <span class="label label-default">Category</span>
-        <a href="http://andrewtrick.com/category/data-visualization.html">Data Visualization</a>
+        <a href="/category/data-visualization.html">Data Visualization</a>
 
 
 <span class="label label-default">Tags</span>
-	<a href="http://andrewtrick.com/tag/d3js.html">D3.js</a>
+	<a href="/tag/d3js.html">D3.js</a>
         /
-	<a href="http://andrewtrick.com/tag/tdwp.html">TDWP</a>
+	<a href="/tag/tdwp.html">TDWP</a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
@@ -147,7 +147,7 @@ var yearTotal = 106;
 var total = ' Total : ' + yearTotal	
 	//tooltip vars
 var div = d3.select("body").append("div")   
-  .attr("class", "tooltip")               
+  .attr("class", "shows_tooltip")               
   .style("opacity", 1)
   .text(' Year : ' + yearSet + ' |' + total);
   
@@ -160,11 +160,15 @@ var rateById = {};
 	//initialize background rect
 var svg = d3.select("body").append("svg")
     .attr("width", width)
+	.attr('id', 'shows_svg')
     .attr("height", height);
 svg.append("rect")
-    .attr("class", "background")
+    .attr("class", "shows_background")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+	.style('fill', 'grey')
+	.style('stroke', 'black')
+	.style('stroke-width', 5);
 	
 	//create g
 var g = svg.append("g");
@@ -208,7 +212,7 @@ queue()
 	
 	//popup background set
 	var poprect = svg.append('rect')
-		.attr('class', 'poprect')
+		.attr('class', 'shows_poprect')
 		.attr("x", 770)
 		.attr("y", 355)
 		.attr('rx', 5)   //rounds corners
@@ -225,23 +229,25 @@ queue()
 		
 		//popup text
 	var popup = svg.append("text")
-    .attr("class", "popup")
+    .attr("class", "shows_popup")
 	.attr("x", 775)
 	.attr("y", 395)
 	.style('opacity', 0)
 	popup.text(d3.select(this).attr('id') + " : " + rateById[d3.select(this).attr('id')])
 	.transition()
     .duration(150)
-	.style('opacity', 1);
+	.style('opacity', 1)
+	.style('padding-left', '10px')
+	.style('padding-bottom', '5px');
 	
   })
       //mouseout clear
   .on("mouseout", function(d) {
     d3.select(this)
     .transition().duration(300).style("opacity", 1);
-    d3.select('text.popup')
+    d3.select('text.shows_popup')
 	.remove()
-	d3.select('rect.poprect')
+	d3.select('rect.shows_poprect')
 	.remove()
   })
          //check and set yearTotal//tooltip
@@ -339,76 +345,76 @@ d3.select('body')
             </li>
 
 
-            <li class="list-group-item"><a href="http://andrewtrick.com/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
                 <ul class="list-group" id="categories">
                     <li class="list-group-item">
-                        <a href="http://andrewtrick.com/category/data-visualization.html">
+                        <a href="/category/data-visualization.html">
                             <i class="fa fa-folder-open fa-lg"></i> Data Visualization
                         </a>
                     </li>
                     <li class="list-group-item">
-                        <a href="http://andrewtrick.com/category/exploratory-data-analysis.html">
+                        <a href="/category/exploratory-data-analysis.html">
                             <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
                         </a>
                     </li>
                     <li class="list-group-item">
-                        <a href="http://andrewtrick.com/category/machine-learning.html">
+                        <a href="/category/machine-learning.html">
                             <i class="fa fa-folder-open fa-lg"></i> Machine Learning
                         </a>
                     </li>
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://andrewtrick.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="http://andrewtrick.com/tag/eda.html">
-                            EDA
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="http://andrewtrick.com/tag/d3js.html">
+                        <a href="/tag/d3js.html">
                             D3.js
                         </a>
                     </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/python.html">
-                            Python
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/reporting.html">
-                            reporting
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/r.html">
-                            R
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/interactive.html">
+                        <a href="/tag/interactive.html">
                             interactive
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/regression.html">
+                        <a href="/tag/modeling.html">
+                            Modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/regression.html">
                             regression
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
-                        <a href="http://andrewtrick.com/tag/modeling.html">
-                            Modeling
+                        <a href="/tag/python.html">
+                            Python
                         </a>
                     </li>
                     <li class="list-group-item tag-4">
-                        <a href="http://andrewtrick.com/tag/tdwp.html">
-                            TDWP
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-4">
-                        <a href="http://andrewtrick.com/tag/clustering.html">
+                        <a href="/tag/clustering.html">
                             clustering
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-4">
+                        <a href="/tag/tdwp.html">
+                            TDWP
                         </a>
                     </li>
                 </ul>
@@ -432,15 +438,15 @@ d3.select('body')
       </div>
    </div>
 </footer>
-<script src="http://andrewtrick.com/theme/js/jquery.min.js"></script>
+<script src="/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://andrewtrick.com/theme/js/bootstrap.min.js"></script>
+<script src="/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://andrewtrick.com/theme/js/respond.min.js"></script>
+<script src="/theme/js/respond.min.js"></script>
 
-    <script src="http://andrewtrick.com/theme/js/bodypadding.js"></script>
+    <script src="/theme/js/bodypadding.js"></script>
     <!-- Google Analytics -->
     <script type="text/javascript">
 

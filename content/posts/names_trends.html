@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-
 <meta charset="utf-8">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-<link rel="stylesheet" href="../extra/names_search.css">
 <head>
 
 <title>US Name Trends</title>
@@ -12,28 +8,24 @@
 		<meta name="name" content="Name Trends" />
 		<meta name="category" content="Data Visualization"/>
         <meta name="author" content="Andrew Trick" />
-        <meta name="summary" content="<b>(CURRENTLY NOT LOADING, SORRY!)</b><br> Interactive D3.js visualization which allows for the input of several names and plots popularity of these names over time.  Data obtained from kaggle.com 'US baby names' dataset. While this chat is interesting, it does not necessarily provide a deep look into the trends of names throughout the US and was primarily done for practice utilizing D3.js's interactive options. I also found I get an absurd amount of enjoyment in comparing name popularity after finishing this project.<br>" />
+        <meta name="summary" content="Interactive D3.js visualization which allows for the input of several names and plots popularity of these names over time.  Data obtained from kaggle.com 'US baby names' dataset. While this chat is interesting, it does not necessarily provide a deep look into the trends of names throughout the US and was primarily done for practice utilizing D3.js's interactive options. I also found I get an absurd amount of enjoyment in comparing name popularity after finishing this project.<br>" />
 
-
-
-<h1><div class='title'>U.S. Name Trends</div></h1> 
-<script src="//d3js.org/d3.v3.min.js"></script>
-<script src="../js/d3.v3.min.js"></script>
-<script src="../jquery-3.2.1.min.js"></script>
 </head>
 
 <body>
-
-I've had some trouble integrating D3.js visualizations onto this site.  I plan to update this soon!
-<form>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="../js/d3.v3.min.js"></script>
+<div class='names_text'><p>Another interersting way to look at the baby names dataset.  Enter a name into the text box below to view a graph of the popularity of given names in the United States.  Data covers 1910 to 2014 and was obtained from <a href='http://kaggle.com'>Kaggle.com</a>. Try entering multiple names to compare up to twenty separate names at a time. You'll have to separate the names in the textbox via comma's.</p></div>
+<p>There are a few things in this I'd like to change after another evalutation of it when loading onto this site.. In particular, adding name and year to the mouseover popup would increase readability and conprehension of the visualization.  I'd also like to fix minor errors in implementation, such as not being able to use the enter key to press the submit button. I hopefully will find time to make these changes in the future.</p>
+<br>
+<h5>---- I'm currently working on fixing format errors.. Please Scroll Down ----</h5>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<form id='names_form'>
 <textarea id='input_names' rows="5" cols="42" onfocus="clearContents(this);">Please enter up to twenty first names, separated by (',') comma's...</textarea>
-<input type='button' class = 'button' value ='Submit' onclick="return update_data(document.getElementById('input_names').value)">
+<br><input type='button' class = 'names_button' value ='Submit' onclick="return update_data(document.getElementById('input_names').value)">
 </form>
 
-<div class='text'><p>Another interersting way to look at the baby names dataset.  Enter a name into the text box below to view a graph of the popularity of given names in the United States.  Data covers 1910 to 2014 and was obtained from <a href='http://kaggle.com'>Kaggle.com</a>. Try entering multiple names to compare up to twenty separate names at a time. You'll have to eparate the names in the textbox via comma's.</p></div>
 
-
-<script src="../js/d3.v3.min.js"></script>
 <script type="text/javascript">
 /////////////Variable intializing
 var margin = {top: 20, right: 150, bottom: 30, left: 70},
@@ -62,6 +54,7 @@ var legendSpacing = 4;                                    // NEW
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+	.style('background-color', 'white')
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
@@ -109,6 +102,7 @@ d3.csv('../data/names.csv', type, function(error, data) {
 			var totalLength = path.node().getTotalLength();
 			path.attr("stroke-dasharray", totalLength + " " + totalLength)
 			.attr("stroke-dashoffset", totalLength)
+			.attr('fill', 'none')
 			.transition()
 			.duration(2000)
 			.ease("linear")
@@ -121,7 +115,7 @@ d3.csv('../data/names.csv', type, function(error, data) {
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
 	  .append('text')
-	  .attr("y", -12)
+	  .attr("y", -18)
 	  .attr("x", 800)
       .attr("dy", ".71em")
 	  .style("text-anchor", "end")
@@ -140,7 +134,7 @@ d3.csv('../data/names.csv', type, function(error, data) {
           .data(color.domain())                                  
           .enter()                                                
           .append('g')                                           
-          .attr('class', 'legend')                                
+          .attr('class', 'names_legend') 
           .attr('transform', function(d, i) {                    
             var height = legendRectSize + legendSpacing;          
             var offset =  height * color.domain().length / 2;     
@@ -217,6 +211,8 @@ d3.csv('../data/names.csv', type, function(error, data) {
             .attr("class", "line")
             .style("stroke", function() { // Add dynamically
                 return d.color = color(d.key); })
+				.style('fill', 'none')
+				.style('stroke-width',1.2)
             .attr("d", line(d.values));
 			var totalLength = path.node().getTotalLength();
 			path.attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -300,6 +296,7 @@ mousePerLine.append("text")
 mouseG.append('svg:rect')
   .attr('width', width)
   .attr('height', height)
+  .attr('class', 'names_svg')
   .attr('fill', 'none')
   .attr('pointer-events', 'all')
   .on('mouseout', function() { // on mouse out hide line, circles and text
@@ -362,3 +359,4 @@ mouseG.append('svg:rect')
 });
 };
 </script>
+</body>

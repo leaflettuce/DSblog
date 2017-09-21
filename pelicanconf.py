@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Andrew Trick'
 
 SITENAME = u'Andrew Trick'
-SITEURL = 'http://andrewtrick.com'
+#SITEURL = 'andrewtrick.com'
 BANNER_SUBTITLE = u"Projects and explorations into the subjects of data science."
 
 
@@ -67,7 +67,7 @@ PLUGINS = ['ipynb.markup', 'assets', 'i18n_subsites', 'tag_cloud', 'pelican_java
 #JINJA_ENVIRONMENT = {'extensions': ['jinja2.ext.i18n']}
 #I18N_SUBSITES = {}
 
-BOOTSTRAP_THEME = 'journal'
+BOOTSTRAP_THEME = 'simplex'
 
 #SITELOGO = 'img/profile_book_square.png'
 #ABOUT_ME = 'Touring and playing music with TDWP. Student in data science.'
