@@ -134,6 +134,7 @@ queue()
 	.attr("x", 775)
 	.attr("y", 395)
 	.style('opacity', 0)
+	.style('font-size', '37px')
 	popup.text(d3.select(this).attr('id') + " : " + rateById[d3.select(this).attr('id')])
 	.transition()
     .duration(150)
@@ -158,7 +159,9 @@ queue()
    g.append("path")
       .datum(topojson.mesh(map, map.objects.states, function(a, b) { return a !== b; }))
       .attr("id", "state-borders")
+	  .style('fill', 'none')
       .attr("d", path);
+	  
   };
   
 	//set year buttons and inital attr styles
