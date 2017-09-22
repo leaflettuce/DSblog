@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 AUTHOR = u'Andrew Trick'
 
 SITENAME = u'Andrew Trick'
-#SITEURL = 'andrewtrick.com'
-BANNER_SUBTITLE = u"Projects and explorations into the subjects of data science."
+#SITEURL = u'andrewtrick.com'
+BANNER_SUBTITLE = u"Projects and Explorations of Data Science."
 
 
 PATH = 'content'
