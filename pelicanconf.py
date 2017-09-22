@@ -83,7 +83,7 @@ BANNER = 'img/banner.jpg'
 
 YEAR_ARCHIVE_SAVE_AS = 'posts/{date:%Y}/index.html'
 SHOW_ARTICLE_CATEGORY = True
-#FAVICON = 'images/favicon.png'
+FAVICON = 'img/favicon.ico'
 
 #DISPLAY_ARTICLE_INFO_ON_INDEX = True
 
