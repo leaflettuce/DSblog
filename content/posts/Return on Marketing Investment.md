@@ -1,7 +1,7 @@
 Title: Return on Marketing Investment
 Slug: ROMI
 Date: 2017-10-01 20:00
-Category: EDA
+Category: Exploratory Data Analysis
 Tags: EDA, Tableau, reporting, clustering
 author: Andrew Trick
 Summary: Another project completed during Udemy's Tableau A-Z course.  This was more focused on exploration and analysis of the data provided. Cluster analysis in particular was explored and evaluated throughout. 
