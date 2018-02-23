@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Modeling - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+
+    <meta name="author" content="Andrew Trick" />
+    <meta name="keywords" content="Modeling" />
+
+    <!-- Open Graph tags -->
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="Andrew Trick"/>
+        <meta property="og:url" content=""/>
+        <meta property="og:description" content="Andrew Trick"/>
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+            <article>
+                <h2><a href="/EnronFraud.html">Predicting Enron Fraud</a></h2>
+                <div class="summary">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Testing and evaluating numerous machine learning techniques to determine best option for predicting fruad occurances in Enron email dataset.  The most efficient predictor ended up being an Adaboost algorithm with 50 n_estimators.  This method using decision tree as a 'weak learner' came out with about 85% accuracy, p-value of 39, and an r-squared of around 32.  Originally conducted for Udacity Nanodegree project.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+                    <a class="btn btn-default btn-xs" href="/EnronFraud.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="/predicting-a-countrys-happiness.html">Predicting a Country's Happiness</a></h2>
+                <div class="summary"><p>A look at the world happiness index and an evaluation of the factors that contribute to the general happiness of a countries population.  Variables were primarily focused on economic, political, and elegantarian factors. Originally conducted as a project for my SNHU Applied Stats II class. As it ended at around 30 pages, included is only a subset of the full project. <br></p>
+                    <a class="btn btn-default btn-xs" href="/predicting-a-countrys-happiness.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/regression.html">
+                            regression
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/modeling.html">
+                            Modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/clustering.html">
+                            clustering
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/interactive.html">
+                            interactive
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>
