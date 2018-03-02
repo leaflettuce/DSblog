@@ -1,0 +1,7 @@
+Title: 2018 March Madness Bracket Predictor (part 1)
+Slug: MarchMadness_1
+Date: 2018-03-02 15:00
+Category: Machine Learning
+Tags: Cleaning, Python, manipulation, pandas
+Author: Andrew Trick
+Summary: First step in creating a 2018 March Madness Bracket predictor for both personal practice with scikit-learn and to compete in the Kaggle competition this year. Part 1 revolves around cleaning the data and creating new variables to use in modeling.
