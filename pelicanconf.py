@@ -7,7 +7,7 @@ AUTHOR = u'Andrew Trick'
 
 SITENAME = u'Andrew Trick'
 #SITEURL = u'andrewtrick.com'
-BANNER_SUBTITLE = u"Projects and Explorations of Data Science."
+BANNER_SUBTITLE = u"Projects and Explorations in Data Science."
 
 
 PATH = 'content'
