@@ -1,0 +1,7 @@
+Title: 2018 March Madness Bracket Predictor (part III)
+Slug: MarchMadness_3
+Date: 2018-03-03 12:30
+Category: Machine Learning
+Tags: Python, Scikit-Learn, classification, Modeling
+Author: Andrew Trick
+Summary: Part three of my march madness predictor project. While final outcomes are to be seen when I let it create a bracket for me, a final model using SVC with a linear kernel reported very high accuracy in the test data. While the Kaggle competition score could be better, I am overall happy with the results.
