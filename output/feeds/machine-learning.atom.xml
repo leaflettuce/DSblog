@@ -981,7 +981,7 @@ h6:hover .anchor-link {
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [7]:&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In [11]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="input_area"&gt;
 &lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
@@ -992,6 +992,8 @@ h6:hover .anchor-link {
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.preprocessing&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Imputer&lt;/span&gt;
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.model_selection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;train_test_split&lt;/span&gt;
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.feature_selection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;SelectPercentile&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.model_selection&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;cross_validate&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.metrics&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;confusion_matrix&lt;/span&gt;
 
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.linear_model&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;LogisticRegression&lt;/span&gt;
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sklearn.linear_model&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;LogisticRegressionCV&lt;/span&gt;
@@ -1017,7 +1019,7 @@ h6:hover .anchor-link {
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [8]:&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In [2]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="input_area"&gt;
 &lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'../data/train_data_diff.csv'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -1033,7 +1035,7 @@ h6:hover .anchor-link {
 &lt;div class="output_wrapper"&gt;
 &lt;div class="output"&gt;
 &lt;div class="output_area"&gt;
-&lt;div class="prompt output_prompt"&gt;Out[8]:&lt;/div&gt;
+&lt;div class="prompt output_prompt"&gt;Out[2]:&lt;/div&gt;
 &lt;div class="output_html rendered_html output_subarea output_execute_result"&gt;
 &lt;div&gt;
 &lt;style&gt;
@@ -1211,13 +1213,13 @@ h6:hover .anchor-link {
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Next is a handful of helper function that will facilitate in extracting the year and teams from Kaggles sample submission. This will allow me to use their sample submission to set predictions and submit to the competition. The get_year_t1_t2 function came from the Basic Starter Kernel of the competition site by Julie Elliott.&lt;/p&gt;
-&lt;p&gt;The other two functions will are used to create a win/loss ration which I missed in earlier manipulation. Get_stat will be used to iterate over the sample sub teams and retrieve the appropriate stat differentials as this is what is used in the training of the model.&lt;/p&gt;
+&lt;p&gt;The other two functions will are used to create a win/loss ration which I missed in earlier manipulation. Get_stat will be used to iterate over the sample sub teams and retrieve the appropriate stat differentials as this is what is used in the training of the model. Probably should have set win and loss variables first instead of writing out this long line using .means().. but this worked out well it seems.  It take a decent amount of time to iterate through the data and return though (~7 minutes or so).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [9]:&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In [3]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="input_area"&gt;
 &lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_count&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;teamID&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;year&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;wl&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
@@ -1453,15 +1455,15 @@ h6:hover .anchor-link {
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;At last to the interesting part.. Setting the training data and splitting into a test set.  This will allow for a good amount (66%) of the data to be used in training the model, with the remainder available to test the accuracy of the fit.&lt;/p&gt;
-&lt;p&gt;I had tried a feature selector with a few of the final models, yet inclusion of all 11 features yeilded better results over the versions with only the top 20% influencers... So this is commented out. While it might be useful in explaination of the predictions (PPG and FGP are by far the top two influenctial variables), I opted to include even minimally influental variables in that resulted in higher accuracy of the model.&lt;/p&gt;
-&lt;p&gt;The only unexpected change is the drop of offensive rebounds from the variable list.. They were way over the place and had not correlation with winning the game.  Similarly, game location can not be deciphered in the kaggle submission file, so I drop this dummy var as well.  I hope to include it back in for the final test when the tourny teams are selected.&lt;/p&gt;
+&lt;p&gt;And now for setting the training data and splitting into a test set.  This will allow for a good amount (66%) of the data to be used in training the model, with the remainder available to test the accuracy of the fit.&lt;/p&gt;
+&lt;p&gt;I had tried a feature selector with a few of the final models, yet inclusion of all 11 features yeilded better results over the versions with only the top 20% influencers... So this is commented out. While it might be useful in explaination of the predictions (PPG and FGP are by far the top two influenctial variables), I opted to include even minimally influental variables in final model if they added to the accuracy of the model even slightly.&lt;/p&gt;
+&lt;p&gt;The only unexpected var is the requirement to drop offensive rebounds from the variable list.. They were way over the place and had no correlation with winning the game whatsoever.  Similarly, game location can not be deciphered in the kaggle submission file, so I drop this dummy var as well.  I hope to include it back in for the final test when the tourny teams are selected.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [11]:&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In [4]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="input_area"&gt;
 &lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="sd"&gt;'''FEATURE SELECTION'''&lt;/span&gt;
@@ -1484,13 +1486,13 @@ h6:hover .anchor-link {
 &lt;div class="output_wrapper"&gt;
 &lt;div class="output"&gt;
 &lt;div class="output_area"&gt;
-&lt;div class="prompt output_prompt"&gt;Out[11]:&lt;/div&gt;
+&lt;div class="prompt output_prompt"&gt;Out[4]:&lt;/div&gt;
 &lt;div class="output_text output_subarea output_execute_result"&gt;
-&lt;pre&gt;15740    0
-7233     1
-14898    0
-12298    0
-1371     1
+&lt;pre&gt;13863    0
+4670     1
+6786     1
+13598    0
+3032     1
 Name: Result, dtype: int64&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1502,13 +1504,14 @@ Name: Result, dtype: int64&lt;/pre&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;And finally to the model fitting.  Most are commented out which indicates that they were not asd powerful and accurate as the final selected: SVC with a linear kernel. I worry simply judging by accuracy is not the most efficient and apt method to deciding between fits, but it appears to have a direct relation to how highly the final submission scores on Kaggle as well.&lt;/p&gt;
-&lt;p&gt;While Random Forest and Adaboost both have great acucuracy.. as excpected with a dataset like this.. I was excited to see SVC b so efficient at prediction based on the inputs.  The clf.score reported .9993. An insanely accurate score which actually ends up worrying me.  I fear this would mean it is largely overfit, but as the test data was shuffled and so large, I find that it might be acceptable?   Regardless, this is the final model I went with!&lt;/p&gt;
+&lt;p&gt;While Random Forest and SVC both have great acucuracy.. as excpected with a dataset like this.. I was excited to see that Adaboost was so efficient at prediction based on the inputs. I had luck with it in past projects and was excited to tune it again.  I know it's quite prone to overfitting though: Something I'm extremely worried about with this project.&lt;/p&gt;
+&lt;p&gt;The clf.score reported .9993. An insanely accurate score which tells me it may be overfitting? As the test data is shuffled and so large though, I find that it might be acceptable?   Regardless, this is the final model I went with!&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;In [12]:&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In [6]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="input_area"&gt;
 &lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="sd"&gt;'''GAUSSIAN NAIVE BAYES'''&lt;/span&gt;
@@ -1539,14 +1542,13 @@ Name: Result, dtype: int64&lt;/pre&gt;
 
 
 &lt;span class="sd"&gt;'''ADABOOST'''&lt;/span&gt;
-&lt;span class="c1"&gt;#ada = AdaBoostClassifier()&lt;/span&gt;
-&lt;span class="c1"&gt;#parameters = {'n_estimators':[10,50,100], 'random_state': [None, 0, 42, 138]}&lt;/span&gt;
-&lt;span class="c1"&gt;#clf = grid_search.GridSearchCV(ada, parameters)&lt;/span&gt;
-&lt;span class="c1"&gt;#clf = AdaBoostClassifier(n_estimators=50, random_state=138)&lt;/span&gt;
-&lt;span class="c1"&gt;#clf.fit(X_train, y_train)&lt;/span&gt;
+&lt;span class="n"&gt;ada&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AdaBoostClassifier&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;parameters&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;'n_estimators'&lt;/span&gt;&lt;span class="p"&gt;:[&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="s1"&gt;'random_state'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;42&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;138&lt;/span&gt;&lt;span class="p"&gt;]}&lt;/span&gt;
+&lt;span class="n"&gt;clf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grid_search&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GridSearchCV&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ada&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;clf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AdaBoostClassifier&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n_estimators&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;random_state&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;138&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X_train&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_train&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-&lt;span class="c1"&gt;#clf.score(X_test, y_test)&lt;/span&gt;
-
+&lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;score&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X_test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_test&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="sd"&gt;'''K Nearest Neighbor'''&lt;/span&gt;
 &lt;span class="c1"&gt;#clf = KNeighborsClassifier(n_neighbors=5)&lt;/span&gt;
@@ -1556,8 +1558,10 @@ Name: Result, dtype: int64&lt;/pre&gt;
 
 
 &lt;span class="sd"&gt;'''Support Vector Machine'''&lt;/span&gt; 
-&lt;span class="n"&gt;clf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;svm&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SVC&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'linear'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;probability&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X_train&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_train&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;#clf = svm.SVC(kernel='linear', gamma=0.7, C=1.0, probability = True)&lt;/span&gt;
+&lt;span class="c1"&gt;#clf.fit(X_train, y_train)&lt;/span&gt;
+
+&lt;span class="c1"&gt;#clf.score(X_test, y_test)&lt;/span&gt;
 
 &lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;score&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X_test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_test&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -1567,9 +1571,9 @@ Name: Result, dtype: int64&lt;/pre&gt;
 &lt;div class="output_wrapper"&gt;
 &lt;div class="output"&gt;
 &lt;div class="output_area"&gt;
-&lt;div class="prompt output_prompt"&gt;Out[12]:&lt;/div&gt;
+&lt;div class="prompt output_prompt"&gt;Out[6]:&lt;/div&gt;
 &lt;div class="output_text output_subarea output_execute_result"&gt;
-&lt;pre&gt;0.99894273127753308&lt;/pre&gt;
+&lt;pre&gt;0.9987665198237885&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1579,7 +1583,72 @@ Name: Result, dtype: int64&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;The next segment is partially thanks to Julie Elliott again with her starter kernel.  I was at a loss of how to easily and quickly iterate through the sample submission and report the model predicted probabilities. I tweaked it to utilize the earlier created stat differential function to create appropriate variables to run the model on.&lt;/p&gt;
+&lt;p&gt;Due to my concern over the high score, I went back and implemented some cross_validation to provide a second check on the fit:&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [9]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;cv_results&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cross_validate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;X_train&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_train&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cv_results&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'test_score'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+&lt;div class="output_area"&gt;
+&lt;div class="prompt output_prompt"&gt;Out[9]:&lt;/div&gt;
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;array([ 0.99869792,  0.99817708,  0.99791612])&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;...And a confusion matrix which also seems wayyyy too accurate?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In [12]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;y_pred&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;predict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;X_test&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# TN,FP, &lt;/span&gt;
+&lt;span class="c1"&gt;#FN, TP&lt;/span&gt;
+&lt;span class="n"&gt;confusion_matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y_pred&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+&lt;div class="output_area"&gt;
+&lt;div class="prompt output_prompt"&gt;Out[12]:&lt;/div&gt;
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;array([[2795,    0],
+       [   7, 2873]], dtype=int64)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Both checks above give another idea that this is quite a strong predictor.. I still can't help worry that I'm missing something though.&lt;/p&gt;
+&lt;p&gt;Two lines of this next segment are thanks to Julie Elliott's starter kernel again.  It provided the begining of the method to  iterate through the sample submission and report the model predicted probabilities my fit finds. I tweaked it to utilize the earlier created stat differential function to create appropriate variables to run the model on. Again  a Win Loss ration is created which adds to the overall run time of this cell: (~10 mins).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1648,10 +1717,10 @@ Name: Result, dtype: int64&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h3 id="Kaggle-Results"&gt;Kaggle Results&lt;a class="anchor-link" href="#Kaggle-Results"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;So the extremely high accuracy of the model score on here does not directly relate to the same in a log loss environment.  I scored 0.633 on the competition site.. I believe this equates to around 92% accuracy? Slightly worse than the Basic starter kernel which only used Seed differential in predicting probabilities.&lt;/p&gt;
+&lt;h3 id="Kaggle-Results"&gt;Kaggle Results&lt;a class="anchor-link" href="#Kaggle-Results"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;So the extremely high accuracy of the model score on here does not directly relate to the same in a log loss environment.  I scored 0.633 on the competition site.. I believe this equates to around 80% accuracy? Slightly worse than the Basic starter kernel which only used Seed differential in predicting probabilities.&lt;/p&gt;
 &lt;p&gt;This is not to say it will not be effective in round two of the competition where current tourney data is unavaible.  I believe my model's use of only regular season data is both a pro and a con.  It can allow me to appropriately fit each game in the 2018 bracket based soley on regular season data from this year. Conversely, it also does not take into account the randomness that is seen within Tourny games- Hence the 'madness' of the bracket.&lt;/p&gt;
-&lt;p&gt;If time becomes available again before the begining of the tourney, I plan to find a way to include betting market odds of the games into the training data. I also think utilizing those dummy location variables and possibly including some lagged past season tourney placements.&lt;/p&gt;
-&lt;h3 id="How-Did-My-Bracket-Do:-(UPCOMING)"&gt;How Did My Bracket Do: (UPCOMING)&lt;a class="anchor-link" href="#How-Did-My-Bracket-Do:-(UPCOMING)"&gt;¶&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If time becomes available again for me before the begining of the tourney, I plan to find a way to include betting market odds  into the training data. I also think utilizing those dummy location variables or possibly including some lagged past season tourney placements my help the efficiency of the model as well.&lt;/p&gt;
+&lt;h3 id="How-Did-My-Bracket-Do:"&gt;How Did My Bracket Do:&lt;a class="anchor-link" href="#How-Did-My-Bracket-Do:"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;(To Be Seen!)&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
