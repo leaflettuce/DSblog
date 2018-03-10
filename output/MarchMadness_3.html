@@ -14,13 +14,13 @@
 
         <meta name="author" content="Andrew Trick" />
         <meta name="keywords" content="Python,Scikit-Learn,classification,Modeling" />
-        <meta name="description" content="Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power... without overfitting." />
+        <meta name="description" content="Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power." />
 
         <meta property="og:site_name" content="Andrew Trick" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="2018 March Madness Bracket Predictor (part III)"/>
         <meta property="og:url" content="/MarchMadness_3.html"/>
-        <meta property="og:description" content="Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power... without overfitting."/>
+        <meta property="og:description" content="Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power."/>
         <meta property="article:published_time" content="2018-03-03" />
             <meta property="article:section" content="Machine Learning" />
             <meta property="article:tag" content="Python" />
@@ -1099,13 +1099,13 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power... without overfitting.</p>
+<p>Part three of my attempt to predict NCAA tourney results based on past game data. As cleaning and var creation is out of the way now, this segment will focus on fitting the data to different classifiers in scikit-lelarn and tweaking parameters to determine a classification model with the best prediction power.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [11]:</div>
+<div class="prompt input_prompt">In [17]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -1115,9 +1115,11 @@ h6:hover .anchor-link {
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">shuffle</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectPercentile</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectPercentile</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectKBest</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
 <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegressionCV</span>
@@ -1127,7 +1129,12 @@ h6:hover .anchor-link {
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">grid_search</span>
 <span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.neural_network</span> <span class="kn">import</span> <span class="n">MLPClassifier</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">svm</span>
+
+<span class="kn">import</span> <span class="nn">plotly.plotly</span> <span class="kn">as</span> <span class="nn">py</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="kn">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">plotly</span> <span class="kn">import</span> <span class="n">tools</span>
 </pre></div>
 </div>
 </div>
@@ -1137,197 +1144,28 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Import list is large here as I threw in a large amount of the classifiers included in sklearn. As noticeable later, once I get the trainn and test data split I toss it into several different models and use the accuracy scores of each to fine tune//pick a final model.  Data importing next:</p>
+<p>Import list is large here as I threw in a large amount of the classifiers included in sklearn. As noticeable later, once I get the trainn and test data split I toss it into several different models and use the accuracy scores of each to fine tune//pick a final model.  Data importing next.</p>
+<p>A few ideas of importance-  I was originally using only the cleaned regular season data (train_data_diff.csv) and splitting it into a test and train. This resulted in extremely high accuracy with most models due to a look ahead bias which was ineherent in training and testing temporal data from the same set (Thanks for the help, Jenn!). As such, I included the tourny_test variable so as to train from regular season data and test on the post-season. This accurately should repressent fitting the 2018 regular season data to the upcoming tourney season.</p>
+<p>I additionaly cut the 2017 year off of the tourney data so as to have a year completely cut from the dataset to also test. 2017 test data is included in the 'season_test.csv'.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [2]:</div>
+<div class="prompt input_prompt">In [18]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/train_data_diff.csv'</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">####################</span>
+<span class="c1">### IMPORT FILES ###</span>
+<span class="c1">####################</span>
 <span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'../data/'</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'train_data_diff.csv'</span><span class="p">)</span>
 <span class="n">sample_sub</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'SampleSubmissionStage1.csv'</span><span class="p">)</span>
 <span class="n">n_test_games</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_sub</span><span class="p">)</span>
-
-<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">tourney_tester</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'season_test.csv'</span><span class="p">)</span>
+<span class="n">tourny_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'NCAATourneyCompactResults.csv'</span><span class="p">)</span>
+<span class="n">tourny_data</span> <span class="o">=</span> <span class="n">tourny_data</span><span class="p">[(</span><span class="n">tourny_data</span><span class="o">.</span><span class="n">Season</span> <span class="o">>=</span> <span class="mi">2003</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">tourny_data</span><span class="o">.</span><span class="n">Season</span> <span class="o"><=</span> <span class="mi">2017</span><span class="p">)]</span>
 </pre></div>
-</div>
-</div>
-</div>
-<div class="output_wrapper">
-<div class="output">
-<div class="output_area">
-<div class="prompt output_prompt">Out[2]:</div>
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
-
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>AST</th>
-<th>AST_Diff</th>
-<th>BLK</th>
-<th>BLK_Diff</th>
-<th>Coach</th>
-<th>DR</th>
-<th>DR_Diff</th>
-<th>FGP</th>
-<th>FGP3</th>
-<th>FGP3_Diff</th>
-<th>...</th>
-<th>PPG_Diff</th>
-<th>Rank</th>
-<th>Rank_Diff</th>
-<th>Result</th>
-<th>SEED_Diff</th>
-<th>STL</th>
-<th>STL_Diff</th>
-<th>Season</th>
-<th>Seed</th>
-<th>TeamID</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>14.000000</td>
-<td>4.666667</td>
-<td>4.176471</td>
-<td>0.676471</td>
-<td>mark_gottfried</td>
-<td>26.411765</td>
-<td>3.911765</td>
-<td>0.444393</td>
-<td>0.347418</td>
-<td>0.040750</td>
-<td>...</td>
-<td>18.539216</td>
-<td>3.0</td>
-<td>35</td>
-<td>1</td>
-<td>9.0</td>
-<td>7.235294</td>
-<td>1.401961</td>
-<td>2003</td>
-<td>10.0</td>
-<td>1104</td>
-</tr>
-<tr>
-<th>1</th>
-<td>15.380952</td>
-<td>6.047619</td>
-<td>4.095238</td>
-<td>0.595238</td>
-<td>rick_stansbury</td>
-<td>26.380952</td>
-<td>3.880952</td>
-<td>0.495357</td>
-<td>0.361980</td>
-<td>0.055311</td>
-<td>...</td>
-<td>17.500000</td>
-<td>3.0</td>
-<td>21</td>
-<td>1</td>
-<td>4.0</td>
-<td>9.285714</td>
-<td>3.452381</td>
-<td>2003</td>
-<td>5.0</td>
-<td>1280</td>
-</tr>
-<tr>
-<th>2</th>
-<td>13.400000</td>
-<td>4.066667</td>
-<td>5.750000</td>
-<td>2.250000</td>
-<td>eddie_sutton</td>
-<td>24.500000</td>
-<td>2.000000</td>
-<td>0.474798</td>
-<td>0.382793</td>
-<td>0.076124</td>
-<td>...</td>
-<td>17.233333</td>
-<td>3.0</td>
-<td>19</td>
-<td>1</td>
-<td>5.0</td>
-<td>9.650000</td>
-<td>3.816667</td>
-<td>2003</td>
-<td>6.0</td>
-<td>1329</td>
-</tr>
-<tr>
-<th>3</th>
-<td>14.590909</td>
-<td>5.257576</td>
-<td>3.818182</td>
-<td>0.318182</td>
-<td>rick_barnes</td>
-<td>26.636364</td>
-<td>4.136364</td>
-<td>0.456127</td>
-<td>0.343126</td>
-<td>0.036458</td>
-<td>...</td>
-<td>22.060606</td>
-<td>3.0</td>
-<td>1</td>
-<td>1</td>
-<td>0.0</td>
-<td>6.954545</td>
-<td>1.121212</td>
-<td>2003</td>
-<td>1.0</td>
-<td>1400</td>
-</tr>
-<tr>
-<th>4</th>
-<td>14.590909</td>
-<td>5.257576</td>
-<td>3.818182</td>
-<td>0.318182</td>
-<td>rick_barnes</td>
-<td>26.636364</td>
-<td>4.136364</td>
-<td>0.456127</td>
-<td>0.343126</td>
-<td>0.036458</td>
-<td>...</td>
-<td>22.060606</td>
-<td>3.0</td>
-<td>1</td>
-<td>1</td>
-<td>0.0</td>
-<td>6.954545</td>
-<td>1.121212</td>
-<td>2003</td>
-<td>1.0</td>
-<td>1400</td>
-</tr>
-</tbody>
-</table>
-<p>5 rows × 28 columns</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1337,16 +1175,23 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Next is a handful of helper function that will facilitate in extracting the year and teams from Kaggles sample submission. This will allow me to use their sample submission to set predictions and submit to the competition. The get_year_t1_t2 function came from the Basic Starter Kernel of the competition site by Julie Elliott.</p>
-<p>The other two functions will are used to create a win/loss ration which I missed in earlier manipulation. Get_stat will be used to iterate over the sample sub teams and retrieve the appropriate stat differentials as this is what is used in the training of the model. Probably should have set win and loss variables first instead of writing out this long line using .means().. but this worked out well it seems.  It take a decent amount of time to iterate through the data and return though (~7 minutes or so).</p>
+<p>The first functions is used to create a win/loss ration which I missed in earlier manipulation. Get_stat will be used to iterate over the test dataset and the sample submission from Kaggle to retrieve the appropriate stat differentials as this is what is primarily used in the training of the model. Probably should have set win and loss variables first instead of writing out this long line using .means().. but this worked out well it seems.</p>
+<p>Set and format Train is the function which will be called when creating new data tables for creating the X variables for the test and submission data. This works primarily in connection with get stat. It also creates a Win Loss Ratio for each row and includes the Team ID's for the winners and losers.</p>
+<p>The final function created provides a way to retrieve the average wins for a TeamID in their post season. IE: Duke on average wins 2.15 games per year in March Madness.  Just another generated var I thought would be (and later after feature selection decidedly is) useful in predicting winners.</p>
+<p>It take a decent amount of time to iterate through the data and return (~7 minutes or so).</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [3]:</div>
+<div class="prompt input_prompt">In [19]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">get_count</span><span class="p">(</span><span class="n">teamID</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">wl</span><span class="p">):</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">##############################################</span>
+<span class="c1">########## HELPER FUNCTIONS ##################</span>
+<span class="c1">##############################################</span>
+<span class="sd">'''Set WIN LOSS RATION'''</span>
+<span class="k">def</span> <span class="nf">get_count</span><span class="p">(</span><span class="n">teamID</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">wl</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">wl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">teamID</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Result</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">TeamID</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1358,17 +1203,53 @@ h6:hover .anchor-link {
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
 
-<span class="sd">'''FUNCTIONS FOR TEST DATA'''</span>
+
+<span class="sd">'''PULL INFO FROM SAMPLE SUBMISSION'''</span>
 <span class="k">def</span> <span class="nf">get_year_t1_t2</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
     <span class="sd">"""Return a tuple with ints `year`, `team1` and `team2`."""</span>
     <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ID</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'_'</span><span class="p">))</span>
 
 
+<span class="sd">'''SETS TEAMS STAT MEAN DIFFERENTIALS BASED ON REGULAR SEASON DATA'''</span>
 <span class="k">def</span> <span class="nf">get_stat</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t1</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t1</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>  
+        <span class="k">return</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t1</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span> <span class="o">&</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Season</span> <span class="o">==</span> <span class="n">year</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t1</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">TeamID</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)][</span><span class="n">stat</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+
+<span class="sd">'''PULLS TRAINING DATA AND ENTERS INTO EMPTY DATASET'''</span>
+<span class="k">def</span> <span class="nf">set_and_format_train</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">input_df</span><span class="p">,</span> <span class="n">stat_list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">=</span> <span class="n">get_year_t1_t2</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span>
+        <span class="n">col_num</span> <span class="o">=</span> <span class="mi">0</span>
+    
+        <span class="k">for</span> <span class="n">team_stat</span> <span class="ow">in</span> <span class="n">stat_list</span><span class="p">:</span>
+            <span class="n">data_set</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">col_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_stat</span><span class="p">(</span><span class="n">team_stat</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
+            <span class="n">col_num</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1">#WL Ratio</span>
+        <span class="n">data_set</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">col_num</span><span class="p">]</span> <span class="o">=</span>  <span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">)</span> <span class="o">-</span> \
+        <span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">)</span>
+        <span class="n">col_num</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1">#Win average in Tourny</span>
+        <span class="n">data_set</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">col_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_win_avg</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+            
+<span class="sd">'''Get avg wins of tourny games for team'''</span>
+<span class="n">tourny_data_train</span> <span class="o">=</span> <span class="n">tourny_data</span><span class="p">[(</span><span class="n">tourny_data</span><span class="o">.</span><span class="n">Season</span> <span class="o"><</span> <span class="mi">2017</span><span class="p">)]</span>
+<span class="n">tourny_win_avg</span> <span class="o">=</span> <span class="n">tourny_data_train</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'WTeamID'</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">Season</span> <span class="o">/</span> <span class="n">tourny_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'WTeamID'</span><span class="p">)</span><span class="o">.</span><span class="n">Season</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+ 
+<span class="k">def</span> <span class="nf">get_win_avg</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tourny_win_avg</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span> <span class="o">-</span> <span class="n">tourny_win_avg</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span>    
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">tourny_win_avg</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">tourny_win_avg</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
 </pre></div>
 </div>
 </div>
@@ -1378,20 +1259,17 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>A little more housecleaning before actual model experimentation.  This will set the win loss ratio for each team in the training dataframe and turn each location variable into categorical dummies.</p>
+<p>A little more housecleaning before actual model experimentation.  This will set the win loss ratio for each team in the training dataframe and turn each location variable into categorical dummies. I actually end up never using this as it is extremely difficult to retrieve this information for the test data.. I hope to include it in the final for the 2018 tourney though!</p>
+<p>NOTE: I also want to eventually include teamID and coaches in as categorical indepent variables as well. Hopefully I'll get some time to add this in eventually.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [10]:</div>
+<div class="prompt input_prompt">In [20]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="sd">'''WIN LOSS RATIO'''</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">'WLRatio'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">TeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">TeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">TeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">)</span> <span class="o">-</span> \
-      <span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">OtherTeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">OtherTeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">OtherTeamID</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">Season</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">),</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="sd">'''SET DUMMIES'''</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="sd">'''SET DUMMIES'''</span>
 <span class="n">loc_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Loc</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">loc_dummies</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -1402,7 +1280,7 @@ h6:hover .anchor-link {
 <div class="output_wrapper">
 <div class="output">
 <div class="output_area">
-<div class="prompt output_prompt">Out[10]:</div>
+<div class="prompt output_prompt">Out[20]:</div>
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
 <style>
@@ -1433,13 +1311,13 @@ h6:hover .anchor-link {
 <th>FGP3</th>
 <th>FGP3_Diff</th>
 <th>...</th>
+<th>Result</th>
 <th>SEED_Diff</th>
 <th>STL</th>
 <th>STL_Diff</th>
 <th>Season</th>
 <th>Seed</th>
 <th>TeamID</th>
-<th>WLRatio</th>
 <th>A</th>
 <th>H</th>
 <th>N</th>
@@ -1459,13 +1337,13 @@ h6:hover .anchor-link {
 <td>0.347418</td>
 <td>0.040750</td>
 <td>...</td>
+<td>1</td>
 <td>9.0</td>
 <td>7.235294</td>
 <td>1.401961</td>
 <td>2003</td>
 <td>10.0</td>
 <td>1104</td>
-<td>-0.258929</td>
 <td>0</td>
 <td>0</td>
 <td>1</td>
@@ -1483,13 +1361,13 @@ h6:hover .anchor-link {
 <td>0.361980</td>
 <td>0.055311</td>
 <td>...</td>
+<td>1</td>
 <td>4.0</td>
 <td>9.285714</td>
 <td>3.452381</td>
 <td>2003</td>
 <td>5.0</td>
 <td>1280</td>
-<td>-0.133929</td>
 <td>0</td>
 <td>0</td>
 <td>1</td>
@@ -1507,13 +1385,13 @@ h6:hover .anchor-link {
 <td>0.382793</td>
 <td>0.076124</td>
 <td>...</td>
+<td>1</td>
 <td>5.0</td>
 <td>9.650000</td>
 <td>3.816667</td>
 <td>2003</td>
 <td>6.0</td>
 <td>1329</td>
-<td>-0.214286</td>
 <td>0</td>
 <td>1</td>
 <td>0</td>
@@ -1531,13 +1409,13 @@ h6:hover .anchor-link {
 <td>0.343126</td>
 <td>0.036458</td>
 <td>...</td>
+<td>1</td>
 <td>0.0</td>
 <td>6.954545</td>
 <td>1.121212</td>
 <td>2003</td>
 <td>1.0</td>
 <td>1400</td>
-<td>-0.171429</td>
 <td>0</td>
 <td>1</td>
 <td>0</td>
@@ -1555,20 +1433,20 @@ h6:hover .anchor-link {
 <td>0.343126</td>
 <td>0.036458</td>
 <td>...</td>
+<td>1</td>
 <td>0.0</td>
 <td>6.954545</td>
 <td>1.121212</td>
 <td>2003</td>
 <td>1.0</td>
 <td>1400</td>
-<td>-0.171429</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 </tr>
 </tbody>
 </table>
-<p>5 rows × 32 columns</p>
+<p>5 rows × 31 columns</p>
 </div>
 </div>
 </div>
@@ -1579,29 +1457,91 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>And now for setting the training data and splitting into a test set.  This will allow for a good amount (66%) of the data to be used in training the model, with the remainder available to test the accuracy of the fit.</p>
-<p>I had tried a feature selector with a few of the final models, yet inclusion of all 11 features yeilded better results over the versions with only the top 20% influencers... So this is commented out. While it might be useful in explaination of the predictions (PPG and FGP are by far the top two influenctial variables), I opted to include even minimally influental variables in final model if they added to the accuracy of the model even slightly.</p>
-<p>The only unexpected var is the requirement to drop offensive rebounds from the variable list.. They were way over the place and had no correlation with winning the game whatsoever.  Similarly, game location can not be deciphered in the kaggle submission file, so I drop this dummy var as well.  I hope to include it back in for the final test when the tourny teams are selected.</p>
+<p>Next I create the test dataset.  This pulls the year and team names for a season game then creates team differential variables based on regular season data of that year.  If data from that specific year is unavailable as is the case with some of the teams, an overall team average (throughout all years) is considered.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [4]:</div>
+<div class="prompt input_prompt">In [21]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="sd">'''FEATURE SELECTION'''</span>
-<span class="n">X_train</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">'PPG_Diff'</span><span class="p">,</span> <span class="s1">'FGP_Diff'</span><span class="p">,</span> <span class="s1">'AST_Diff'</span><span class="p">,</span> <span class="s1">'FGP3_Diff'</span><span class="p">,</span> <span class="s1">'SEED_Diff'</span><span class="p">,</span>
-             <span class="s1">'FTP_Diff'</span><span class="p">,</span> <span class="s1">'DR_Diff'</span><span class="p">,</span> <span class="s1">'STL_Diff'</span><span class="p">,</span> <span class="s1">'BLK_Diff'</span><span class="p">,</span> <span class="s1">'Rank_Diff'</span><span class="p">,</span> <span class="s1">'WLRatio'</span><span class="p">]]</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Result'</span><span class="p">]</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#######################################</span>
+<span class="c1">###### CREATE TEST DATA ## ############</span>
+<span class="c1">#######################################</span>
+<span class="sd">'''SET TEST DATAFRAME'''</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tourney_tester</span><span class="p">),</span> <span class="mi">12</span><span class="p">))</span>
 
+<span class="sd">'''SETTING FEATURES'''</span>
+<span class="n">stat_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'PPG'</span><span class="p">,</span> <span class="s1">'FGP'</span><span class="p">,</span> <span class="s1">'AST'</span><span class="p">,</span> <span class="s1">'FGP3'</span><span class="p">,</span> <span class="s1">'Seed'</span><span class="p">,</span> <span class="s1">'FTP'</span><span class="p">,</span> <span class="s1">'DR'</span><span class="p">,</span> <span class="s1">'STL'</span><span class="p">,</span> <span class="s1">'BLK'</span><span class="p">,</span> <span class="s1">'Rank'</span><span class="p">]</span> 
+<span class="n">set_and_format_train</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">tourney_tester</span><span class="p">,</span> <span class="n">stat_list</span><span class="p">)</span>
+
+<span class="sd">'''REULTS AND SHUFFLE DATA'''</span>
+<span class="n">test_data_results</span> <span class="o">=</span> <span class="n">tourney_tester</span><span class="p">[</span><span class="s1">'Result'</span><span class="p">]</span>      
+<span class="n">X_data</span><span class="p">,</span> <span class="n">y_data</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_data_results</span><span class="p">)</span>
+
+<span class="sd">'''FILL NaN's'''</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">Imputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="s1">'NaN'</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'median'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
+<span class="n">imp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_data</span><span class="p">)</span>
+<span class="n">X_data</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Time to rescale the features in the dataset! I opted to standardize as, suggested again by a friend, a mean of 0 is nice and efficient for most classifiers.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [22]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">######################################</span>
+<span class="c1">######### RESCALE DATA ###############</span>
+<span class="c1">######################################</span>
+<span class="sd">'''Standardize'''</span>
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_data</span><span class="p">)</span>
+<span class="n">X_data</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And now for setting the training data and splitting into a test set. This will allow for a good amount (80%) of the data to be used in training the model, with the remainder available to test the accuracy of the fit.</p>
+<p>I had tried a feature selector with a few of the final models, yet inclusion of all 14 features yeilded better results over the versions with only the top 20% influencers... So this is commented out. SelectKBest also appears to increase accuracy for some models, while decreasing for others.. Regardless, I'm leaving it out for this final version.</p>
+<p>While feature selection might be useful in explaination of the predictions (PPG, WLRatio, Rank, and Win_Avg are by far the top  influenctial variables), I opted to include even minimally influental variables in final model if they added to the accuracy of the final model even slightly.</p>
+<p>The only unexpected var that required a drop was offensive rebounds. They were all over the place and had no correlation with winning the game whatsoever. Similarly, game location can not be deciphered in the kaggle submission file, so I drop this dummy var as well. I hope to include it back in for the final test when the tourny teams are selected.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [23]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">############################################</span>
+<span class="c1">#### FEATURE SELECTION AND TRAIN SPLIT #####</span>
+<span class="c1">############################################</span>
 <span class="sd">'''SELECTION SCORES'''</span>
-<span class="c1">#X_new = SelectPercentile(percentile = 20).fit_transform(X_train, y_train)</span>
+<span class="c1">#X_new = SelectPercentile(percentile = 20).fit_transform(X_data, y_data)</span>
 
-<span class="sd">'''TRAIN-TEST SPLIT - (for testing locally)'''</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">X_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">selector</span> <span class="o">=</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">k</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">X_new</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+<span class="c1">#selector.scores_</span>
+
+<span class="sd">'''SPLIT TRAIN AND TEST'''</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">y_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1610,13 +1550,13 @@ h6:hover .anchor-link {
 <div class="output_wrapper">
 <div class="output">
 <div class="output_area">
-<div class="prompt output_prompt">Out[4]:</div>
+<div class="prompt output_prompt">Out[23]:</div>
 <div class="output_text output_subarea output_execute_result">
-<pre>13863    0
-4670     1
-6786     1
-13598    0
-3032     1
+<pre>960     1
+543     1
+1247    0
+1834    0
+583     1
 Name: Result, dtype: int64</pre>
 </div>
 </div>
@@ -1628,20 +1568,21 @@ Name: Result, dtype: int64</pre>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And finally to the model fitting.  Most are commented out which indicates that they were not asd powerful and accurate as the final selected: SVC with a linear kernel. I worry simply judging by accuracy is not the most efficient and apt method to deciding between fits, but it appears to have a direct relation to how highly the final submission scores on Kaggle as well.</p>
-<p>While Random Forest and SVC both have great acucuracy.. as excpected with a dataset like this.. I was excited to see that Adaboost was so efficient at prediction based on the inputs. I had luck with it in past projects and was excited to tune it again.  I know it's quite prone to overfitting though: Something I'm extremely worried about with this project.</p>
-<p>The clf.score reported .9993. An insanely accurate score which tells me it may be overfitting? As the test data is shuffled and so large though, I find that it might be acceptable?   Regardless, this is the final model I went with!</p>
+<p>While Random Forest and SVC both have great accuracy.. as excpected with a dataset like this.. I was excited to see that Adaboost was so efficient at prediction based on the inputs. I had luck with it in past projects and was excited to tune it again. It was also extremely fun to give a neural network a try for the first time with scikit's Multi-layer perceptron classifier. While it gave great accuracy for the cross validation, test results were lackluster.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [6]:</div>
+<div class="prompt input_prompt">In [24]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="sd">'''GAUSSIAN NAIVE BAYES'''</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#######################################</span>
+<span class="c1">######### FITTING MODELS ##############</span>
+<span class="c1">#######################################</span>
+<span class="sd">'''GAUSSIAN NAIVE BAYES'''</span>
 <span class="c1">#clf = GaussianNB()</span>
 <span class="c1">#clf.fit(X_train, y_train)</span>
-<span class="c1">#clf.score(X_test, y_test)</span>
 
 
 <span class="sd">'''LOGISTIC REGRESSION'''</span>
@@ -1649,8 +1590,6 @@ Name: Result, dtype: int64</pre>
 <span class="c1">#params = {'C': np.logspace(start=-5, stop=3, num=9)}</span>
 <span class="c1">#clf = GridSearchCV(logreg, params, scoring='neg_log_loss', refit=True)</span>
 <span class="c1">#clf.fit(X_train, y_train)</span>
-<span class="c1">#print('Best log_loss: {:.4}, with best C: {}'</span>
-<span class="c1">#      .format(clf.best_score_, clf.best_params_['C']))</span>
 
 
 <span class="sd">'''LOG REG CV'''</span>
@@ -1661,33 +1600,44 @@ Name: Result, dtype: int64</pre>
 <span class="sd">'''TRAIN MODEL - RANDOM FOREST'''</span>
 <span class="c1">#clf = RandomForestClassifier(random_state=42)</span>
 <span class="c1">#clf.fit(X_train, y_train)</span>
-<span class="c1">#clf.feature_importances_</span>
-<span class="c1">#clf.score(X_test, y_test)</span>
 
 
 <span class="sd">'''ADABOOST'''</span>
 <span class="n">ada</span> <span class="o">=</span> <span class="n">AdaBoostClassifier</span><span class="p">()</span>
-<span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'n_estimators'</span><span class="p">:[</span><span class="mi">10</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="s1">'random_state'</span><span class="p">:</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">138</span><span class="p">]}</span>
+<span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'n_estimators'</span><span class="p">:[</span><span class="mi">10</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="s1">'random_state'</span><span class="p">:</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">138</span><span class="p">],</span> \
+              <span class="s1">'learning_rate'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">GridSearchCV</span><span class="p">(</span><span class="n">ada</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
-<span class="n">clf</span> <span class="o">=</span> <span class="n">AdaBoostClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">138</span><span class="p">)</span>
+
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
-<span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 
 <span class="sd">'''K Nearest Neighbor'''</span>
-<span class="c1">#clf = KNeighborsClassifier(n_neighbors=5)</span>
-<span class="c1">#clf.fit(X_train, y_train) </span>
+<span class="c1">#knn = KNeighborsClassifier()</span>
+<span class="c1">#parameters = {'algorithm':['auto','ball_tree', 'kd_tree'], 'n_neighbors': [5, 100], \</span>
+ <span class="c1">#             'weights': ['uniform', 'distance'], 'p': [1, 2]}</span>
+<span class="c1">#clf = grid_search.GridSearchCV(knn, parameters)</span>
 
-<span class="c1">#clf.score(X_test, y_test)</span>
+<span class="c1">#clf.fit(X_train, y_train) </span>
 
 
 <span class="sd">'''Support Vector Machine'''</span> 
-<span class="c1">#clf = svm.SVC(kernel='linear', gamma=0.7, C=1.0, probability = True)</span>
+<span class="c1">#svc = svm.SVC()</span>
+<span class="c1">#parameters = {'kernel':['linear','rbf'], 'random_state': [None, 0, 42, 138], \</span>
+<span class="c1">#              'gamma': ['auto', 0.25, 0.5, 0.7, 0.9], 'C': [0.2, 0.5, 0.8, 1.0], \</span>
+<span class="c1">#              'probability': [True]}</span>
+<span class="c1">#clf = grid_search.GridSearchCV(svc, parameters)</span>
+
 <span class="c1">#clf.fit(X_train, y_train)</span>
 
-<span class="c1">#clf.score(X_test, y_test)</span>
 
-<span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="sd">'''Multi-layer Perceptron Classifier (NN)'''</span>
+<span class="c1">#mlp = MLPClassifier()</span>
+<span class="c1">#parameters = {'hidden_layer_sizes':[(100,), (50,),(200,)], 'activation': ['identity','relu', 'logistic', 'tanh'], \</span>
+<span class="c1">#              'solver': ['adam', 'lbfgs'], 'learning_rate': ['constant', 'invscaling', 'adaptive'], 'max_iter': [100, 200, 300], \</span>
+<span class="c1">#              'early_stopping': [True]}</span>
+<span class="c1">#clf = grid_search.GridSearchCV(mlp, parameters)</span>
+ 
+<span class="c1">#clf.fit(X_train, y_train)</span>
 </pre></div>
 </div>
 </div>
@@ -1695,9 +1645,9 @@ Name: Result, dtype: int64</pre>
 <div class="output_wrapper">
 <div class="output">
 <div class="output_area">
-<div class="prompt output_prompt">Out[6]:</div>
+<div class="prompt output_prompt">Out[24]:</div>
 <div class="output_text output_subarea output_execute_result">
-<pre>0.9987665198237885</pre>
+<pre>'Multi-layer Perceptron Classifier (NN)'</pre>
 </div>
 </div>
 </div>
@@ -1707,50 +1657,35 @@ Name: Result, dtype: int64</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Due to my concern over the high score, I went back and implemented some cross_validation to provide a second check on the fit:</p>
+<p>The next section encompasses the cross validation and accuracy testing for the models.  I utilized a grid search for parameter turning for most of these as well, so gridsearch results are also called for below. Adaboost classifier sits with a final accuracy of around 74% and a average cross validation of around 72%.  Not great, but a better predictor than I could personal result in for march madness games.</p>
+<p>Confusion matrix is also included jsut to give an idea of where the mistakes in the estimator are.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [9]:</div>
+<div class="prompt input_prompt">In [27]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">################################</span>
+<span class="c1">### CLASSIFIER  REVIEW ########</span>
+<span class="c1">################################</span>
+<span class="sd">'''FEATURE SELECTION (IF GRIDSEARCH)'''</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">best_estimator_</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">best_score_</span>
+
+<span class="sd">'''CROSS VALIDATE'''</span>
+<span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="n">cv_results</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">]</span>  
-</pre></div>
-</div>
-</div>
-</div>
-<div class="output_wrapper">
-<div class="output">
-<div class="output_area">
-<div class="prompt output_prompt">Out[9]:</div>
-<div class="output_text output_subarea output_execute_result">
-<pre>array([ 0.99869792,  0.99817708,  0.99791612])</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>...And a confusion matrix which also seems wayyyy too accurate?</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [12]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 
-<span class="c1"># TN,FP, </span>
-<span class="c1">#FN, TP</span>
+<span class="sd">'''Confusion Matrix'''</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="c1"># TN,FP, FN, TP</span>
 <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="sd">'''PREDICTOR ACCURACY'''</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">score</span>
 </pre></div>
 </div>
 </div>
@@ -1758,10 +1693,10 @@ Name: Result, dtype: int64</pre>
 <div class="output_wrapper">
 <div class="output">
 <div class="output_area">
-<div class="prompt output_prompt">Out[12]:</div>
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[2795,    0],
-       [   7, 2873]], dtype=int64)</pre>
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0.737913486005
+</pre>
 </div>
 </div>
 </div>
@@ -1771,8 +1706,8 @@ Name: Result, dtype: int64</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Both checks above give another idea that this is quite a strong predictor.. I still can't help worry that I'm missing something though.</p>
-<p>Two lines of this next segment are thanks to Julie Elliott's starter kernel again.  It provided the begining of the method to  iterate through the sample submission and report the model predicted probabilities my fit finds. I tweaked it to utilize the earlier created stat differential function to create appropriate variables to run the model on. Again  a Win Loss ration is created which adds to the overall run time of this cell: (~10 mins).</p>
+<p>Final step is to use the sample submission from Kaggle and report the model's predicted probability for each game.</p>
+<p>As with the test creation, this section provides the method to iterate through the sample submission and report the model predicted probabilities my fit finds. Sets the differentials and other stats to create appropriate variables to run the model on. Again the iterative functions used add to the overall run time of this cell: (~15 mins).</p>
 </div>
 </div>
 </div>
@@ -1781,30 +1716,20 @@ Name: Result, dtype: int64</pre>
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="sd">'''SET TEST DATAFRAME'''</span>
-<span class="n">X_sub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_test_games</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
-
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#######################################</span>
+<span class="c1">###### FORMAT SUBMISSION FILE #########</span>
+<span class="c1">#######################################</span>
+<span class="sd">'''SET TEST DATAFRAME'''</span>
+<span class="n">X_sub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_test_games</span><span class="p">,</span>  <span class="mi">12</span><span class="p">))</span> 
 
 <span class="sd">'''SETTING FEATURES'''</span>
 <span class="n">stat_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'PPG'</span><span class="p">,</span> <span class="s1">'FGP'</span><span class="p">,</span> <span class="s1">'AST'</span><span class="p">,</span> <span class="s1">'FGP3'</span><span class="p">,</span> <span class="s1">'Seed'</span><span class="p">,</span> <span class="s1">'FTP'</span><span class="p">,</span> <span class="s1">'DR'</span><span class="p">,</span> <span class="s1">'STL'</span><span class="p">,</span> <span class="s1">'BLK'</span><span class="p">,</span> <span class="s1">'Rank'</span><span class="p">]</span> 
+<span class="n">set_and_format_train</span><span class="p">(</span><span class="n">X_sub</span><span class="p">,</span> <span class="n">sample_sub</span><span class="p">,</span> <span class="n">stat_list</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sample_sub</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">year</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">=</span> <span class="n">get_year_t1_t2</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span>
-    <span class="n">col_num</span> <span class="o">=</span> <span class="mi">0</span>
-    
-    <span class="k">for</span> <span class="n">team_stat</span> <span class="ow">in</span> <span class="n">stat_list</span><span class="p">:</span>
-        <span class="n">X_sub</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">col_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_stat</span><span class="p">(</span><span class="n">team_stat</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
-        <span class="n">col_num</span> <span class="o">+=</span> <span class="mi">1</span>
-        
-    <span class="n">X_sub</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">col_num</span><span class="p">]</span> <span class="o">=</span>  <span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">)</span> <span class="o">-</span> \
-     <span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span> <span class="p">(</span><span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_count</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">)</span>
-
-      
-<span class="sd">'''EDIT NaN's and infinite values'''</span>
+<span class="sd">'''Fill NaN's'''</span>
 <span class="n">imp</span> <span class="o">=</span> <span class="n">Imputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="s1">'NaN'</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'median'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
 <span class="n">imp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_sub</span><span class="p">)</span>
 <span class="n">X_sub</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_sub</span><span class="p">)</span>
-<span class="n">X_sub</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1831,7 +1756,7 @@ Name: Result, dtype: int64</pre>
 <span class="n">sample_sub</span><span class="o">.</span><span class="n">Pred</span> <span class="o">=</span> <span class="n">clipped_preds</span>
 
 <span class="sd">'''WRITE TO CSV'''</span>
-<span class="c1">#sample_sub.to_csv('SVC_11FD_clipped_sub.csv', index=False)</span>
+<span class="c1">#sample_sub.to_csv('Ada_12Feature_clipped_sub.csv', index=False)</span>
 </pre></div>
 </div>
 </div>
@@ -1841,10 +1766,10 @@ Name: Result, dtype: int64</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Kaggle-Results">Kaggle Results<a class="anchor-link" href="#Kaggle-Results">¶</a></h3><p>So the extremely high accuracy of the model score on here does not directly relate to the same in a log loss environment.  I scored 0.633 on the competition site.. I believe this equates to around 80% accuracy? Slightly worse than the Basic starter kernel which only used Seed differential in predicting probabilities.</p>
-<p>This is not to say it will not be effective in round two of the competition where current tourney data is unavaible.  I believe my model's use of only regular season data is both a pro and a con.  It can allow me to appropriately fit each game in the 2018 bracket based soley on regular season data from this year. Conversely, it also does not take into account the randomness that is seen within Tourny games- Hence the 'madness' of the bracket.</p>
-<p>If time becomes available again for me before the begining of the tourney, I plan to find a way to include betting market odds  into the training data. I also think utilizing those dummy location variables or possibly including some lagged past season tourney placements my help the efficiency of the model as well.</p>
-<h3 id="How-Did-My-Bracket-Do:">How Did My Bracket Do:<a class="anchor-link" href="#How-Did-My-Bracket-Do:">¶</a></h3><p>(To Be Seen!)</p>
+<h3 id="Kaggle-Results">Kaggle Results<a class="anchor-link" href="#Kaggle-Results">¶</a></h3><p>So the decent accuracy of the model on here relates about as expected in a log loss environment.  I scored 0.603 on the competition site.. I believe this equates to around 70% accuracy? Slightly better than the Basic starter kernel which only used Seed differential in predicting probabilities. I'm happy about it, but still far from the top scores in the competition.</p>
+<p>This is not to say the model will not be effective in round two of the competition where current tourney data is unavailable.  I believe my model's use of only regular season data is both a pro and a con.  It can allow me to appropriately fit each game in the 2018 bracket based soley on regular season data from this year. Conversely, it also does not take into account the randomness that is seen within Tourny games- Hence the 'madness' of the bracket.</p>
+<p>If time becomes available again for me before the begining of the tourney, I plan to find a way to include betting market odds  into the training data. I also think utilizing those dummy location variables and introducing team Id's or possibly including some lagged past season tourney placements may help the efficiency of the model as well.</p>
+<h3 id="How-Did-My-Predicted-Bracket-Do:">How Did My Predicted Bracket Do:<a class="anchor-link" href="#How-Did-My-Predicted-Bracket-Do:">¶</a></h3><p>(To Be Seen!)</p>
 </div>
 </div>
 </div>
@@ -1924,13 +1849,13 @@ Name: Result, dtype: int64</pre>
             <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="/tag/d3js.html">
-                            D3.js
+                        <a href="/tag/modeling.html">
+                            Modeling
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/python.html">
-                            Python
+                        <a href="/tag/d3js.html">
+                            D3.js
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -1939,28 +1864,18 @@ Name: Result, dtype: int64</pre>
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/modeling.html">
-                            Modeling
+                        <a href="/tag/reporting.html">
+                            Reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
                         <a href="/tag/r.html">
                             R
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="/tag/reporting.html">
-                            Reporting
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/cleaning.html">
-                            Cleaning
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/tableau.html">
-                            Tableau
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
@@ -1969,8 +1884,18 @@ Name: Result, dtype: int64</pre>
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
                         <a href="/tag/classification.html">
                             classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/cleaning.html">
+                            Cleaning
                         </a>
                     </li>
                 </ul>
