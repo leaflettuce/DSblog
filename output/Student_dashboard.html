@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Quick Qlikview Project - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/Student_dashboard.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="EDA,Qlikview,Dashboard,reporting,survey" />
+        <meta name="description" content="Quick dashboard I threw together in Qlikview for a school assignment. Data was a survey collection of goal opinions of 4th to 6th graders in Michigan schools. A few demographic variables are also recorded." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Quick Qlikview Project"/>
+        <meta property="og:url" content="/Student_dashboard.html"/>
+        <meta property="og:description" content="Quick dashboard I threw together in Qlikview for a school assignment. Data was a survey collection of goal opinions of 4th to 6th graders in Michigan schools. A few demographic variables are also recorded."/>
+        <meta property="article:published_time" content="2018-03-13" />
+            <meta property="article:section" content="Data Visualization" />
+            <meta property="article:tag" content="EDA" />
+            <meta property="article:tag" content="Qlikview" />
+            <meta property="article:tag" content="Dashboard" />
+            <meta property="article:tag" content="reporting" />
+            <meta property="article:tag" content="survey" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/data-visualization.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Data Visualization ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/Student_dashboard.html"
+                       rel="bookmark"
+                       title="Permalink to Quick Qlikview Project">
+                        Quick Qlikview Project
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-03-13T15:00:00-05:00"> Tue 13 March 2018</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/data-visualization.html">Data Visualization</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/eda.html">EDA</a>
+        /
+	<a href="/tag/qlikview.html">Qlikview</a>
+        /
+	<a href="/tag/dashboard.html">Dashboard</a>
+        /
+	<a href="/tag/reporting.html">reporting</a>
+        /
+	<a href="/tag/survey.html">survey</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h1>Student Goal Dashboard</h1>
+<p>Homework Assignment was to throw together a dashboard in Qlikview which would allow for exploration of the survey results of Michigan students being asked about what they consider their most important goals in school. Data originally from Caregie Mellow University, data located at: http://lib.stat.cmu.edu/DASL/Datafiles/PopularKids.html. I first created the selection list box and variable specific selection boxes which will provide the ability to jump around sample demographics. This will allow for the tables and charts to change based upon selected variables.\
+<br><br>
+I opted for two specific bar charts for examination: An overall histogram of 'most important goals' for students, and a barchart of goal choice v. Gender and Grade. This provides users to see both the general goals of importance per selection, while also the grade/gender split considerations as well.
+<br><br>
+Additionally, Two pie charts are included to display the demographic proportions of each selection. Age and Location both were expected to provide the most interesting insights into the analysis.
+<br><br>
+<img src="../img/Student_Qlik/1.png" style="width: 800px;"/>
+<br><br>
+Final results indicate that a large majority of student consider grades their most important goal in school. Followed secondly by popularity. While the proportion split amongst these considers stay relatively constant, we can see a trend of girls increasingly their valuation of popularity as they move from 4th on to 5th and 6th grades. </p>
+<p><br></p>
+<h2>6th Grader Segmentation</h2>
+<p>I also included a screenshot of a 6th graders selection so as to provide an example of the ease of use and power Qlikview dashboards can introduce to exploratory data analysis.
+<br><br>
+<img src="../img/Student_Qlik/2.png" style="width: 800px;"/>
+<br><br>
+Quick analysis: While for the entire sample location demographics are most-or-less evenly split and age’s range about evenly between 9, 10, and 11, Qlikview allows for quick variable selection to explore the sample data.  The above screenshot shows a selection of the 6th graders in the dataset. From this we can see that most of the 6th graders surveyed were 11 years old- the remainder are 12 and 13- and about 45% of them are from the suburbs.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-0">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-0">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/scikit-learn.html">
+                            Scikit-Learn
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/modeling.html">
+                            Modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/survey.html">
+                            survey
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>
