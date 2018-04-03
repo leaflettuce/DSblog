@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2018-03-03T12:30:00-06:00</updated><entry><title>2018 March Madness Bracket Predictor (part III)</title><link href="/MarchMadness_3.html" rel="alternate"></link><published>2018-03-03T12:30:00-06:00</published><updated>2018-03-03T12:30:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-03-03:MarchMadness_3.html</id><summary type="html">&lt;style type="text/css"&gt;/*!
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2018-04-02T12:30:00-05:00</updated><entry><title>2018 March Madness Bracket Predictor (part III)</title><link href="/MarchMadness_3.html" rel="alternate"></link><published>2018-04-02T12:30:00-05:00</published><updated>2018-04-02T12:30:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-04-02:MarchMadness_3.html</id><summary type="html">&lt;style type="text/css"&gt;/*!
 *
 * IPython notebook
 *
@@ -1644,8 +1644,9 @@ Name: Result, dtype: int64&lt;/pre&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;h3 id="Kaggle-Results"&gt;Kaggle Results&lt;a class="anchor-link" href="#Kaggle-Results"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;So the decent accuracy of the model on here relates about as expected in a log loss environment.  I scored 0.603 on the competition site.. I believe this equates to around 70% accuracy? Slightly better than the Basic starter kernel which only used Seed differential in predicting probabilities. I'm happy about it, but still far from the top scores in the competition.&lt;/p&gt;
 &lt;p&gt;This is not to say the model will not be effective in round two of the competition where current tourney data is unavailable.  I believe my model's use of only regular season data is both a pro and a con.  It can allow me to appropriately fit each game in the 2018 bracket based soley on regular season data from this year. Conversely, it also does not take into account the randomness that is seen within Tourny games- Hence the 'madness' of the bracket.&lt;/p&gt;
-&lt;p&gt;If time becomes available again for me before the begining of the tourney, I plan to find a way to include betting market odds  into the training data. I also think utilizing those dummy location variables and introducing team Id's or possibly including some lagged past season tourney placements may help the efficiency of the model as well.&lt;/p&gt;
-&lt;h3 id="How-Did-My-Predicted-Bracket-Do:"&gt;How Did My Predicted Bracket Do:&lt;a class="anchor-link" href="#How-Did-My-Predicted-Bracket-Do:"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;(To Be Seen!)&lt;/p&gt;
+&lt;p&gt;If time becomes available again for me before the beginning of the tourney, I plan to find a way to include betting market odds  into the training data. I also think utilizing those dummy location variables and introducing team Id's or possibly including some lagged past season tourney placements may help the efficiency of the model as well.&lt;/p&gt;
+&lt;h3 id="How-Did-My-Predicted-Bracket-Do:"&gt;How Did My Predicted Bracket Do:&lt;a class="anchor-link" href="#How-Did-My-Predicted-Bracket-Do:"&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Kaggle: About 50th Percntile.. I'll take it for my first competition submission.&lt;/p&gt;
+&lt;p&gt;ESPN: Top 4% of all submitted brackets in ESPN's bracket contest.. Woo!&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
