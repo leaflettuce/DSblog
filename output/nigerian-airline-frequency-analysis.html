@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Nigerian Airline Frequency Analysis - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/nigerian-airline-frequency-analysis.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="modeling,reporting,dashboard,r,SQL,tableau,cleaning" />
+        <meta name="description" content="A summary report of work I did for a Data Analytics II course at SNHU. Fictional company, Austin Air, is looking to enter the international airline industry with a goal of capturing a significant market share of business focused around Nigeria. Analysis will provide a look at the current industry and suggest strategies towards implementing a pilot program for the company to introduce to the market and achieve their goal." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Nigerian Airline Frequency Analysis"/>
+        <meta property="og:url" content="/nigerian-airline-frequency-analysis.html"/>
+        <meta property="og:description" content="A summary report of work I did for a Data Analytics II course at SNHU. Fictional company, Austin Air, is looking to enter the international airline industry with a goal of capturing a significant market share of business focused around Nigeria. Analysis will provide a look at the current industry and suggest strategies towards implementing a pilot program for the company to introduce to the market and achieve their goal."/>
+        <meta property="article:published_time" content="2018-04-22" />
+            <meta property="article:section" content="exploratory data analysis" />
+            <meta property="article:tag" content="modeling" />
+            <meta property="article:tag" content="reporting" />
+            <meta property="article:tag" content="dashboard" />
+            <meta property="article:tag" content="r" />
+            <meta property="article:tag" content="SQL" />
+            <meta property="article:tag" content="tableau" />
+            <meta property="article:tag" content="cleaning" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/exploratory-data-analysis.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick exploratory data analysis ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/nigerian-airline-frequency-analysis.html"
+                       rel="bookmark"
+                       title="Permalink to Nigerian Airline Frequency Analysis">
+                        Nigerian Airline Frequency Analysis
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-04-22T08:53:00-05:00"> Sun 22 April 2018</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/exploratory-data-analysis.html">exploratory data analysis</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/modeling.html">modeling</a>
+        /
+	<a href="/tag/reporting.html">reporting</a>
+        /
+	<a href="/tag/dashboard.html">dashboard</a>
+        /
+	<a href="/tag/r.html">r</a>
+        /
+	<a href="/tag/sql.html">SQL</a>
+        /
+	<a href="/tag/tableau.html">tableau</a>
+        /
+	<a href="/tag/cleaning.html">cleaning</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Housed below is a summary report of work I did for a Data Analytics II course at SNHU. Fictional 
+company, Austin Air, is looking to enter the international airline industry with a goal of capturing 
+a significant market share of business focused around Nigeria. Available data was examined and a data
+analysis life-cycle plan was created. Three datasets were of particular interest, and these could be 
+connected via unique identifiers. As over 90% of the data within the datasets were categorical, a frequency
+analysis approach was used to discover trends within the industry. 
+ <br><br>
+<strong>Process</strong><br>
+I initially imported the data into R and used this program to clean and explore the data. Once cleaned,
+the data were written out and stored into a relational format via a MySQL database. I then utilized ggplot2
+in R to create the presentation visuals, while using Tableau to create three dashboards- each one with a particular
+flight segmentation focus. Additionally, JMP was used occasional to perform some quick statistical tests when needed. </p>
+<p>Once visuals were created, results were detailed on in the summary report to indicate suggested business strategies for
+the company. Although a lack of time-series knowledge largely hampered the possibilities of analysis, three particular
+findings are focused on which could be leveraged by Austin Air. I believe the insights determined through this analysis
+can start Austin Air on the correct path towards achieving their goals.
+ <br><br>
+All data and working files can be found on my <a href="https://github.com/leaflettuce/AustinAirAnalysis" download>github</a><br><br></p>
+<p><br></p>
+<p><strong>Austin Air Analysis - Summary Report <em>(Partial)</em></strong><br></p>
+<p><a href=""><strong>Abstract</strong></a></p>
+<p>Austin Air is seeking to capture
+a significant portion of the Nigerian airline industry away from the currently
+dominate European companies. The following summary report provides a look at
+the current status of the Nigerian airline industry and leverages historic data
+to suggests an appropriate strategy for Austin Air to enter the market. Frequency
+analysis has specified three specific business strategies in particular for
+Austin Air to implement towards achieving their goals. Firstly, Austin Air
+should initially invest into only three specific plane types: 73G, A333, and
+DH8. A suggested distribution of these plane type for the company’s initial
+fleet is also included below. Secondly, the report suggests locations, domestic
+and international, which should be included in the beginning, pilot program for
+Austin Air. Lastly, analysis designates two airliners, Arik Air and Ethiopian
+Airlines, as direct competitors and proposes further avenues of research
+towards leveraging this knowledge positively for Austin Air. Utilizing the
+data-driven insights highlighted throughout this report, Austin Air can
+efficiently and effectively achieve their goal of capturing a signification
+portion of the Nigeria air travel industry.</p>
+<p><a href=""></a></p>
+<h2><a href="">Data Processing</a></h2>
+<h3><a href="">Collection Methods and Integration Tactics</a></h3>
+<p>The data utilized throughout this project was a collection
+of airport, airline, and air-route information sourced in January 2012. This
+data was obtained by Austin Air and provided to the team for processing and
+analysis. Although no collection time-frame was indicated, one assumption can
+be made based upon size of the air-routes dataset: The data accounts for no
+more than a few days’ worth of flight route information. This can be implied
+from the number of flights to and from each airport in the dataset. </p>
+<p>Integration
+of the data revolved around connecting the airline and airport data to the
+routes dataset, which contained both an airline ID and an airport ID. Joining
+via these identifiers resulted in a unified version of the data with all
+necessary information connected and accessible. R dataframe merging techniques
+were utilized to complete this step for exploratory data analysis, while SQL
+foreign keys were used to connect the data within a relational database as well.</p>
+<h3><a href="">Data Enrichment Processes</a></h3>
+<h4><a href="">Missing Values</a></h4>
+<p>Data enrichment began with cleaning the data. This first
+step, even before integration, was to check for missing values to either impute
+values for or remove. ~1,194 rows were missing the necessary connector variables
+of either airline ID or airport ID. It was determined that there was no acceptable
+method to figure correct values and, instead of possible introducing errors
+into the analysis, these rows were removed. As these rows account for only 2%
+of the data and no rows directly relate to Nigerian airports, it was an
+acceptable choice to omit. Outside of ID values, few other rows required
+editing. Although there were numerous IATA/ICAO codes missing, these were unnecessary
+for the goals of this analysis, and therefore ignored. </p>
+<h4><a href="">Subsetting</a></h4>
+<p>After cleaning, the data were integrated together and
+subset. As Austin Air’s goals all focus upon the Nigerian air-travel industry, data
+was subset to encompass only routes which included a Nigerian airport as its
+source and/or destination. This allowed analysis to convey the trends seen specifically
+within the Nigeria market- including routes from Berlin to New York, for
+example, would be not only useless, but detrimental to analysis of the Nigerian
+market. This Nigerian subset was then subset three more times during EDA to
+provide a more granular look at domestic v. international (from Nigeria) v.
+international (to Nigeria) flights.</p>
+<h4><a href="">Feature Generation</a></h4>
+<p>Finally,
+new features were generated to facilitate frequency analysis techniques. The
+primary variables of interest are plane types, destination/source airports, and
+airlines. Each of these variables had a ‘count’ variable created and added to
+the dataset to promote easy exploratory analysis in R. Although nonstop v connecting
+variables were expected to have provided information relevant to scheduling flight
+routes for Austin Air, a quick look indicated that there were only 24
+connecting flights in the dataset (&lt;.01%). As such, this course of analysis was
+scraped for lack of data.</p>
+<h3><a href="">Data Positioning</a></h3>
+<p>Once cleaning, feature generation, and preliminary analysis were
+conducted, data were then stored into a relational database. R was used to
+split and rewrite the data into three organized and cleaned csv files:
+airports_cleaned, airlines_cleaned, and routes_cleaned. Although MS SQL Server
+was initially planned for storage, unforeseen circumstances (virtual
+environment downtime) required the use of MySQL (w/ Workbench) instead. </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/SQL_Proof.png" style="width: 800px;"/><br><br></p>
+<p>As seen above, a query was used
+after data insertion to confirm proper storage and alignment of the data. All
+relevant data to this analysis are held within the ‘AustinAir’ database, and
+each route can be connected to appropriate airline and airports via calling on
+foreign key identifiers.</p>
+<h2><a href="">Results</a></h2>
+<p>As expected by the analysis team, both time-series and
+regression analysis were not practical considering the data available.
+Time-series modelling was out due to the lack of any type of time variables, while
+even a naïve model is impossible due to the lack of knowledge regarding the
+time-frame of collection. Rather than predict needed fleet size by estimating
+flight volume for a time-period as planned, the approach was changed and
+focused instead on figuring plane type distribution of the fleet based upon
+competitor airlines. Similarly, regression techniques are most applicable when
+predicting some base numeric dependent, which was also lacking in the available
+data. Since over 90% of the variables recorded are categorical, frequency
+analysis was determined as the best route to achieving useful results from
+analysis. </p>
+<h3><a href="">Visualization Strategies</a></h3>
+<p>Relating results from frequency analysis hinges on creating
+informative and easily understood tables and histograms. Utilizing two
+different visualization methods, Austin Air stakeholders and management can be
+presented with visuals which convey: the appropriate fleet size to invest in,
+the top competitors in the market, and locations which should be included in
+the initial phases of the pilot program. The two visualization methods utilized
+to relate analysis results are a presentation and a dashboard.</p>
+<h4><a href="">Presentation</a></h4>
+<p>Although Austin Air is looking to venture into the
+international market, the domestic consumer can not be forgotten. About 1 in 3
+travelers in the Nigerian airline market are domestic flyers.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/ratio.png" style="width: 250px;"/><br><br></p>
+<p>Although most of the presentation
+focuses on international trends and patterns, major domestic routes between
+Nigerian airports should be considered by Austin Air as well so as not neglect
+1 out of every 3 fliers.</p>
+<p>Charts
+relating international distributions are split into two different histograms:
+One representing flights <em>into</em> Nigeria
+and one representing flights <em>from</em>
+Nigeria. The first chart is a look at the top international competitors to
+Austin Air.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/inter_carriers_histo.png" style="width: 800px;"/><br><br></p>
+<p>Ethiopian Airlines and Arik Air are
+the airlines consumers typically chose for international travel to and from
+Nigeria. Therefore, these two companies should be considered Austin Air’s
+primary competition.</p>
+<p>The
+next look is the distribution of the top plane types flying to and from Nigeria.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/inter_equip_histo.png" style="width: 800px;"/><br><br></p>
+<p>As seen above, international flights
+are typically on: 738’s; 330, 332, and 333 Airbuses; and Bombardier Dash 8s. Although
+domestic is considered additionally in the dashboard below, this chart
+indicated that investment into these plane types would be valuable for international
+routing. </p>
+<p>Next
+for the presentation is a histogram of countries of interest for Austin Air.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/inter_countries_histo.png" style="width: 800px;"/><br><br></p>
+<p>Ghana, Germany, France, and the United
+Kingdom top the charts in Nigerian international travel. These plus the next
+three top popular routes (Egypt, Cote D’Ivoire, and Ethiopia) account for 46%
+of all International air travel connected to Nigeria.</p>
+<p>Lastly,
+JMP provides an interesting look of two connected histograms. The display below
+represents the connection between source and destination airports of Nigerian air
+travel. We can see that Mutala Muhammad International Airport sees the most
+flights, both incoming and outgoing, for the Nigerian air travel market. As
+such, this location should be the home base for Austin Air. This airport
+accounts for about 32% of all flights connected to Nigeria while also having a
+very wide spread of connecting airports (~80%)- seen by the highlighted
+airports on the left frequencies list.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/JMP main airport.png" style="width: 800px;"/><br><br></p>
+<h4><a href="">Dashboard</a></h4>
+<p>Tableau dashboards have also been created for use by Austin
+Air stakeholders and management to explore at their own pace. Three dashboards
+split up information that is of interest to Austin Air. Although much of this
+data is another view at the findings represented in the presentation, this provides
+a second, segmented perspective for the audience to fully grasp the results of
+analysis. The first dashboard examines international data:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/international_dash.png" style="width: 800px;"/><br><br>     </p>
+<p>The dashboard includes hover
+tooltips to provide context and further information on the country, city, and
+airport names to and from Nigeria. Top airline competitors and plane types for
+these routes are also included on the right-hand side.</p>
+<p>Similarly,
+domestic information is broken down and evaluated on the next dashboard:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/domestic_dash.png" style="width: 800px;"/><br><br>
+        </p>
+<p>Instead of a map, the primary image
+is a histogram of the top cities of popularity for domestic Nigerian flights. Domestic
+flights, as indicated above, represent 33% of all air travel in Nigeria, while
+these three cities account for 66% of that domestic travel. The lower costs of domestic
+flights can also help facilitate lower prices for international travelers as
+well. The bottom-right table displays the distribution of plane types for domestic
+flights, split by airline. Arik Air holds a dominate share of the market, and a
+similar fleet distribution for Austin Air’s domestic wing could be effective.</p>
+<p>Lastly,
+a dashboard examining an aggregate of domestic and international data:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/austinair/both_dash.png" style="width: 800px;"/><br><br>
+ 
++
+Although a bit more time consuming
+to take in, the primary visual of this dashboard represents a look at plane
+type distributions of each major airlines Nigerian flights (flights which
+include Nigeria- both domestic and international). Again, it is seen that Arik
+Air and Ethiopian Airlines currently control a large portion of the country’s air
+traffic. Additionally included are the top 9 plane types (in aggregate) used
+for Nigerian air routes. </p>
+<h3><a href="">Suggestions to Austin Air</a></h3>
+<p>With analysis complete, the value of the project can be
+examined with Austin Air’s overall goals in mind. The objectives of the project
+were to: </p>
+<p>·        
+Determine the busiest Airports typically linked
+to Nigerian airports.</p>
+<p>·        
+Decide how many of each plane type to initially
+invest into.</p>
+<p>·        
+Discover which routes should be direct, and
+which should be connections.</p>
+<p>Although the latter objective was
+impossible due to a lack of data, the two former goals can be directly answered
+from the results of this analysis. Additionally, the team can also evaluate top
+competition currently in the market. A three-pronged business strategy for
+Austin Air follows which will help the company leverage these data-driven
+insights towards achieving its overall goal of capturing a significant portion
+of Nigerian air travel.
+<br></p>
+<h4><a href="">Suggested Distribution of Fleet</a></h4>
+<p>Although precise numbers cannot be determined due to lack of
+time reference of data collection, Austin Air should invest into a fleet with
+the following distribution of plane types:</p>
+<p>-27%
+// 73G (Boeing 737-700) </p>
+<p>-55%
+// A333 (Airbus 330-300)</p>
+<p>-18%
+// DH8 (Bombardier Dash 8)</p>
+<p>A distribution like this promotes a
+focus of international travel without neglecting the revenue possible from
+domestic flight service. The 73G’s should be prioritized towards domestic
+flights, with one or two A333’s also devoted to domestic service as needed. The
+majority of the A333 division should be the primary mode of international
+travel. DH8’s- a smaller plane type- should be utilized towards the less busy
+international routes. Contact with the original data collectors to obtain the
+time-frame of the survey can provide a lead on the precise numbers these
+distributions relate to.
+<br></p>
+<h4><a href="">Ports of Interest</a></h4>
+<p>Domestic service should primarily focus on Abuja, Lagos, and
+Port Hartcourt as these account for about 21% of all Nigeria air traffic (66%
+of the domestic). Countries which should be included in the beginning phase of Austin
+Air’s international services are: Ghana, Germany, France, UK, Egypt, Ethiopia,
+and Cote D’Ivoire (Ivory Coast). These seven countries account for 48% of
+international traffic to and from Nigeria. Overall, the ten locations listed
+above account for 52% of all flight to and from Nigeria. With a home-base of
+Mutala Muhammad International Airport, Austin Air would also have direct, one-way
+flight access to each of these locations. 
+<br></p>
+<h4><a href="">Focus Marketing Against Direct Competitors</a></h4>
+<p>Lastly, Austin Air should conduct marketing competitor
+analysis to determine the strengths and weaknesses of its two top competitors:
+Arik Air and Ethiopian Airlines. Analysis results indicate that these two
+companies hold an extreme majority of the Nigerian air travel market share,
+both domestic and international. Successfully leveraging this knowledge can
+lead to finding strategies in which to outperform these two companies in price
+and customer expectations. Further, it could also hint at avenues to
+aggressively advertising against each company. </p>
+<p>Each of these suggestions to Austin Air provide a strong
+launching point for the pilot program of the company. With further in-house
+data collection and analysis as the company grows, Austin Air will be able to follow
+the trends and insights found from big data analytics and utilize them towards making
+informed decisions while expanding the business. Following this route, Austin
+Air will not only start strong, but could quickly become the number one airline
+for Nigeria air travel and a large contender in the worldwide industry.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> exploratory data analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/r.html">
+                            r
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/scikit-learn.html">
+                            Scikit-Learn
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/cleaning.html">
+                            cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>
