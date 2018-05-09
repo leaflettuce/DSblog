@@ -2,7 +2,7 @@
 Author: Andrew Trick 
 Title: About
 
-<img src="../img/profile_book_square.png" style="width: 200px;"/>
+<img src="../img/1.jpg" style="width: 200px;"/>
 
 <br>
 
