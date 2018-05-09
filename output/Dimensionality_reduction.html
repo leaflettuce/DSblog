@@ -1,0 +1,5045 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Practice at Dimensionality Reduction with SKlearn - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/Dimensionality_reduction.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="Cleaning,Python,manipulation,pandas,scikit-learn,clustering,pca,regression" />
+        <meta name="description" content="I found some free time and thought I&#39;d finally get some more practice at dimensionality reduction. With this goal in mind, I went onto Kaggle and found a competition(Estimate house prices) which looked appropriate to practice these skill with. Throughout this post I walk through the steps I took from cleaning and standardizing the data, to finally performing PCA and fitting a simple linear regression to the top five most influential eigenvectors! Not the most accurate regression ever, but great practice and surprisingly efficient given it drops 81 variables into only 5." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Practice at Dimensionality Reduction with SKlearn"/>
+        <meta property="og:url" content="/Dimensionality_reduction.html"/>
+        <meta property="og:description" content="I found some free time and thought I&#39;d finally get some more practice at dimensionality reduction. With this goal in mind, I went onto Kaggle and found a competition(Estimate house prices) which looked appropriate to practice these skill with. Throughout this post I walk through the steps I took from cleaning and standardizing the data, to finally performing PCA and fitting a simple linear regression to the top five most influential eigenvectors! Not the most accurate regression ever, but great practice and surprisingly efficient given it drops 81 variables into only 5."/>
+        <meta property="article:published_time" content="2018-05-09" />
+            <meta property="article:section" content="Machine Learning" />
+            <meta property="article:tag" content="Cleaning" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:tag" content="manipulation" />
+            <meta property="article:tag" content="pandas" />
+            <meta property="article:tag" content="scikit-learn" />
+            <meta property="article:tag" content="clustering" />
+            <meta property="article:tag" content="pca" />
+            <meta property="article:tag" content="regression" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/machine-learning.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Machine Learning ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/Dimensionality_reduction.html"
+                       rel="bookmark"
+                       title="Permalink to Practice at Dimensionality Reduction with SKlearn">
+                        Practice at Dimensionality Reduction with SKlearn
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-05-09T15:00:00-05:00"> Wed 09 May 2018</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/machine-learning.html">Machine Learning</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/cleaning.html">Cleaning</a>
+        /
+	<a href="/tag/python.html">Python</a>
+        /
+	<a href="/tag/manipulation.html">manipulation</a>
+        /
+	<a href="/tag/pandas.html">pandas</a>
+        /
+	<a href="/tag/scikit-learn.html">scikit-learn</a>
+        /
+	<a href="/tag/clustering.html">clustering</a>
+        /
+	<a href="/tag/pca.html">pca</a>
+        /
+	<a href="/tag/regression.html">regression</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI colors. */
+.ansibold {
+  font-weight: bold;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  border-left-width: 1px;
+  padding-left: 5px;
+  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #90CAF9;
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected {
+  border-color: #ababab;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  div.cell.selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected.jupyter-soft-selected {
+  border-left-width: 0;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  padding: 0.4em;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
+  /* .CodeMirror-lines */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+.rendered_html pre,
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+.rendered_html td,
+
+
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I found some free time and thought I'd finally get some more practice at dimensionality reduction. With this goal in mind, I went onto Kaggle and found a competition(Estimate house prices) which looked appropriate to practice these skill with. Throughout this post I walk through the steps I took from cleaning and standardizing the data, to finally performing PCA and fitting a simple linear regression to the top five most influential eigenvectors! Not the most accurate regression ever, but great practice and surprisingly efficient given it drops 81 variables into only 5.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">##-2018.05.09 // Andrew Trick</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As mentioned in the summary above, I've been wanting to get some practice with PCA and other dimension reduction techniques. I found a house price dataset on Kaggle which looks to be a great dataset to practice these techniques with. While not technically too large to model out a regression with, 81 variables is a lot to take in and I thought it would be interesting to finally explore feature reduction. Below is my step by step process from importing the data, cleaning and standardizing, reducing, to finally fitting a model for kaggle submission.  I iterate over steps a few times, try stuff that eventually doesn't work, and even conduct a KMeans which is really pointless in the projet aside from my exploring SKlearn some.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">mca</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LassoCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_validate</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">r2_score</span><span class="p">,</span> <span class="n">mean_squared_error</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First step I'll import the data and inspect it a bit. It's already split between a train and test split- typical of Kaggle. Let's import all of this and then work with primarily the train set. I'll also grab the sample submission now as I plan to upload to Kaggle and see is a regression using either clusters or principal components is effective.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'data/'</span>
+<span class="n">df_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'train.csv'</span><span class="p">)</span>
+<span class="n">df_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'test.csv'</span><span class="p">)</span>
+<span class="n">df_sample</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s1">'sample_submission.csv'</span><span class="p">)</span>
+
+<span class="n">df_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[2]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>(1460, 81)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[3]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>MSZoning</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>Street</th>
+<th>Alley</th>
+<th>LotShape</th>
+<th>LandContour</th>
+<th>Utilities</th>
+<th>...</th>
+<th>PoolArea</th>
+<th>PoolQC</th>
+<th>Fence</th>
+<th>MiscFeature</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+<th>SaleType</th>
+<th>SaleCondition</th>
+<th>SalePrice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>60</td>
+<td>RL</td>
+<td>65.0</td>
+<td>8450</td>
+<td>Pave</td>
+<td>NaN</td>
+<td>Reg</td>
+<td>Lvl</td>
+<td>AllPub</td>
+<td>...</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>2</td>
+<td>2008</td>
+<td>WD</td>
+<td>Normal</td>
+<td>208500</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>20</td>
+<td>RL</td>
+<td>80.0</td>
+<td>9600</td>
+<td>Pave</td>
+<td>NaN</td>
+<td>Reg</td>
+<td>Lvl</td>
+<td>AllPub</td>
+<td>...</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>5</td>
+<td>2007</td>
+<td>WD</td>
+<td>Normal</td>
+<td>181500</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>60</td>
+<td>RL</td>
+<td>68.0</td>
+<td>11250</td>
+<td>Pave</td>
+<td>NaN</td>
+<td>IR1</td>
+<td>Lvl</td>
+<td>AllPub</td>
+<td>...</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>9</td>
+<td>2008</td>
+<td>WD</td>
+<td>Normal</td>
+<td>223500</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>70</td>
+<td>RL</td>
+<td>60.0</td>
+<td>9550</td>
+<td>Pave</td>
+<td>NaN</td>
+<td>IR1</td>
+<td>Lvl</td>
+<td>AllPub</td>
+<td>...</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>2</td>
+<td>2006</td>
+<td>WD</td>
+<td>Abnorml</td>
+<td>140000</td>
+</tr>
+<tr>
+<th>4</th>
+<td>5</td>
+<td>60</td>
+<td>RL</td>
+<td>84.0</td>
+<td>14260</td>
+<td>Pave</td>
+<td>NaN</td>
+<td>IR1</td>
+<td>Lvl</td>
+<td>AllPub</td>
+<td>...</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>0</td>
+<td>12</td>
+<td>2008</td>
+<td>WD</td>
+<td>Normal</td>
+<td>250000</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 81 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[4]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>Id               int64
+MSSubClass       int64
+MSZoning        object
+LotFrontage    float64
+LotArea          int64
+dtype: object</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Cut this to 5,but there is a combination of about half continuous and half categorical variables in the dataset. 81 features in total.. A perfect option for dimensionality reduction! Further exploring:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[5]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>OverallQual</th>
+<th>OverallCond</th>
+<th>YearBuilt</th>
+<th>YearRemodAdd</th>
+<th>MasVnrArea</th>
+<th>BsmtFinSF1</th>
+<th>...</th>
+<th>WoodDeckSF</th>
+<th>OpenPorchSF</th>
+<th>EnclosedPorch</th>
+<th>3SsnPorch</th>
+<th>ScreenPorch</th>
+<th>PoolArea</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+<th>SalePrice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>count</th>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1201.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1452.000000</td>
+<td>1460.000000</td>
+<td>...</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+<td>1460.000000</td>
+</tr>
+<tr>
+<th>mean</th>
+<td>730.500000</td>
+<td>56.897260</td>
+<td>70.049958</td>
+<td>10516.828082</td>
+<td>6.099315</td>
+<td>5.575342</td>
+<td>1971.267808</td>
+<td>1984.865753</td>
+<td>103.685262</td>
+<td>443.639726</td>
+<td>...</td>
+<td>94.244521</td>
+<td>46.660274</td>
+<td>21.954110</td>
+<td>3.409589</td>
+<td>15.060959</td>
+<td>2.758904</td>
+<td>43.489041</td>
+<td>6.321918</td>
+<td>2007.815753</td>
+<td>180921.195890</td>
+</tr>
+<tr>
+<th>std</th>
+<td>421.610009</td>
+<td>42.300571</td>
+<td>24.284752</td>
+<td>9981.264932</td>
+<td>1.382997</td>
+<td>1.112799</td>
+<td>30.202904</td>
+<td>20.645407</td>
+<td>181.066207</td>
+<td>456.098091</td>
+<td>...</td>
+<td>125.338794</td>
+<td>66.256028</td>
+<td>61.119149</td>
+<td>29.317331</td>
+<td>55.757415</td>
+<td>40.177307</td>
+<td>496.123024</td>
+<td>2.703626</td>
+<td>1.328095</td>
+<td>79442.502883</td>
+</tr>
+<tr>
+<th>min</th>
+<td>1.000000</td>
+<td>20.000000</td>
+<td>21.000000</td>
+<td>1300.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1872.000000</td>
+<td>1950.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>...</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>2006.000000</td>
+<td>34900.000000</td>
+</tr>
+<tr>
+<th>25%</th>
+<td>365.750000</td>
+<td>20.000000</td>
+<td>59.000000</td>
+<td>7553.500000</td>
+<td>5.000000</td>
+<td>5.000000</td>
+<td>1954.000000</td>
+<td>1967.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>...</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>5.000000</td>
+<td>2007.000000</td>
+<td>129975.000000</td>
+</tr>
+<tr>
+<th>50%</th>
+<td>730.500000</td>
+<td>50.000000</td>
+<td>69.000000</td>
+<td>9478.500000</td>
+<td>6.000000</td>
+<td>5.000000</td>
+<td>1973.000000</td>
+<td>1994.000000</td>
+<td>0.000000</td>
+<td>383.500000</td>
+<td>...</td>
+<td>0.000000</td>
+<td>25.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>6.000000</td>
+<td>2008.000000</td>
+<td>163000.000000</td>
+</tr>
+<tr>
+<th>75%</th>
+<td>1095.250000</td>
+<td>70.000000</td>
+<td>80.000000</td>
+<td>11601.500000</td>
+<td>7.000000</td>
+<td>6.000000</td>
+<td>2000.000000</td>
+<td>2004.000000</td>
+<td>166.000000</td>
+<td>712.250000</td>
+<td>...</td>
+<td>168.000000</td>
+<td>68.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>8.000000</td>
+<td>2009.000000</td>
+<td>214000.000000</td>
+</tr>
+<tr>
+<th>max</th>
+<td>1460.000000</td>
+<td>190.000000</td>
+<td>313.000000</td>
+<td>215245.000000</td>
+<td>10.000000</td>
+<td>9.000000</td>
+<td>2010.000000</td>
+<td>2010.000000</td>
+<td>1600.000000</td>
+<td>5644.000000</td>
+<td>...</td>
+<td>857.000000</td>
+<td>547.000000</td>
+<td>552.000000</td>
+<td>508.000000</td>
+<td>480.000000</td>
+<td>738.000000</td>
+<td>15500.000000</td>
+<td>12.000000</td>
+<td>2010.000000</td>
+<td>755000.000000</td>
+</tr>
+</tbody>
+</table>
+<p>8 rows × 38 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Thats a lot to take in.. eough description of the dataframe. Time to check for any missing values and correct if necessary.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[6]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>Id                  0
+MSSubClass          0
+MSZoning            0
+LotFrontage       259
+LotArea             0
+Street              0
+Alley            1369
+LotShape            0
+LandContour         0
+Utilities           0
+LotConfig           0
+LandSlope           0
+Neighborhood        0
+Condition1          0
+Condition2          0
+BldgType            0
+HouseStyle          0
+OverallQual         0
+OverallCond         0
+YearBuilt           0
+YearRemodAdd        0
+RoofStyle           0
+RoofMatl            0
+Exterior1st         0
+Exterior2nd         0
+MasVnrType          8
+MasVnrArea          8
+ExterQual           0
+ExterCond           0
+Foundation          0
+                 ... 
+BedroomAbvGr        0
+KitchenAbvGr        0
+KitchenQual         0
+TotRmsAbvGrd        0
+Functional          0
+Fireplaces          0
+FireplaceQu       690
+GarageType         81
+GarageYrBlt        81
+GarageFinish       81
+GarageCars          0
+GarageArea          0
+GarageQual         81
+GarageCond         81
+PavedDrive          0
+WoodDeckSF          0
+OpenPorchSF         0
+EnclosedPorch       0
+3SsnPorch           0
+ScreenPorch         0
+PoolArea            0
+PoolQC           1453
+Fence            1179
+MiscFeature      1406
+MiscVal             0
+MoSold              0
+YrSold              0
+SaleType            0
+SaleCondition       0
+SalePrice           0
+Length: 81, dtype: int64</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A few of these are almost all null values.. Lets completely drop any variables with over 1/3 of the values missing:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">"Alley"</span><span class="p">,</span> <span class="s1">'FireplaceQu'</span><span class="p">,</span> <span class="s1">'PoolQC'</span><span class="p">,</span> <span class="s1">'Fence'</span><span class="p">,</span> <span class="s1">'MiscFeature'</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">df_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[7]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>(1460, 76)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train_cont</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"int64"</span> <span class="ow">or</span> <span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"float64"</span><span class="p">:</span>
+        <span class="n">df_train_cont</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+<span class="n">df_train_cont</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[8]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>OverallQual</th>
+<th>OverallCond</th>
+<th>YearBuilt</th>
+<th>YearRemodAdd</th>
+<th>MasVnrArea</th>
+<th>BsmtFinSF1</th>
+<th>...</th>
+<th>WoodDeckSF</th>
+<th>OpenPorchSF</th>
+<th>EnclosedPorch</th>
+<th>3SsnPorch</th>
+<th>ScreenPorch</th>
+<th>PoolArea</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+<th>SalePrice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>60</td>
+<td>65.0</td>
+<td>8450</td>
+<td>7</td>
+<td>5</td>
+<td>2003</td>
+<td>2003</td>
+<td>196.0</td>
+<td>706</td>
+<td>...</td>
+<td>0</td>
+<td>61</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>2008</td>
+<td>208500</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>20</td>
+<td>80.0</td>
+<td>9600</td>
+<td>6</td>
+<td>8</td>
+<td>1976</td>
+<td>1976</td>
+<td>0.0</td>
+<td>978</td>
+<td>...</td>
+<td>298</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2007</td>
+<td>181500</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>60</td>
+<td>68.0</td>
+<td>11250</td>
+<td>7</td>
+<td>5</td>
+<td>2001</td>
+<td>2002</td>
+<td>162.0</td>
+<td>486</td>
+<td>...</td>
+<td>0</td>
+<td>42</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>2008</td>
+<td>223500</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>70</td>
+<td>60.0</td>
+<td>9550</td>
+<td>7</td>
+<td>5</td>
+<td>1915</td>
+<td>1970</td>
+<td>0.0</td>
+<td>216</td>
+<td>...</td>
+<td>0</td>
+<td>35</td>
+<td>272</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>2006</td>
+<td>140000</td>
+</tr>
+<tr>
+<th>4</th>
+<td>5</td>
+<td>60</td>
+<td>84.0</td>
+<td>14260</td>
+<td>8</td>
+<td>5</td>
+<td>2000</td>
+<td>2000</td>
+<td>350.0</td>
+<td>655</td>
+<td>...</td>
+<td>192</td>
+<td>84</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>2008</td>
+<td>250000</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So we split up the continuous and the categorical variables in the dataset. Time to fill in the remaining missing values in the continuous set with their respective columns means:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">imp</span> <span class="o">=</span> <span class="n">Imputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="s1">'NaN'</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">)</span>
+
+<span class="n">df_train_cont_imp</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train_cont</span><span class="p">)</span>
+<span class="n">df_train_cont_imp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_cont_imp</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">df_train_cont</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="n">df_train_cont_imp</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[9]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>False</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Successfully filled in null values.. lets split out the result (sale price) and perform some PCA!</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">y_train</span> <span class="o">=</span> <span class="n">df_train_cont_imp</span><span class="p">[</span><span class="s2">"SalePrice"</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">df_train_cont_imp</span><span class="p">[</span><span class="s2">"SalePrice"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[10]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>0    208500.0
+1    181500.0
+2    223500.0
+3    140000.0
+4    250000.0
+Name: SalePrice, dtype: float64</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before we perform any dimensionality reduction, lets review were we're at!</p>
+<p>df_train:          categorical training variables</p>
+<p>df_train_cont_imp:  (no missing) continuous training variables</p>
+<p>y_train:            dependant variable of modeling</p>
+<p>df_test:            test data for kaggle-   NEEDS TO GO THROUGH PIPELINE</p>
+<p>Objective from here:</p>
+<p>-standardize continuous values</p>
+<p>-PCA on continuous</p>
+<p>-K-modes clustering on categorical!?</p>
+<p>-Combine principal components and clusters of categorical to get X_train</p>
+<p>-fit models</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [11]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train_cont_imp</span><span class="p">:</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train_cont_imp</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">df_train_cont_imp</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="n">X_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[11]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>OverallQual</th>
+<th>OverallCond</th>
+<th>YearBuilt</th>
+<th>YearRemodAdd</th>
+<th>MasVnrArea</th>
+<th>BsmtFinSF1</th>
+<th>...</th>
+<th>GarageArea</th>
+<th>WoodDeckSF</th>
+<th>OpenPorchSF</th>
+<th>EnclosedPorch</th>
+<th>3SsnPorch</th>
+<th>ScreenPorch</th>
+<th>PoolArea</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>-1.730865</td>
+<td>0.073375</td>
+<td>-0.229372</td>
+<td>-0.207142</td>
+<td>0.651479</td>
+<td>-0.517200</td>
+<td>1.050994</td>
+<td>0.878668</td>
+<td>0.511418</td>
+<td>0.575425</td>
+<td>...</td>
+<td>0.351000</td>
+<td>-0.752176</td>
+<td>0.216503</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-1.599111</td>
+<td>0.138777</td>
+</tr>
+<tr>
+<th>1</th>
+<td>-1.728492</td>
+<td>-0.872563</td>
+<td>0.451936</td>
+<td>-0.091886</td>
+<td>-0.071836</td>
+<td>2.179628</td>
+<td>0.156734</td>
+<td>-0.429577</td>
+<td>-0.574410</td>
+<td>1.171992</td>
+<td>...</td>
+<td>-0.060731</td>
+<td>1.626195</td>
+<td>-0.704483</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-0.489110</td>
+<td>-0.614439</td>
+</tr>
+<tr>
+<th>2</th>
+<td>-1.726120</td>
+<td>0.073375</td>
+<td>-0.093110</td>
+<td>0.073480</td>
+<td>0.651479</td>
+<td>-0.517200</td>
+<td>0.984752</td>
+<td>0.830215</td>
+<td>0.323060</td>
+<td>0.092907</td>
+<td>...</td>
+<td>0.631726</td>
+<td>-0.752176</td>
+<td>-0.070361</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>0.990891</td>
+<td>0.138777</td>
+</tr>
+<tr>
+<th>3</th>
+<td>-1.723747</td>
+<td>0.309859</td>
+<td>-0.456474</td>
+<td>-0.096897</td>
+<td>0.651479</td>
+<td>-0.517200</td>
+<td>-1.863632</td>
+<td>-0.720298</td>
+<td>-0.574410</td>
+<td>-0.499274</td>
+<td>...</td>
+<td>0.790804</td>
+<td>-0.752176</td>
+<td>-0.176048</td>
+<td>4.092524</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-1.599111</td>
+<td>-1.367655</td>
+</tr>
+<tr>
+<th>4</th>
+<td>-1.721374</td>
+<td>0.073375</td>
+<td>0.633618</td>
+<td>0.375148</td>
+<td>1.374795</td>
+<td>-0.517200</td>
+<td>0.951632</td>
+<td>0.733308</td>
+<td>1.364570</td>
+<td>0.463568</td>
+<td>...</td>
+<td>1.698485</td>
+<td>0.780197</td>
+<td>0.563760</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>2.100892</td>
+<td>0.138777</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [12]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">del</span> <span class="n">X_train</span><span class="p">[</span><span class="s1">'Id'</span><span class="p">]</span>
+
+<span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[12]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>(1460, 36)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Time to run PCA on this set. I'll first transfer this to an array and then apply sklearn.decomp.PCA to the X_train dataset.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [13]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">values</span>
+
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="n">explained_variance</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
+<span class="k">print</span><span class="p">(</span><span class="n">explained_variance</span><span class="p">)</span>
+
+<span class="n">X_train_pca</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:,:</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">X_train_pca</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_train_pca</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"pca1"</span><span class="p">,</span> <span class="s2">"pca2"</span><span class="p">,</span> <span class="s2">"pca3"</span><span class="p">,</span> <span class="s2">"pca4"</span><span class="p">,</span> <span class="s2">"pca5"</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[ 0.19812105  0.08900553  0.0714888   0.05614703  0.04091307]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>About 46% of the explained variance from only 5 principal components.  Not too bad... I think.. lets continue with this and try a k-means on the components just for fun!</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [14]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+
+<span class="n">X_train_clusters</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+ 
+<span class="n">X_train_clusters</span><span class="o">.</span><span class="n">labels_</span>
+<span class="n">X_train_clusters</span><span class="o">.</span><span class="n">cluster_centers_</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[14]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>array([[ 1.8471566 ,  1.67522714, -0.68752213, -0.74411962, -0.14086944],
+       [-2.20431745, -0.19357077,  0.38318628, -0.00859105, -0.08315146],
+       [ 2.21848876, -1.55823088,  0.03890235,  0.87915433,  0.32763546]])</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Alright, on to the categorical data..  first to clean it of nulls and then dummy variable it out. As this is more a project to explore dimensionality reduction, I'll allow the label encoder to encoder null values over to a value.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [15]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">hot_encoder</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">()</span>
+
+<span class="c1">#initialize empty frames for storage</span>
+<span class="n">df_train_enc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df_train_hot_enc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="c1">#iterate over categorical cols and transform into int values</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train</span><span class="p">:</span>
+    <span class="n">df_train_enc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    
+<span class="c1">#encoder into binary dummies</span>
+<span class="n">df_train_hot_enc</span> <span class="o">=</span> <span class="n">hot_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train_enc</span><span class="p">)</span>
+<span class="n">df_train_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_hot_enc</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
+
+<span class="n">df_train_dummies</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[15]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>...</th>
+<th>744</th>
+<th>745</th>
+<th>746</th>
+<th>747</th>
+<th>748</th>
+<th>749</th>
+<th>750</th>
+<th>751</th>
+<th>752</th>
+<th>753</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 754 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>okay.. so we just did the exact opposite of dimensionality reduction.. thats what dummy variables do. Lets try multiple correspondence analysis, the categorical PCA!</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [16]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train_mca</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">MCA</span><span class="p">(</span><span class="n">df_train_dummies</span><span class="p">,</span> <span class="n">ncols</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df_train_mca</span><span class="o">.</span><span class="n">L</span><span class="p">)</span> <span class="c1">#eigenvalues</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[ 0.00895017  0.00755986  0.00481571  0.0029876   0.00267983  0.00247353
+  0.00244682  0.00078794]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Well, not too valueable really. It's not explaining all too much of the variance.  Lets go back to the the first categorical and take a more traditional approach. First to view unique counts per column:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [17]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">i</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>MSZoning
+RL         1151
+RM          218
+FV           65
+RH           16
+C (all)      10
+Name: MSZoning, dtype: int64
+Street
+Pave    1454
+Grvl       6
+Name: Street, dtype: int64
+LotShape
+Reg    925
+IR1    484
+IR2     41
+IR3     10
+Name: LotShape, dtype: int64
+LandContour
+Lvl    1311
+Bnk      63
+HLS      50
+Low      36
+Name: LandContour, dtype: int64
+Utilities
+AllPub    1459
+NoSeWa       1
+Name: Utilities, dtype: int64
+LotConfig
+Inside     1052
+Corner      263
+CulDSac      94
+FR2          47
+FR3           4
+Name: LotConfig, dtype: int64
+LandSlope
+Gtl    1382
+Mod      65
+Sev      13
+Name: LandSlope, dtype: int64
+Neighborhood
+NAmes      225
+CollgCr    150
+OldTown    113
+Edwards    100
+Somerst     86
+Gilbert     79
+NridgHt     77
+Sawyer      74
+NWAmes      73
+SawyerW     59
+BrkSide     58
+Crawfor     51
+Mitchel     49
+NoRidge     41
+Timber      38
+IDOTRR      37
+ClearCr     28
+SWISU       25
+StoneBr     25
+MeadowV     17
+Blmngtn     17
+BrDale      16
+Veenker     11
+NPkVill      9
+Blueste      2
+Name: Neighborhood, dtype: int64
+Condition1
+Norm      1260
+Feedr       81
+Artery      48
+RRAn        26
+PosN        19
+RRAe        11
+PosA         8
+RRNn         5
+RRNe         2
+Name: Condition1, dtype: int64
+Condition2
+Norm      1445
+Feedr        6
+Artery       2
+RRNn         2
+PosN         2
+RRAn         1
+RRAe         1
+PosA         1
+Name: Condition2, dtype: int64
+BldgType
+1Fam      1220
+TwnhsE     114
+Duplex      52
+Twnhs       43
+2fmCon      31
+Name: BldgType, dtype: int64
+HouseStyle
+1Story    726
+2Story    445
+1.5Fin    154
+SLvl       65
+SFoyer     37
+1.5Unf     14
+2.5Unf     11
+2.5Fin      8
+Name: HouseStyle, dtype: int64
+RoofStyle
+Gable      1141
+Hip         286
+Flat         13
+Gambrel      11
+Mansard       7
+Shed          2
+Name: RoofStyle, dtype: int64
+RoofMatl
+CompShg    1434
+Tar&Grv;      11
+WdShngl       6
+WdShake       5
+Membran       1
+Metal         1
+ClyTile       1
+Roll          1
+Name: RoofMatl, dtype: int64
+Exterior1st
+VinylSd    515
+HdBoard    222
+MetalSd    220
+Wd Sdng    206
+Plywood    108
+CemntBd     61
+BrkFace     50
+WdShing     26
+Stucco      25
+AsbShng     20
+Stone        2
+BrkComm      2
+AsphShn      1
+ImStucc      1
+CBlock       1
+Name: Exterior1st, dtype: int64
+Exterior2nd
+VinylSd    504
+MetalSd    214
+HdBoard    207
+Wd Sdng    197
+Plywood    142
+CmentBd     60
+Wd Shng     38
+Stucco      26
+BrkFace     25
+AsbShng     20
+ImStucc     10
+Brk Cmn      7
+Stone        5
+AsphShn      3
+Other        1
+CBlock       1
+Name: Exterior2nd, dtype: int64
+MasVnrType
+None       864
+BrkFace    445
+Stone      128
+BrkCmn      15
+Name: MasVnrType, dtype: int64
+ExterQual
+TA    906
+Gd    488
+Ex     52
+Fa     14
+Name: ExterQual, dtype: int64
+ExterCond
+TA    1282
+Gd     146
+Fa      28
+Ex       3
+Po       1
+Name: ExterCond, dtype: int64
+Foundation
+PConc     647
+CBlock    634
+BrkTil    146
+Slab       24
+Stone       6
+Wood        3
+Name: Foundation, dtype: int64
+BsmtQual
+TA    649
+Gd    618
+Ex    121
+Fa     35
+Name: BsmtQual, dtype: int64
+BsmtCond
+TA    1311
+Gd      65
+Fa      45
+Po       2
+Name: BsmtCond, dtype: int64
+BsmtExposure
+No    953
+Av    221
+Gd    134
+Mn    114
+Name: BsmtExposure, dtype: int64
+BsmtFinType1
+Unf    430
+GLQ    418
+ALQ    220
+BLQ    148
+Rec    133
+LwQ     74
+Name: BsmtFinType1, dtype: int64
+BsmtFinType2
+Unf    1256
+Rec      54
+LwQ      46
+BLQ      33
+ALQ      19
+GLQ      14
+Name: BsmtFinType2, dtype: int64
+Heating
+GasA     1428
+GasW       18
+Grav        7
+Wall        4
+OthW        2
+Floor       1
+Name: Heating, dtype: int64
+HeatingQC
+Ex    741
+TA    428
+Gd    241
+Fa     49
+Po      1
+Name: HeatingQC, dtype: int64
+CentralAir
+Y    1365
+N      95
+Name: CentralAir, dtype: int64
+Electrical
+SBrkr    1334
+FuseA      94
+FuseF      27
+FuseP       3
+Mix         1
+Name: Electrical, dtype: int64
+KitchenQual
+TA    735
+Gd    586
+Ex    100
+Fa     39
+Name: KitchenQual, dtype: int64
+Functional
+Typ     1360
+Min2      34
+Min1      31
+Mod       15
+Maj1      14
+Maj2       5
+Sev        1
+Name: Functional, dtype: int64
+GarageType
+Attchd     870
+Detchd     387
+BuiltIn     88
+Basment     19
+CarPort      9
+2Types       6
+Name: GarageType, dtype: int64
+GarageFinish
+Unf    605
+RFn    422
+Fin    352
+Name: GarageFinish, dtype: int64
+GarageQual
+TA    1311
+Fa      48
+Gd      14
+Ex       3
+Po       3
+Name: GarageQual, dtype: int64
+GarageCond
+TA    1326
+Fa      35
+Gd       9
+Po       7
+Ex       2
+Name: GarageCond, dtype: int64
+PavedDrive
+Y    1340
+N      90
+P      30
+Name: PavedDrive, dtype: int64
+SaleType
+WD       1267
+New       122
+COD        43
+ConLD       9
+ConLw       5
+ConLI       5
+CWD         4
+Oth         3
+Con         2
+Name: SaleType, dtype: int64
+SaleCondition
+Normal     1198
+Partial     125
+Abnorml     101
+Family       20
+Alloca       12
+AdjLand       4
+Name: SaleCondition, dtype: int64
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Several of these cetagories are overwhelmingly distributed to one value. As such, they will not provide useful information in forecasting.. I'm going to set a threshold of 75% within one value.. IE: if one value in a category holds >= 75% of the total count, it gets removed from the dataset.. This acocunts for:</p>
+<p>MSZoning, Street, LandContour, Utilities, LandSlope, Condition1, Condition2, BldgType, RoofStyle, RoofMat1, ExterCond, BsmtQual, BsmtFinType2, Heating, CentralAir, Electrical, Functional, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition</p>
+<p>While Numerous of these would be expected to be useful in predicting price (central air, paved driveway, sale condition) I'm still removing at this threshold to try to reduce dimensionality. I'll evbentually compare to a full-on regression with all variables and see what the difference relates to.</p>
+<p>Lets remove them:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [18]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_train</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">"MSZoning"</span><span class="p">,</span> <span class="s2">"Street"</span><span class="p">,</span> <span class="s2">"LandContour"</span><span class="p">,</span> <span class="s2">"Utilities"</span><span class="p">,</span> <span class="s2">"LandSlope"</span><span class="p">,</span> <span class="s2">"Condition1"</span><span class="p">,</span> <span class="s2">"Condition2"</span><span class="p">,</span> <span class="s2">"BldgType"</span><span class="p">,</span> 
+                          <span class="s2">"RoofStyle"</span><span class="p">,</span> <span class="s2">"RoofMatl"</span><span class="p">,</span> <span class="s2">"ExterCond"</span><span class="p">,</span> <span class="s2">"BsmtQual"</span><span class="p">,</span> <span class="s2">"BsmtFinType2"</span><span class="p">,</span> <span class="s2">"Heating"</span><span class="p">,</span> <span class="s2">"CentralAir"</span><span class="p">,</span> <span class="s2">"Electrical"</span><span class="p">,</span> 
+                          <span class="s2">"Functional"</span><span class="p">,</span> <span class="s2">"GarageQual"</span><span class="p">,</span> <span class="s2">"GarageCond"</span><span class="p">,</span> <span class="s2">"PavedDrive"</span><span class="p">,</span> <span class="s2">"SaleType"</span><span class="p">,</span> <span class="s2">"SaleCondition"</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[18]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>LotShape</th>
+<th>LotConfig</th>
+<th>Neighborhood</th>
+<th>HouseStyle</th>
+<th>Exterior1st</th>
+<th>Exterior2nd</th>
+<th>MasVnrType</th>
+<th>ExterQual</th>
+<th>Foundation</th>
+<th>BsmtCond</th>
+<th>BsmtExposure</th>
+<th>BsmtFinType1</th>
+<th>HeatingQC</th>
+<th>KitchenQual</th>
+<th>GarageType</th>
+<th>GarageFinish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Reg</td>
+<td>Inside</td>
+<td>CollgCr</td>
+<td>2Story</td>
+<td>VinylSd</td>
+<td>VinylSd</td>
+<td>BrkFace</td>
+<td>Gd</td>
+<td>PConc</td>
+<td>TA</td>
+<td>No</td>
+<td>GLQ</td>
+<td>Ex</td>
+<td>Gd</td>
+<td>Attchd</td>
+<td>RFn</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Reg</td>
+<td>FR2</td>
+<td>Veenker</td>
+<td>1Story</td>
+<td>MetalSd</td>
+<td>MetalSd</td>
+<td>None</td>
+<td>TA</td>
+<td>CBlock</td>
+<td>TA</td>
+<td>Gd</td>
+<td>ALQ</td>
+<td>Ex</td>
+<td>TA</td>
+<td>Attchd</td>
+<td>RFn</td>
+</tr>
+<tr>
+<th>2</th>
+<td>IR1</td>
+<td>Inside</td>
+<td>CollgCr</td>
+<td>2Story</td>
+<td>VinylSd</td>
+<td>VinylSd</td>
+<td>BrkFace</td>
+<td>Gd</td>
+<td>PConc</td>
+<td>TA</td>
+<td>Mn</td>
+<td>GLQ</td>
+<td>Ex</td>
+<td>Gd</td>
+<td>Attchd</td>
+<td>RFn</td>
+</tr>
+<tr>
+<th>3</th>
+<td>IR1</td>
+<td>Corner</td>
+<td>Crawfor</td>
+<td>2Story</td>
+<td>Wd Sdng</td>
+<td>Wd Shng</td>
+<td>None</td>
+<td>TA</td>
+<td>BrkTil</td>
+<td>Gd</td>
+<td>No</td>
+<td>ALQ</td>
+<td>Gd</td>
+<td>Gd</td>
+<td>Detchd</td>
+<td>Unf</td>
+</tr>
+<tr>
+<th>4</th>
+<td>IR1</td>
+<td>FR2</td>
+<td>NoRidge</td>
+<td>2Story</td>
+<td>VinylSd</td>
+<td>VinylSd</td>
+<td>BrkFace</td>
+<td>Gd</td>
+<td>PConc</td>
+<td>TA</td>
+<td>Av</td>
+<td>GLQ</td>
+<td>Ex</td>
+<td>Gd</td>
+<td>Attchd</td>
+<td>RFn</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Lets encode these out and get to model fitting.  (This is just a rewriting of the above encoding, but with the smaller dataset.)</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [19]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#initialize empty frames for storage</span>
+<span class="n">df_train_enc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df_train_hot_enc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="c1">#iterate over categorical cols and transform into int values</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train</span><span class="p">:</span>
+    <span class="n">df_train_enc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    
+<span class="c1">#encoder into binary dummies</span>
+<span class="n">df_train_hot_enc</span> <span class="o">=</span> <span class="n">hot_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_train_enc</span><span class="p">)</span>
+<span class="n">df_train_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_train_hot_enc</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
+
+<span class="n">df_train_dummies</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[19]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>...</th>
+<th>391</th>
+<th>392</th>
+<th>393</th>
+<th>394</th>
+<th>395</th>
+<th>396</th>
+<th>397</th>
+<th>398</th>
+<th>399</th>
+<th>400</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 401 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Alright,  lets combine the two train sets (continuous and categorical). We'll split the Kaggle train set into a train and test subset so we can test the accuracy as well. After that, We'll fit a regression and see the results:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [20]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train_pca</span>
+<span class="n">X_train</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_train_dummies</span><span class="p">:</span>
+    <span class="n">X_train</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span><span class="n">df_train_dummies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    
+<span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[20]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>(1460, 406)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [21]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">X_train_save</span> <span class="o">=</span> <span class="n">X_train</span> <span class="c1">#needed for later</span>
+<span class="n">y_train_save</span> <span class="o">=</span> <span class="n">y_train</span> <span class="c1">#needed for later</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">"okay, this is getting messy and difficult to track in jupyter.. lets model and gtfo"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>okay, this is getting messy and difficult to track in jupyter.. lets model and gtfo
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [22]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#linear</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># The mean squared error</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">"Mean squared error: </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>     
+
+<span class="c1"># Explained variance score: 1 is perfect prediction</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">'Variance score: </span><span class="si">%.2f</span><span class="s1">'</span><span class="p">)</span> <span class="o">%</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>    
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Mean squared error: 1063481822160301124330534731776.00
+Variance score: -144861071958222913536.00
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Well something is off here.  lets print out the preds to true values:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [23]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">"True       Predicted"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">        </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>True       Predicted
+154500.00        150211.00
+325000.00        301361.00
+115000.00        108992.00
+159000.00        173719.00
+315500.00        312825.00
+75500.00        138320126160922.00
+311500.00        253260.00
+146000.00        148172.00
+84500.00        138320126158674.00
+135500.00        131382.00
+145000.00        129060.00
+130000.00        112941.00
+81000.00        124811.00
+214000.00        234873.00
+181000.00        184833.00
+134500.00        117976.00
+183500.00        193918.00
+135000.00        123773.00
+118400.00        137025.00
+226000.00        208449.00
+155000.00        160173.00
+210000.00        199413.00
+173500.00        177851.00
+129000.00        120808.00
+192000.00        203707.00
+153900.00        162917.00
+181134.00        202883.00
+141000.00        120239.00
+181000.00        181342.00
+208900.00        191221.00
+127000.00        125141.00
+284000.00        288563.00
+200500.00        138320126372920.00
+135750.00        96995.00
+255000.00        256505.00
+140000.00        134191.00
+138000.00        120298.00
+219500.00        213180.00
+310000.00        307259.00
+97000.00        -774136251902434.00
+114500.00        142973.00
+205000.00        222909.00
+119500.00        95397.00
+253293.00        355635.00
+128500.00        126239.00
+117500.00        143418.00
+115000.00        106424.00
+127000.00        119092.00
+451950.00        412803.00
+144000.00        132118.00
+119000.00        112934.00
+196000.00        209345.00
+115000.00        112250.00
+287000.00        257300.00
+144500.00        193217.00
+260000.00        224363.00
+213000.00        194860.00
+175000.00        202897.00
+107000.00        121559.00
+107500.00        1725825612082280.50
+68500.00        78946.00
+154000.00        176947.00
+317000.00        306067.00
+264132.00        264680.00
+283463.00        275617.00
+243000.00        185570.00
+109000.00        87792.00
+305000.00        310483.00
+93500.00        138320126241910.00
+176000.00        183413.00
+118858.00        1725825504232654.50
+134000.00        128268.00
+109008.00        102973.00
+93500.00        -774136254329829.00
+611657.00        423795.00
+173000.00        191545.00
+348000.00        301939.00
+341000.00        323617.00
+141000.00        157451.00
+124900.00        122659.00
+118000.00        113566.00
+67000.00        -1554537323787872.00
+113000.00        114221.00
+91300.00        96145.00
+149500.00        151220.00
+133000.00        138577.00
+266000.00        243967.00
+190000.00        228239.00
+155900.00        159075.00
+155835.00        187658.00
+153500.00        144105.00
+152000.00        168074.00
+124500.00        142124.00
+301000.00        257600.00
+136500.00        138320126227596.00
+169990.00        201483.00
+205000.00        209734.00
+183900.00        161974.00
+204900.00        192513.00
+260000.00        263733.00
+163500.00        113063.00
+224900.00        203469.00
+244000.00        246738.00
+132000.00        148597.00
+194000.00        206130.00
+156500.00        198485.00
+156000.00        136923.00
+275000.00        296543.00
+145000.00        165230.00
+135000.00        210297.00
+60000.00        138320126187433.00
+124000.00        138320126239118.00
+127000.00        136659.00
+137500.00        141155.00
+213500.00        201041.00
+119000.00        127766.00
+107900.00        99353.00
+123000.00        117569.00
+112000.00        1725825618631814.50
+284000.00        283433.00
+133000.00        118655.00
+149000.00        163041.00
+169000.00        179597.00
+207000.00        185300.00
+175000.00        195858.00
+137000.00        127718.00
+236000.00        234605.00
+79500.00        105241.00
+144000.00        166678.00
+162900.00        195239.00
+185900.00        190545.00
+369900.00        296073.00
+197900.00        187585.00
+104000.00        138320126283852.00
+35311.00        74353.00
+337500.00        370623.00
+367294.00        350601.00
+130250.00        150079.00
+230000.00        229071.00
+755000.00        485857.00
+403000.00        364357.00
+132000.00        117788.00
+178000.00        181370.00
+136500.00        157698.00
+145000.00        156978.00
+123000.00        118015.00
+250000.00        259562.00
+187100.00        183581.00
+133900.00        135873.00
+67000.00        138320126169044.00
+137500.00        142958.00
+155000.00        148617.00
+200624.00        -8653893472972565.00
+154300.00        145019.00
+91000.00        92689.00
+136000.00        138320126228596.00
+108959.00        92647.00
+140000.00        128766.00
+86000.00        138320126201490.00
+131400.00        128927.00
+179900.00        188881.00
+144000.00        84173.00
+293077.00        279677.00
+144500.00        156131.00
+118500.00        104763.00
+141000.00        138320126276588.00
+239000.00        244213.00
+276000.00        295022.00
+556581.00        401247.00
+244400.00        189966.00
+360000.00        376705.00
+103200.00        138320126203828.00
+102000.00        138320126226476.00
+151000.00        142324.00
+285000.00        306595.00
+134432.00        -774136251876770.00
+113000.00        112747.00
+187500.00        218847.00
+125500.00        125485.00
+177500.00        185998.00
+179900.00        224773.00
+55993.00        112097.00
+132500.00        122842.00
+135000.00        128932.00
+255000.00        237135.00
+140000.00        116236.00
+271000.00        252505.00
+246578.00        204611.00
+202500.00        226097.00
+75000.00        67890.00
+122500.00        123907.00
+108480.00        99525.00
+160000.00        179893.00
+171000.00        157812.00
+196000.00        228883.00
+225000.00        180511.00
+197000.00        201043.00
+40000.00        109905.00
+172500.00        208755.00
+154900.00        147669.00
+280000.00        228550.00
+175000.00        212461.00
+147000.00        107849.00
+315000.00        302866.00
+185000.00        199013.00
+135500.00        121819.00
+239500.00        222069.00
+139000.00        137251.00
+140000.00        116580.00
+110000.00        98251.00
+225000.00        211325.00
+143500.00        153057.00
+128950.00        138320126227238.00
+172500.00        178613.00
+241500.00        220326.00
+262500.00        245885.00
+194201.00        214354.00
+143000.00        122727.00
+130000.00        127966.00
+126000.00        -774136211604861.00
+142500.00        131248.00
+254000.00        243943.00
+217500.00        225380.00
+66500.00        107989.00
+201000.00        231147.00
+155000.00        136984.00
+68400.00        92379.00
+64500.00        112649.00
+173000.00        175250.00
+102776.00        105775.00
+84900.00        -774136243291964.00
+165600.00        173911.00
+120000.00        120584.00
+135000.00        107419.00
+220000.00        224611.00
+153575.00        145213.00
+195400.00        191925.00
+147000.00        151899.00
+277000.00        235819.00
+143000.00        129173.00
+105900.00        117508.00
+242000.00        233884.00
+194500.00        217067.00
+438780.00        414802.00
+185000.00        185123.00
+107500.00        138320126235972.00
+165000.00        161152.00
+176000.00        168580.00
+129900.00        135860.00
+115000.00        99227.00
+192140.00        157348.00
+160000.00        152723.00
+145000.00        130093.00
+86000.00        114795.00
+158000.00        150398.00
+127500.00        150855.00
+115000.00        121843.00
+119500.00        124727.00
+175900.00        186719.00
+240000.00        230065.00
+395000.00        292513.00
+165000.00        190207.00
+128200.00        126002.00
+275000.00        241374.00
+311872.00        333837.00
+214000.00        264196.00
+153500.00        160347.00
+144000.00        162383.00
+115000.00        109338.00
+180000.00        194829.00
+465000.00        -8652679814782547.00
+180000.00        234497.00
+253000.00        236517.00
+85000.00        78592.00
+101800.00        1725825612516762.00
+148500.00        126353.00
+137500.00        139437.00
+318061.00        305143.00
+143000.00        243483.00
+140000.00        130494.00
+192500.00        5849406439234922.00
+92000.00        138320126211547.00
+197000.00        191633.00
+109500.00        113817.00
+297000.00        276491.00
+185750.00        191003.00
+230000.00        199221.00
+89471.00        123403.00
+260000.00        288824.00
+189000.00        211275.00
+108000.00        98723.00
+124500.00        118627.00
+145000.00        120283.00
+178000.00        166875.00
+85000.00        138320126207371.00
+175000.00        148939.00
+127000.00        156835.00
+149900.00        150848.00
+174000.00        204456.00
+125500.00        111787.00
+175500.00        192644.00
+225000.00        232678.00
+129000.00        124576.00
+159950.00        143923.00
+157000.00        166119.00
+205000.00        194794.00
+140000.00        148306.00
+200000.00        211151.00
+217000.00        247819.00
+125000.00        122265.00
+159500.00        116462.00
+184000.00        170168.00
+96500.00        126309.00
+200000.00        213463.00
+149000.00        131097.00
+178900.00        190158.00
+184900.00        -8653581893279559.00
+164700.00        162167.00
+335000.00        332750.00
+87500.00        1725825641496850.00
+233170.00        243361.00
+149350.00        148185.00
+133000.00        115034.00
+98000.00        138320126189518.00
+207500.00        194142.00
+150000.00        160024.00
+134900.00        139607.00
+187750.00        200477.00
+149500.00        152687.00
+116050.00        92949.00
+153337.00        157879.00
+165000.00        143732.00
+130500.00        159244.00
+206300.00        199895.00
+146000.00        159029.00
+126500.00        107896.00
+139000.00        184977.00
+113000.00        138320126168551.00
+79000.00        138320126185880.00
+182000.00        -8652809840427027.00
+188000.00        189026.00
+129000.00        134809.00
+160000.00        138320126237881.00
+174000.00        179009.00
+219210.00        231392.00
+310000.00        336157.00
+374000.00        348145.00
+100000.00        117929.00
+250000.00        219850.00
+145000.00        126189.00
+325000.00        279416.00
+380000.00        377130.00
+275000.00        283691.00
+180000.00        179456.00
+245350.00        215241.00
+151500.00        140879.00
+134500.00        107990.00
+94000.00        138320126207187.00
+216000.00        210017.00
+350000.00        344335.00
+195000.00        190204.00
+120000.00        126433.00
+228500.00        218045.00
+248000.00        256537.00
+124000.00        125469.00
+191000.00        180685.00
+181000.00        193363.00
+105000.00        101319.00
+139900.00        121797.00
+157900.00        139285.00
+130500.00        103079.00
+172400.00        178517.00
+130000.00        114067.00
+178000.00        193458.00
+161500.00        213060.00
+119900.00        139045.00
+239000.00        218895.00
+190000.00        187535.00
+85400.00        90611.00
+205000.00        187157.00
+134000.00        157096.00
+168000.00        174856.00
+185000.00        184494.00
+180500.00        124479.00
+152000.00        142014.00
+215000.00        220313.00
+153000.00        129503.00
+106000.00        124801.00
+340000.00        248105.00
+159000.00        174063.00
+120000.00        121939.00
+115000.00        1725825612612082.50
+128000.00        150991.00
+314813.00        338699.00
+131000.00        134171.00
+446261.00        380933.00
+127500.00        136555.00
+155000.00        185090.00
+177500.00        180883.00
+128500.00        141651.00
+176000.00        173214.00
+402000.00        338309.00
+130000.00        138320126255192.00
+145000.00        138453.00
+147000.00        133947.00
+115000.00        138320126202910.00
+189000.00        187737.00
+143000.00        141074.00
+240000.00        220399.00
+230000.00        239589.00
+190000.00        257705.00
+213000.00        210433.00
+82500.00        138320126210703.00
+274900.00        323037.00
+155000.00        176213.00
+423000.00        335065.00
+128500.00        138165.00
+335000.00        362733.00
+262000.00        1977392763534562.50
+129500.00        113577.00
+222500.00        226664.00
+270000.00        303206.00
+207500.00        241393.00
+175000.00        197931.00
+238000.00        236415.00
+135900.00        138320126259177.00
+224000.00        243293.00
+170000.00        185195.00
+185000.00        199637.00
+263000.00        245408.00
+62383.00        111109.00
+150000.00        163169.00
+171000.00        204763.00
+139000.00        122581.00
+126175.00        136056.00
+205950.00        -8652818881057405.00
+110000.00        118022.00
+485000.00        409522.00
+174000.00        166949.00
+145000.00        136073.00
+215200.00        217373.00
+320000.00        280178.00
+212000.00        224297.00
+168500.00        183295.00
+189000.00        207801.00
+140000.00        138871.00
+187500.00        175023.00
+254900.00        236189.00
+135000.00        115596.00
+151000.00        132415.00
+112500.00        142966.00
+184000.00        165857.00
+197000.00        241757.00
+161500.00        177418.00
+85000.00        119763.00
+203000.00        198777.00
+325000.00        346638.00
+313000.00        297451.00
+237000.00        -8652690454334707.00
+180500.00        149137.00
+137000.00        131775.00
+90350.00        160051.00
+150900.00        179002.00
+214000.00        203415.00
+121500.00        165591.00
+745000.00        431961.00
+190000.00        186177.00
+181000.00        179219.00
+60000.00        893910032540262.00
+239000.00        252748.00
+118500.00        138320126212778.00
+109500.00        -774136251924978.00
+110000.00        112669.00
+105500.00        99684.00
+199900.00        199245.00
+271900.00        243597.00
+131500.00        143228.00
+135000.00        137710.00
+119000.00        108789.00
+215000.00        194265.00
+133500.00        140300.00
+169000.00        177765.00
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So it appears one of the variables is drastically throwing off a few of the predictions.  the majority are, while not great, not too far off from expected.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [24]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">coef_</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[24]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>array([  1.62516326e+04,   4.40655927e+03,   2.03253328e+03,
+        -3.04495955e+03,  -7.80482467e+03,   9.28415933e+15,
+         9.28415933e+15,   9.28415933e+15,   9.28415933e+15,
+         7.63267190e+15,   7.63267190e+15,   7.63267190e+15,
+         7.63267190e+15,   7.63267190e+15,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -8.36533038e+14,  -8.36533038e+14,  -8.36533038e+14,
+        -5.77037165e+15,  -5.77037165e+15,  -5.77037165e+15,
+        -5.77037165e+15,  -5.77037165e+15,  -5.77037165e+15,
+        -5.77037165e+15,  -5.77037165e+15,  -1.77139543e+15,
+        -7.02077691e+13,  -8.77485397e+14,  -1.77139543e+15,
+        -1.83102432e+14,  -1.77139543e+15,  -1.77139543e+15,
+         2.05997334e+14,  -1.77139543e+15,  -1.77139543e+15,
+        -1.77139543e+15,  -1.77139543e+15,  -1.77139543e+15,
+        -1.77139543e+15,  -1.77139543e+15,  -1.29524422e+14,
+        -1.29524422e+14,  -1.29524422e+14,  -1.29524422e+14,
+        -1.71781742e+15,  -1.29524422e+14,  -1.29524422e+14,
+        -1.29524422e+14,  -1.29524422e+14,  -1.29524422e+14,
+        -1.29524422e+14,  -1.29524422e+14,  -1.29524422e+14,
+        -1.29524422e+14,  -1.29524422e+14,  -1.29524422e+14,
+        -8.06110533e+11,  -1.11769025e+12,   8.65277578e+15,
+         8.65277578e+15,  -3.40577044e+10,   8.53283709e+10,
+        -4.30983234e+10,   9.59677471e+10,   8.65277578e+15,
+         8.65277578e+15,   8.65277578e+15,   8.65277578e+15,
+        -9.03357387e+15,  -9.03357387e+15,  -9.03357387e+15,
+        -9.03357387e+15,  -1.50534191e+16,  -1.50534191e+16,
+        -1.50534191e+16,  -1.25534572e+16,  -1.50534191e+16,
+        -1.50534191e+16,  -1.08351220e+08,   7.96750505e+14,
+        -4.80882164e+14,   4.02981534e+07,   8.64768686e+06,
+         2.89682608e+07,  -2.31971348e+06,   6.03989554e+06,
+         1.36059843e+14,  -4.84235608e+05,  -2.80539364e+14,
+        -6.45212466e+14,  -2.93144416e+14,  -8.16910341e+14,
+        -8.05137463e+14,  -4.47669191e+14,  -5.89947766e+14,
+        -2.57311280e+14,   5.35000000e+01,  -1.02261277e+15,
+        -5.03262310e+14,  -7.43156193e+13,   1.60000000e+01,
+        -9.23200167e+14,  -4.00000000e+00,   7.50000000e-01,
+        -5.17347298e+14,  -3.21850117e+14,   6.73470178e+12,
+        -6.60887834e+14,  -9.56502604e+14,   2.67892076e+14,
+         4.59802839e+14,   1.78581717e+14,  -6.67916101e+14,
+         5.20303742e+13,   6.87599182e-04,   2.51998155e+15,
+         2.51998155e+15,   9.65444226e+14,   2.51998155e+15,
+        -3.05514637e+14,   3.59945209e+13,  -4.80559816e+14,
+         3.74497854e-02,   1.07409219e-02,  -2.84644040e-03,
+         1.41220980e+15,  -2.80583663e+14,  -9.26421126e-06,
+         5.47993185e+14,   3.48050889e-07,   3.07561780e+14,
+        -6.59850280e+14,  -3.28780392e+14,  -1.00422572e+15,
+        -9.54965663e+14,  -3.54725088e+14,   5.00222086e-12,
+         6.55896725e+13,   5.45071479e+14,  -9.26715498e+14,
+        -9.57680202e+13,  -9.12247184e+14,  -8.48216793e+14,
+         0.00000000e+00,   2.97777268e+14,   0.00000000e+00,
+        -1.45519152e-11,  -1.26016051e+15,  -5.28954756e+14,
+        -6.01891084e+14,  -1.45395814e+15,   3.63797881e-12,
+        -6.82121026e-13,   9.09494702e-13,  -9.09494702e-13,
+        -4.97442151e+14,  -1.20462126e+15,  -5.84940644e+15,
+        -5.84940644e+15,  -5.84940644e+15,  -5.84940644e+15,
+        -5.28954756e+14,  -6.59850280e+14,   5.47993185e+14,
+         2.97777268e+14,   0.00000000e+00,   0.00000000e+00,
+        -2.80791437e+14,  -5.80134879e+14,   4.59839771e+14,
+        -1.09972116e+14,  -3.04151171e+14,   2.48743740e+14,
+         0.00000000e+00,   1.29047575e+13,  -2.09162348e+14,
+         0.00000000e+00,   0.00000000e+00,  -4.18309330e+14,
+         0.00000000e+00,  -7.27918499e+14,  -1.26241561e+15,
+        -5.20434013e+14,  -2.73930701e+14,   0.00000000e+00,
+         0.00000000e+00,   0.00000000e+00,  -6.20672219e+14,
+        -8.48318685e+14,  -2.40664986e+14,  -6.15173512e+14,
+         0.00000000e+00,   0.00000000e+00,  -2.05770692e+14,
+         0.00000000e+00,  -5.39759547e+14,  -1.84306015e+14,
+        -2.98429298e+14,   4.10356114e+15,   4.10356114e+15,
+         4.10356114e+15,   4.10356114e+15,   4.10356114e+15,
+         4.10356114e+15,   4.35371297e+15,   4.35371297e+15,
+         4.35371297e+15,   4.35371297e+15,   4.35371297e+15,
+        -2.77641934e+15,  -2.77641934e+15,  -2.77641934e+15,
+        -2.77641934e+15,   0.00000000e+00,   1.49586085e+14,
+        -4.55706690e+14,  -3.95475089e+14,   8.83466323e+13,
+        -7.95538603e+13,  -4.75835651e+14,   0.00000000e+00,
+         1.29047575e+13,  -5.09616641e+14,  -7.53905798e+13,
+         5.43556264e+13,  -2.47236503e+14,   0.00000000e+00,
+         0.00000000e+00,  -6.16894023e+14,  -3.00429275e+15,
+        -1.43566949e+14,  -4.18309331e+14,   0.00000000e+00,
+         0.00000000e+00,  -1.05576023e+13,  -2.86981769e+14,
+         7.08108599e+14,   2.17149181e+14,  -1.18262878e+15,
+         1.58346906e+14,   6.32700306e+13,   1.92131286e+14,
+        -1.84306015e+14,   0.00000000e+00,   0.00000000e+00,
+        -9.44916123e+13,   0.00000000e+00,   0.00000000e+00,
+        -4.10944237e+14,  -1.26770966e+14,   9.71200810e+13,
+         3.15937475e+13,   0.00000000e+00,   0.00000000e+00,
+         0.00000000e+00,  -1.79219044e+14,  -4.91634772e+14,
+        -3.88248968e+13,   0.00000000e+00,   0.00000000e+00,
+        -2.81575971e+14,   0.00000000e+00,   2.22254187e+14,
+        -1.22489141e+14,  -9.96608043e+13,  -2.97824709e+14,
+        -1.37040245e+13,   0.00000000e+00,  -2.46124845e+14,
+        -3.04151171e+14,  -1.95416363e+13,  -1.68850042e+14,
+         0.00000000e+00,   0.00000000e+00,   5.95814089e+13,
+         0.00000000e+00,   0.00000000e+00,   0.00000000e+00,
+        -8.52313998e+14,   0.00000000e+00,   0.00000000e+00,
+        -2.01035139e+14,  -5.26732230e+13,   0.00000000e+00,
+        -2.98429298e+14,   1.60391021e+14,  -1.45637624e+14,
+        -9.60563158e+12,  -1.73184325e+14,   0.00000000e+00,
+         0.00000000e+00,  -4.12913995e+13,  -3.18248396e+13,
+         0.00000000e+00,  -2.50284060e+15,  -2.50284060e+15,
+        -2.50284060e+15,  -2.50284060e+15,  -2.50284060e+15,
+        -2.50284060e+15,   1.59504583e+14,  -2.26666758e+14,
+         0.00000000e+00,   0.00000000e+00,   4.78573897e+14,
+         2.86597262e+15,  -4.18309133e+14,   0.00000000e+00,
+        -1.27762524e+14,   0.00000000e+00,   3.71296515e+14,
+        -1.92675752e+14,   0.00000000e+00,   1.08916377e+14,
+         1.04430865e+15,  -3.30451412e+14,   0.00000000e+00,
+        -1.84306015e+14,   0.00000000e+00,   3.05299159e+13,
+        -2.98429298e+14,   0.00000000e+00,   4.08989175e+13,
+         0.00000000e+00,   0.00000000e+00,   7.08108599e+14,
+        -2.87906212e+14,   3.37515524e+14,   1.29047575e+13,
+        -2.35440207e+14,   0.00000000e+00,   1.43255845e+14,
+        -4.38285138e+13,  -1.69913874e+14,   1.07804718e+14,
+         0.00000000e+00,   1.48661642e+14,   0.00000000e+00,
+         3.53314646e+14,  -1.06495287e+14,  -1.24616102e+14,
+        -3.55469307e+14,   0.00000000e+00,   7.31749797e+12,
+        -1.28714495e+14,  -2.01590157e+14,  -1.58309855e+13,
+        -1.15491601e+13,  -3.86593219e+13,   0.00000000e+00,
+         6.27150125e+13,  -4.10944237e+14,   0.00000000e+00,
+         0.00000000e+00,  -1.18778490e+14,   3.48641994e+13,
+        -8.56469031e+13,   0.00000000e+00,   0.00000000e+00,
+        -3.04151171e+14,   0.00000000e+00,   0.00000000e+00,
+        -2.98711147e+14,  -1.97901535e+14,   3.17386564e+14,
+        -9.94952294e+13,   0.00000000e+00,   0.00000000e+00,
+         2.57154962e+14,   0.00000000e+00,   0.00000000e+00,
+         0.00000000e+00,   0.00000000e+00,  -6.29295464e+13,
+         0.00000000e+00,  -3.60574314e+14,  -9.70287266e+13,
+         7.13993872e+14,  -5.87662659e+13,  -1.43566949e+14,
+        -2.96667032e+14,   2.36452047e+15,   2.36452047e+15,
+         2.36452047e+15])</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Looks like a large portion of the dummy variables are.. severe.  lets just cut them and see how solely the principal vectors do.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [37]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train_save</span><span class="p">[[</span><span class="s2">"pca1"</span><span class="p">,</span><span class="s2">"pca2"</span><span class="p">,</span><span class="s2">"pca3"</span><span class="p">,</span> <span class="s2">"pca4"</span><span class="p">,</span> <span class="s2">"pca5"</span><span class="p">]]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train_save</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [38]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#linear</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># The mean squared error</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">"Mean squared error: </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>     
+
+<span class="c1"># Explained variance score: 1 is perfect prediction</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">'Variance score: </span><span class="si">%.2f</span><span class="s1">'</span><span class="p">)</span> <span class="o">%</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>    
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Mean squared error: 1570704767.92
+Variance score: 0.79
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [40]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Lasso</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># The mean squared error</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">"Mean squared error: </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>     
+
+<span class="c1"># Explained variance score: 1 is perfect prediction</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">'Variance score: </span><span class="si">%.2f</span><span class="s1">'</span><span class="p">)</span> <span class="o">%</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>    
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Mean squared error: 1611351349.64
+Variance score: 0.78
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [41]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#Ridge</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># The mean squared error</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">"Mean squared error: </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>     
+
+<span class="c1"># Explained variance score: 1 is perfect prediction</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">'Variance score: </span><span class="si">%.2f</span><span class="s1">'</span><span class="p">)</span> <span class="o">%</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>    
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Mean squared error: 1570874057.65
+Variance score: 0.79
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [42]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">"True       Predicted"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">        </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">)</span> <span class="o">%</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>True       Predicted
+154500.00        147888.31
+325000.00        293508.12
+115000.00        96145.85
+159000.00        162123.22
+315500.00        272257.67
+75500.00        53688.24
+311500.00        213377.88
+146000.00        160354.30
+84500.00        51587.39
+135500.00        138603.64
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So in effect, We've reduced an 81 variable dataset (>1000 if we count all dummy variables possible) into only 5 variables thanks to PCA. while 79% variance explained ins't all too great for something like predicting house final sale prices, I'll take it for now (as I've run out of free time for the week). I'd like to get back into this and further explore possibilities of fine-tune these categorical vars and fit to some non-linear regression models... Till then,  lets upload this to Kaggle just to see how it goes!</p>
+<p>To do this, I'll need to run the df_test data through the pipeline.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [44]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_test</span> <span class="o">=</span> <span class="n">df_test</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">"Alley"</span><span class="p">,</span> <span class="s1">'FireplaceQu'</span><span class="p">,</span> <span class="s1">'PoolQC'</span><span class="p">,</span> <span class="s1">'Fence'</span><span class="p">,</span> <span class="s1">'MiscFeature'</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[44]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>Id                  0
+MSSubClass          0
+MSZoning            4
+LotFrontage       227
+LotArea             0
+Street              0
+Alley            1352
+LotShape            0
+LandContour         0
+Utilities           2
+LotConfig           0
+LandSlope           0
+Neighborhood        0
+Condition1          0
+Condition2          0
+BldgType            0
+HouseStyle          0
+OverallQual         0
+OverallCond         0
+YearBuilt           0
+YearRemodAdd        0
+RoofStyle           0
+RoofMatl            0
+Exterior1st         1
+Exterior2nd         1
+MasVnrType         16
+MasVnrArea         15
+ExterQual           0
+ExterCond           0
+Foundation          0
+                 ... 
+HalfBath            0
+BedroomAbvGr        0
+KitchenAbvGr        0
+KitchenQual         1
+TotRmsAbvGrd        0
+Functional          2
+Fireplaces          0
+FireplaceQu       730
+GarageType         76
+GarageYrBlt        78
+GarageFinish       78
+GarageCars          1
+GarageArea          1
+GarageQual         78
+GarageCond         78
+PavedDrive          0
+WoodDeckSF          0
+OpenPorchSF         0
+EnclosedPorch       0
+3SsnPorch           0
+ScreenPorch         0
+PoolArea            0
+PoolQC           1456
+Fence            1169
+MiscFeature      1408
+MiscVal             0
+MoSold              0
+YrSold              0
+SaleType            1
+SaleCondition       0
+Length: 80, dtype: int64</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [45]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_test_cont</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_test</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">df_test</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"int64"</span> <span class="ow">or</span> <span class="n">df_test</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"float64"</span><span class="p">:</span>
+        <span class="n">df_test_cont</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_test</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="n">df_train_cont</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[45]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>OverallQual</th>
+<th>OverallCond</th>
+<th>YearBuilt</th>
+<th>YearRemodAdd</th>
+<th>MasVnrArea</th>
+<th>BsmtFinSF1</th>
+<th>...</th>
+<th>WoodDeckSF</th>
+<th>OpenPorchSF</th>
+<th>EnclosedPorch</th>
+<th>3SsnPorch</th>
+<th>ScreenPorch</th>
+<th>PoolArea</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+<th>SalePrice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>60</td>
+<td>65.0</td>
+<td>8450</td>
+<td>7</td>
+<td>5</td>
+<td>2003</td>
+<td>2003</td>
+<td>196.0</td>
+<td>706</td>
+<td>...</td>
+<td>0</td>
+<td>61</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>2008</td>
+<td>208500</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>20</td>
+<td>80.0</td>
+<td>9600</td>
+<td>6</td>
+<td>8</td>
+<td>1976</td>
+<td>1976</td>
+<td>0.0</td>
+<td>978</td>
+<td>...</td>
+<td>298</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>2007</td>
+<td>181500</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>60</td>
+<td>68.0</td>
+<td>11250</td>
+<td>7</td>
+<td>5</td>
+<td>2001</td>
+<td>2002</td>
+<td>162.0</td>
+<td>486</td>
+<td>...</td>
+<td>0</td>
+<td>42</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>2008</td>
+<td>223500</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>70</td>
+<td>60.0</td>
+<td>9550</td>
+<td>7</td>
+<td>5</td>
+<td>1915</td>
+<td>1970</td>
+<td>0.0</td>
+<td>216</td>
+<td>...</td>
+<td>0</td>
+<td>35</td>
+<td>272</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>2006</td>
+<td>140000</td>
+</tr>
+<tr>
+<th>4</th>
+<td>5</td>
+<td>60</td>
+<td>84.0</td>
+<td>14260</td>
+<td>8</td>
+<td>5</td>
+<td>2000</td>
+<td>2000</td>
+<td>350.0</td>
+<td>655</td>
+<td>...</td>
+<td>192</td>
+<td>84</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>2008</td>
+<td>250000</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [47]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">df_test_cont_imp</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_test_cont</span><span class="p">)</span>
+<span class="n">df_test_cont_imp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_test_cont_imp</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">df_test_cont</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="n">df_test_cont_imp</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[47]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>False</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [48]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_test_cont_imp</span><span class="p">:</span>
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_test_cont_imp</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">df_test_cont_imp</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="n">X_test</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[48]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Id</th>
+<th>MSSubClass</th>
+<th>LotFrontage</th>
+<th>LotArea</th>
+<th>OverallQual</th>
+<th>OverallCond</th>
+<th>YearBuilt</th>
+<th>YearRemodAdd</th>
+<th>MasVnrArea</th>
+<th>BsmtFinSF1</th>
+<th>...</th>
+<th>GarageArea</th>
+<th>WoodDeckSF</th>
+<th>OpenPorchSF</th>
+<th>EnclosedPorch</th>
+<th>3SsnPorch</th>
+<th>ScreenPorch</th>
+<th>PoolArea</th>
+<th>MiscVal</th>
+<th>MoSold</th>
+<th>YrSold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1.733238</td>
+<td>-0.872563</td>
+<td>0.451936</td>
+<td>0.110763</td>
+<td>-0.795151</td>
+<td>0.381743</td>
+<td>-0.340077</td>
+<td>-1.156380</td>
+<td>-0.574410</td>
+<td>0.053428</td>
+<td>...</td>
+<td>1.202536</td>
+<td>0.365179</td>
+<td>-0.704483</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>1.882709</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-0.119110</td>
+<td>1.64521</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1.735610</td>
+<td>-0.872563</td>
+<td>0.497357</td>
+<td>0.375850</td>
+<td>-0.071836</td>
+<td>0.381743</td>
+<td>-0.439440</td>
+<td>-1.301740</td>
+<td>0.023903</td>
+<td>1.051363</td>
+<td>...</td>
+<td>-0.753188</td>
+<td>2.384400</td>
+<td>-0.160950</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>25.116309</td>
+<td>-0.119110</td>
+<td>1.64521</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1.737983</td>
+<td>0.073375</td>
+<td>0.179413</td>
+<td>0.332053</td>
+<td>-0.795151</td>
+<td>-0.517200</td>
+<td>0.852269</td>
+<td>0.636400</td>
+<td>-0.574410</td>
+<td>0.761852</td>
+<td>...</td>
+<td>0.042202</td>
+<td>0.939819</td>
+<td>-0.191147</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-1.229111</td>
+<td>1.64521</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1.740356</td>
+<td>0.073375</td>
+<td>0.361095</td>
+<td>-0.054002</td>
+<td>-0.071836</td>
+<td>0.381743</td>
+<td>0.885390</td>
+<td>0.636400</td>
+<td>-0.463612</td>
+<td>0.347326</td>
+<td>...</td>
+<td>-0.013943</td>
+<td>2.121024</td>
+<td>-0.160950</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>-0.270208</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-0.119110</td>
+<td>1.64521</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1.742728</td>
+<td>1.492282</td>
+<td>-1.228623</td>
+<td>-0.552407</td>
+<td>1.374795</td>
+<td>-0.517200</td>
+<td>0.686666</td>
+<td>0.345679</td>
+<td>-0.574410</td>
+<td>-0.396190</td>
+<td>...</td>
+<td>0.154492</td>
+<td>-0.752176</td>
+<td>0.533564</td>
+<td>-0.359325</td>
+<td>-0.116339</td>
+<td>2.313293</td>
+<td>-0.068692</td>
+<td>-0.087688</td>
+<td>-1.969111</td>
+<td>1.64521</td>
+</tr>
+</tbody>
+</table>
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [49]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">del</span> <span class="n">X_test</span><span class="p">[</span><span class="s1">'Id'</span><span class="p">]</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">values</span>
+
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="n">X_test_pca</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[:,:</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">X_test_pca</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_test_pca</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"pca1"</span><span class="p">,</span> <span class="s2">"pca2"</span><span class="p">,</span> <span class="s2">"pca3"</span><span class="p">,</span> <span class="s2">"pca4"</span><span class="p">,</span> <span class="s2">"pca5"</span><span class="p">])</span>
+<span class="n">X_test_pca</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[49]:</div>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pca1</th>
+<th>pca2</th>
+<th>pca3</th>
+<th>pca4</th>
+<th>pca5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>-2.480251</td>
+<td>-1.442848</td>
+<td>0.787127</td>
+<td>0.232835</td>
+<td>-0.824734</td>
+</tr>
+<tr>
+<th>1</th>
+<td>-1.205705</td>
+<td>0.018728</td>
+<td>2.461575</td>
+<td>-0.715957</td>
+<td>-0.199358</td>
+</tr>
+<tr>
+<th>2</th>
+<td>0.719761</td>
+<td>0.213787</td>
+<td>-1.043330</td>
+<td>-1.509953</td>
+<td>-0.001801</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1.176124</td>
+<td>0.546120</td>
+<td>-1.118030</td>
+<td>-1.286063</td>
+<td>-0.589375</td>
+</tr>
+<tr>
+<th>4</th>
+<td>0.137644</td>
+<td>-1.025616</td>
+<td>-2.117799</td>
+<td>0.992937</td>
+<td>0.336105</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [53]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_pca</span><span class="p">)</span>
+
+<span class="n">df_sample</span><span class="o">.</span><span class="n">SalePrice</span> <span class="o">=</span> <span class="n">preds</span>
+
+<span class="sd">'''WRITE TO CSV'''</span>
+<span class="n">df_sample</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'Linear_Reg_PCA.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Kaggle results: As expected.. Not all too great. About 75 percentile.. The project was great practice though. I was able to get some practice with: PCA, KMeans clustering, Multiple Correspondence Analysis, along with all the typical cleaning and scaling that was done throughout.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As this page eventually turned into a much longer and messier version than I had hoped for, any further exploration into this project will be done and uploaded on a new post!</p>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> exploratory data analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/cleaning.html">
+                            Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/r.html">
+                            r
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/scikit-learn.html">
+                            scikit-learn
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/manipulation.html">
+                            manipulation
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+Title: Practice at Dimensionality Reduction with SKlearn
+Slug: Dimensionality_reduction
+Date: 2018-05-09 15:00
+Category: Machine Learning
+Tags: Cleaning, Python, manipulation, pandas, scikit-learn, clustering, pca, regression
+Author: Andrew Trick
+Summary: I found some free time and, as I've been looking to get some practice at dimensionality reduction, I went and found a competition on Kaggle (Estimate house prices) which looked appropriate for practice at this skill. I walk through the step I took from cleaning and standardizing the data, to finally performing PCA and fitting a simple linear regression to the top five most influential eigenvectors! 
