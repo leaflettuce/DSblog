@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/data-visualization.atom.xml" rel="self"></link><id>/</id><updated>2018-03-13T15:00:00-05:00</updated><entry><title>Quick Qlikview Project</title><link href="/Student_dashboard.html" rel="alternate"></link><published>2018-03-13T15:00:00-05:00</published><updated>2018-03-13T15:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-03-13:Student_dashboard.html</id><summary type="html">&lt;h1&gt;Student Goal Dashboard&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/data-visualization.atom.xml" rel="self"></link><id>/</id><updated>2018-05-19T14:00:00-05:00</updated><entry><title>Visualizing Bikeshare Data</title><link href="/DC_Bikeshare.html" rel="alternate"></link><published>2018-05-19T14:00:00-05:00</published><updated>2018-05-19T14:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-05-19:DC_Bikeshare.html</id><summary type="html">&lt;h1&gt;D.C. Bikeshare Visualization&lt;/h1&gt;
+&lt;p&gt;I'll keep this quick and simple: I conducted some exploratory data analysis on D.C.'s bikeshare programs (2011-12) for my Data Visualization course at SNHU. The overall goal was to provide context and promote understanding to city leadership about the bikeshare program usage. As this was an explanatory presentation, most of the visuals are kept simple on purpose, and bar charts are highly utilized for their clear interoperability and direct representation. I avoided any curved lines and bubble charts like the plague as their are almost as difficult to interpret accurately as pie charts.. I hate pie charts.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;Usage volume by season&lt;/h2&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/1.png" style="width: 800px;"/&gt;
+&lt;br&gt;
+Pretty straightforward look at the average seasonal usage of the program. The bottom right chart inidcates the projected levels of use for the city of Columbus. Not including it in this write-up as I'm focusing on the visuals here, but another goal of the project was to infer expected usage in Columbus based upon this data. 
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;Workday and Weekend splits&lt;/h2&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/2.png" style="width: 800px;"/&gt;
+&lt;br&gt;
+A clear split between the max usage seen in the data by day of the week. A lot of the project focused around the workday and weekday differences.. which gets more interesting once we split it up by hour later on.
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/3.png" style="width: 800px;"/&gt;
+&lt;br&gt;
+Split by hour here.  I fought the urge to use line or area charts here. While they tend to look nicer, the data was distinctly split by hour and, while this is technically a continuous feature I opted to split it as ordinal. I would have gone with a line if if usage was recorded by the minute, but using such given only the hour like this may have been representative of the flow of usage between hours.&lt;br /&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;Usage by Day/Time and split by User Type.&lt;/h2&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/4.png" style="width: 800px;"/&gt;
+&lt;br&gt;
+Types of users are split between registered and casual within the data. This give a clear look at the trends of both types of users, and how they differentiate between days of the week and times of the day. While registered users typically account for 3/4 of the user base, casual users account for a significant portion of the use during the early afternoon and the weekend. Further, we see registered users are the large portion of people who use the bikeshare system to commute to and from work.  Unsurprising. 
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2&gt;Temp Explorations&lt;/h2&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/5.png" style="width: 800px;"/&gt;
+&lt;br&gt;
+A little cluttered but a visual which depicts not only the yearly trends and correlation between temperature and usage, but also delineates by season as well. Again, completely unsurprisingly stuff here, but nice to see.&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Like mentioned above, short and simple. &lt;/p&gt;</summary><category term="EDA"></category><category term="visualizing"></category><category term="Tableau"></category><category term="reporting"></category></entry><entry><title>Quick Qlikview Project</title><link href="/Student_dashboard.html" rel="alternate"></link><published>2018-03-13T15:00:00-05:00</published><updated>2018-03-13T15:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-03-13:Student_dashboard.html</id><summary type="html">&lt;h1&gt;Student Goal Dashboard&lt;/h1&gt;
 &lt;p&gt;Homework Assignment was to throw together a dashboard in Qlikview which would allow for exploration of the survey results of Michigan students being asked about what they consider their most important goals in school. Data originally from Caregie Mellow University, data located at: http://lib.stat.cmu.edu/DASL/Datafiles/PopularKids.html. I first created the selection list box and variable specific selection boxes which will provide the ability to jump around sample demographics. This will allow for the tables and charts to change based upon selected variables.\
 &lt;br&gt;&lt;br&gt;
 I opted for two specific bar charts for examination: An overall histogram of 'most important goals' for students, and a barchart of goal choice v. Gender and Grade. This provides users to see both the general goals of importance per selection, while also the grade/gender split considerations as well.

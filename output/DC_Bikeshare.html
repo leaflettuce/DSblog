@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Visualizing Bikeshare Data - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/DC_Bikeshare.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="EDA,visualizing,Tableau,reporting" />
+        <meta name="description" content="A few visuals I created in Tableau displaying some findings within the D.C. bikeshare program. Data accounts for the program during the 2011-12 years and aggregates usage by day and by hour. Project was originally conducted as homework for my Decision Support Presentation course at SNHU. The final goal of analysis was to create visuals which accurately and efficiently represented usage information within the data. As such, the visuals are kept simple, clean, and utilize more traditional/easily perceived graphs (ie: mostly bar charts - They&#39;re easy to read and hard to misinterpret!)" />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Visualizing Bikeshare Data"/>
+        <meta property="og:url" content="/DC_Bikeshare.html"/>
+        <meta property="og:description" content="A few visuals I created in Tableau displaying some findings within the D.C. bikeshare program. Data accounts for the program during the 2011-12 years and aggregates usage by day and by hour. Project was originally conducted as homework for my Decision Support Presentation course at SNHU. The final goal of analysis was to create visuals which accurately and efficiently represented usage information within the data. As such, the visuals are kept simple, clean, and utilize more traditional/easily perceived graphs (ie: mostly bar charts - They&#39;re easy to read and hard to misinterpret!)"/>
+        <meta property="article:published_time" content="2018-05-19" />
+            <meta property="article:section" content="Data Visualization" />
+            <meta property="article:tag" content="EDA" />
+            <meta property="article:tag" content="visualizing" />
+            <meta property="article:tag" content="Tableau" />
+            <meta property="article:tag" content="reporting" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/data-visualization.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Data Visualization ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/DC_Bikeshare.html"
+                       rel="bookmark"
+                       title="Permalink to Visualizing Bikeshare Data">
+                        Visualizing Bikeshare Data
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-05-19T14:00:00-05:00"> Sat 19 May 2018</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/data-visualization.html">Data Visualization</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/eda.html">EDA</a>
+        /
+	<a href="/tag/visualizing.html">visualizing</a>
+        /
+	<a href="/tag/tableau.html">Tableau</a>
+        /
+	<a href="/tag/reporting.html">reporting</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h1>D.C. Bikeshare Visualization</h1>
+<p>I'll keep this quick and simple: I conducted some exploratory data analysis on D.C.'s bikeshare programs (2011-12) for my Data Visualization course at SNHU. The overall goal was to provide context and promote understanding to city leadership about the bikeshare program usage. As this was an explanatory presentation, most of the visuals are kept simple on purpose, and bar charts are highly utilized for their clear interoperability and direct representation. I avoided any curved lines and bubble charts like the plague as their are almost as difficult to interpret accurately as pie charts.. I hate pie charts.</p>
+<p><br></p>
+<h2>Usage volume by season</h2>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/bikeshare/1.png" style="width: 800px;"/>
+<br>
+Pretty straightforward look at the average seasonal usage of the program. The bottom right chart inidcates the projected levels of use for the city of Columbus. Not including it in this write-up as I'm focusing on the visuals here, but another goal of the project was to infer expected usage in Columbus based upon this data. 
+<br><br></p>
+<h2>Workday and Weekend splits</h2>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/bikeshare/2.png" style="width: 800px;"/>
+<br>
+A clear split between the max usage seen in the data by day of the week. A lot of the project focused around the workday and weekday differences.. which gets more interesting once we split it up by hour later on.
+<br><br></p>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/bikeshare/3.png" style="width: 800px;"/>
+<br>
+Split by hour here.  I fought the urge to use line or area charts here. While they tend to look nicer, the data was distinctly split by hour and, while this is technically a continuous feature I opted to split it as ordinal. I would have gone with a line if if usage was recorded by the minute, but using such given only the hour like this may have been representative of the flow of usage between hours.<br />
+<br><br></p>
+<h2>Usage by Day/Time and split by User Type.</h2>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/bikeshare/4.png" style="width: 800px;"/>
+<br>
+Types of users are split between registered and casual within the data. This give a clear look at the trends of both types of users, and how they differentiate between days of the week and times of the day. While registered users typically account for 3/4 of the user base, casual users account for a significant portion of the use during the early afternoon and the weekend. Further, we see registered users are the large portion of people who use the bikeshare system to commute to and from work.  Unsurprising. 
+<br><br></p>
+<h2>Temp Explorations</h2>
+<p><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/bikeshare/5.png" style="width: 800px;"/>
+<br>
+A little cluttered but a visual which depicts not only the yearly trends and correlation between temperature and usage, but also delineates by season as well. Again, completely unsurprisingly stuff here, but nice to see.<br><br></p>
+<p>Like mentioned above, short and simple. </p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> exploratory data analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/cleaning.html">
+                            Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/d3js.html">
+                            D3.js
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/pandas.html">
+                            pandas
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/manipulation.html">
+                            manipulation
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/r.html">
+                            r
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>
