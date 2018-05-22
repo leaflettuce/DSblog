@@ -6,18 +6,18 @@
 &lt;p&gt;&lt;br&gt;
 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/1.png" style="width: 800px;"/&gt;
 &lt;br&gt;
-Pretty straightforward look at the average seasonal usage of the program. The bottom right chart inidcates the projected levels of use for the city of Columbus. Not including it in this write-up as I'm focusing on the visuals here, but another goal of the project was to infer expected usage in Columbus based upon this data. 
+Pretty straightforward look at the average seasonal usage of the program. The bottom right chart indicates the projected levels of use for the city of Columbus. Not including it in this write-up as I'm focusing on the visuals here, but another goal of the project was to infer expected usage in Columbus based upon this data. 
 &lt;br&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h2&gt;Workday and Weekend splits&lt;/h2&gt;
 &lt;p&gt;&lt;br&gt;
 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/2.png" style="width: 800px;"/&gt;
 &lt;br&gt;
-A clear split between the max usage seen in the data by day of the week. A lot of the project focused around the workday and weekday differences.. which gets more interesting once we split it up by hour later on.
+A simple view of the max usage seen in the data by day of the week. A lot of the project focused around the workday and weekday differences.. which gets more interesting once we split it up by hour:
 &lt;br&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;
 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/bikeshare/3.png" style="width: 800px;"/&gt;
 &lt;br&gt;
-Split by hour here.  I fought the urge to use line or area charts here. While they tend to look nicer, the data was distinctly split by hour and, while this is technically a continuous feature I opted to split it as ordinal. I would have gone with a line if if usage was recorded by the minute, but using such given only the hour like this may have been representative of the flow of usage between hours.&lt;br /&gt;
+Split by hour here.  I fought the urge to use line or area charts here. While they tend to look nicer, the data was distinctly split by hour and, while this is technically a continuous feature I opted to split it as ordinal. I would have gone with a line if if usage was recorded by the minute, but using such given only the hour like this may have been mis-representative of the flow of usage between hours.&lt;br /&gt;
 &lt;br&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h2&gt;Usage by Day/Time and split by User Type.&lt;/h2&gt;
 &lt;p&gt;&lt;br&gt;
