@@ -1,4 +1,4 @@
-Title: A Baby Own the Way
+Title: A Baby on the Way
 Slug: baby_stats
 Date: 2018-06-02 15:00
 Category: Data Visualization
