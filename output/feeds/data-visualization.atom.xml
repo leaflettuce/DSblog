@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/data-visualization.atom.xml" rel="self"></link><id>/</id><updated>2018-06-05T14:00:00-05:00</updated><entry><title>Quick Life-Expectancy Visualizations</title><link href="/life_expectancy.html" rel="alternate"></link><published>2018-06-05T14:00:00-05:00</published><updated>2018-06-05T14:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-06-05:life_expectancy.html</id><summary type="html">&lt;h1&gt;Life Expectancy Exploration and Visualization&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/data-visualization.atom.xml" rel="self"></link><id>/</id><updated>2018-07-02T15:00:00-05:00</updated><entry><title>Lyric Analysis</title><link href="/Lyrics.html" rel="alternate"></link><published>2018-07-02T15:00:00-05:00</published><updated>2018-07-02T15:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-07-02:Lyrics.html</id><summary type="html">&lt;p&gt;Inspired a bit by Pudding.cool and the great API from genius.com, I wrote some Python code to which, once asking for an artist, pulls the lyrics of 150 of their more 'popular' songs. Popular in terms of 'genius.com' user likes. This first py file conducts this search and stores the data in a csv containing only the song titles and their lyrics. 
+&lt;br&gt;
+The second phase of this project was to pull the stored data into another python file and form a word cloud from it. Thankfully, the actually visualization was pretty easy thanks to the wordcloud library. The tedious part was using nltk to stem and process the words of the lyrics. This included removing typical stopwords from the file (and the artist's name as well). Additionally, I wrote manual cocde to remove the punctuation and any other issues which arose.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+I'm going to be lazy and not include the code on this page- I'd rather just focus on the final results which were the visuals. Feel free to link over to my github to see the full code though!
+&lt;br&gt; &lt;/p&gt;
+&lt;p&gt;So, Here are the resulting woord clouds:&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/mount eerie.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/beatles.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/aesop.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/chance.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/bjork.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/bowie.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/daft punk.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/lyrics/harry potters.jpg" style="width: 800px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;I'm pretty happy with how these turned out!  And what's nice is that it takes only about 3 minutes to run both python files and form a new cloud of any other artist sought.&lt;/p&gt;</summary><category term="visualizing"></category><category term="Python"></category><category term="NLP"></category><category term="word_cloud"></category></entry><entry><title>Quick Life-Expectancy Visualizations</title><link href="/life_expectancy.html" rel="alternate"></link><published>2018-06-05T14:00:00-05:00</published><updated>2018-06-05T14:00:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-06-05:life_expectancy.html</id><summary type="html">&lt;h1&gt;Life Expectancy Exploration and Visualization&lt;/h1&gt;
 &lt;p&gt;A few visuals I created in Tableau displaying some trends in life expectancy by country. Data was sources from the World Bank Open Data website and includes life expectancy at birth of around 200 countries from between 1968 and 2014. Originally conducted for SNHU Data Visualization homework assignment in which to express data in five different method classifications: comparison, hierarchical, temporal, correlation, and geo-spatial. &lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/life_exp/compare.png" style="width: 800px;"/&gt;
 &lt;br&gt;
