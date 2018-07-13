@@ -23,7 +23,7 @@ So, Here are the resulting woord clouds:
 <br><br>
 
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/beatles.jpg" style="width: 800px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/Beatles.jpg" style="width: 800px;"/>
 <br><br>
 
 <br>
@@ -31,7 +31,7 @@ So, Here are the resulting woord clouds:
 <br><br>
 
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/chance.jpg" style="width: 800px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/Chance.jpg" style="width: 800px;"/>
 <br><br>
 
 <br>
@@ -39,7 +39,7 @@ So, Here are the resulting woord clouds:
 <br><br>
 
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/bowie.jpg" style="width: 800px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/lyrics/Bowie.jpg" style="width: 800px;"/>
 <br><br>
 
 <br>

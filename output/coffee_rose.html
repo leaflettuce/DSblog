@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Nightingale Rose in R - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/coffee_rose.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="visualizing,R,Data Collection" />
+        <meta name="description" content="Summary: I recently tracked my daily coffee consumption and thought it would be interesting to find a fun way to visual it. After some exploration of options in R, I decided to give a Nightingale Rose Diagram a try." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Nightingale Rose in R"/>
+        <meta property="og:url" content="/coffee_rose.html"/>
+        <meta property="og:description" content="Summary: I recently tracked my daily coffee consumption and thought it would be interesting to find a fun way to visual it. After some exploration of options in R, I decided to give a Nightingale Rose Diagram a try."/>
+        <meta property="article:published_time" content="2018-07-13" />
+            <meta property="article:section" content="Data Visualization" />
+            <meta property="article:tag" content="visualizing" />
+            <meta property="article:tag" content="R" />
+            <meta property="article:tag" content="Data Collection" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/data-visualization.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Data Visualization ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/coffee_rose.html"
+                       rel="bookmark"
+                       title="Permalink to Nightingale Rose in R">
+                        Nightingale Rose in R
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-07-13T08:00:00-05:00"> Fri 13 July 2018</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/data-visualization.html">Data Visualization</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/visualizing.html">visualizing</a>
+        /
+	<a href="/tag/r.html">R</a>
+        /
+	<a href="/tag/data-collection.html">Data Collection</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI colors. */
+.ansibold {
+  font-weight: bold;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  border-left-width: 1px;
+  padding-left: 5px;
+  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #90CAF9;
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected {
+  border-color: #ababab;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  div.cell.selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected.jupyter-soft-selected {
+  border-left-width: 0;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  padding: 0.4em;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
+  /* .CodeMirror-lines */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+.rendered_html pre,
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+.rendered_html td,
+
+
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Summary:  I recently tracked my daily coffee consumption and thought it would be interesting to find a fun way to visual it. After some exploration of options in R, I decided to give a Nightingale Rose Diagram a try.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So I tracked the past 40 or so days of my coffee consumption. It was a method as simple as using my notepad on my phone and listed down the number of ounces per coffee drinking session I had. Variables I tracked were day, time, and volume. While there is probably plenty of othher possibilities that could have been interesting if I tracked a little more, I opted to keep it simple and easy to do so I wouldn't begin to neglect the input of the data.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After some epxloration, I opted to go with a Nightingale Rose diagram to display this information. Not only does it show overall comparison between the days, but also shows patterns over time and informs on the portions of a whole.. Thats a lot of different ways to display in one visual!</p>
+<p>On top of this, I found the radial representation to work nicely when discussing coffee. With this in mind, I ended up removing all of the R fluff (title, background, axis, etc). This allowed me to paste the chart over top of a coffee mug (done in paint.net). While this made it maybe a more interesting of a visual overall, it also detracted from the explainability of the visual. To counteract this, I ended up printing out a single petal to the side of the chart and providing a 'How to Read' section.</p>
+<p>I'm overall happy with how this one turned out. While its almost impossible to determine exactly how much coffee I had daily, I think it provides a nice display for overall pattern depiction.</p>
+<p>Below is the (relatively simply) code to make a Nightingale Rose in R.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>df <span class="o"><-</span> read.csv<span class="p">(</span><span class="s">'../data/intake.csv'</span><span class="p">)</span>
+
+ggplot<span class="p">(</span>data <span class="o">=</span> df<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> day<span class="p">,</span> y <span class="o">=</span> ounces<span class="p">,</span> fill <span class="o">=</span> phase<span class="p">))</span> <span class="o">+</span>
+  geom_bar<span class="p">(</span>stat <span class="o">=</span> <span class="s">'identity'</span><span class="p">,</span> width <span class="o">=</span> <span class="m">1</span><span class="p">,</span> color <span class="o">=</span> <span class="s">"black"</span><span class="p">,</span> size <span class="o">=</span> <span class="m">0.1</span><span class="p">)</span> <span class="o">+</span>
+  coord_polar<span class="p">()</span> <span class="o">+</span>
+  scale_fill_manual<span class="p">(</span>values <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">'#CC9966'</span><span class="p">,</span> <span class="s">'#996633'</span><span class="p">,</span> <span class="s">'#663300'</span><span class="p">))</span><span class="o">+</span>
+  xlab<span class="p">(</span><span class="s">""</span><span class="p">)</span> <span class="o">+</span> ylab<span class="p">(</span><span class="s">""</span><span class="p">)</span> <span class="o">+</span>
+  labs<span class="p">(</span>fill<span class="o">=</span><span class="s">""</span><span class="p">)</span> <span class="o">+</span> 
+  guides<span class="p">(</span>fill <span class="o">=</span> guide_legend<span class="p">(</span>reverse<span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span> <span class="o">+</span>
+  theme<span class="p">(</span>
+    legend.position<span class="o">=</span><span class="s">"top"</span><span class="p">,</span> 
+    legend.direction<span class="o">=</span><span class="s">"horizontal"</span><span class="p">,</span>
+    panel.grid.major <span class="o">=</span> element_blank<span class="p">(),</span>
+    <span class="c1">#panel.grid.minor = element_blank(),</span>
+    panel.border <span class="o">=</span> element_blank<span class="p">(),</span>
+    panel.background <span class="o">=</span> element_blank<span class="p">(),</span>
+    axis.title.x<span class="o">=</span>element_blank<span class="p">(),</span>
+    axis.text.x<span class="o">=</span>element_blank<span class="p">(),</span>
+    axis.ticks.x<span class="o">=</span>element_blank<span class="p">(),</span>
+    axis.title.y<span class="o">=</span>element_blank<span class="p">(),</span>
+    axis.text.y<span class="o">=</span>element_blank<span class="p">(),</span>
+    axis.ticks.y<span class="o">=</span>element_blank<span class="p">()</span>
+  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+</div>
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA0gAAANICAMAAADKOT/pAAAAD1BMVEUAAABmMwCZZjPMmWb/
+//90H/SNAAAACXBIWXMAABJ0AAASdAHeZh94AAAgAElEQVR4nO2diaKjOA4And73/9+8k5NL
+siVbXHbV7nQnQAALVQsccNIfADSTzt4BgB5AJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACR
+AAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJAspxyVXnV0tBz0eYmohPXRaRfqn
+0yLS/zJw0OMhphYQCQoQUwuIBAWIqQVEggLE1AIiQQFiagGRoAAxtYBIUICYWkAkKEBMLSAS
+FCCmFgJE0hbziZSUv7cLNopEXjghYBYuV5F2FwmcEFMLiAQFiKmFokjp73Ur6Od+0M99oc+J
+3znPQKfZ/EmFkkiLVafZp2d/p++B/B3Oskirj832Obe7oECALJRFSr8/PjFN24nz+b87sMsi
+rdfyeTv/+y+5RVp9bLnP+u6CAgGyYKhIsz/Wf88VWE7/M1Uky1o++T7tsVGk78eEfRc3BAoE
+yMK1RZpO0jwipcXH5m8RqQICZOHSIk3/zQ6mrSL9/T42K22IVAMBsnBlkWZCIdJ5ECAL8SI5
+OhuEtaw7G74dbrM9tl4j6fsu7i4oECALPpGmruQ/MTO93d9/66TedH9vq4a1+/v3sdU+a7sL
+CgTIwg5fyJpF8q/y9booUv26QYAAWYgVyXeN5Fzv93WcSFwjWSBAFoIr0nxErDCRlpcxkRWJ
+AbwMECELl7vXrrza4FM7KEBMLSASFCCmFhAJChBTC4gEBYipBUSCAsTUAoPoQwFiChAAIgEE
+gEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACI
+BBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgA
+ASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAA
+IgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASAS
+QACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEEgEgAASASQACIBBAAIgEE
+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
+jUiYJNJ5826DcfSES4BJAn237j4MIFLfJnXduBtxJ5HqTbpWM0LpuGm34lYiVZvUcVHqt2X3
+4l4iYdKGbht2M24mEiat6bVdd2MUkS7XkCi6bdjNuJtI3OCwot+W3YrScPYXPEwM4bCg46bd
+iRuKVGHSFVsRRc9tuxF3FIlfIJvTdePuwy1Fcpp0zTZE0XfrbsM9RXKZdNEmRNF58+5C/yJd
+tAVh9N6+e2D8DcrrYTbpqg0Io/sG3oLbimQ16bL7H0b/LbwDKWV+7uXSItlMuu7uhzFAE2/D
+bNS6vkS67t7HMUIbb8jaqQsfprJJF975OIZo5K3ZdWjICEomXXnf4xijlbAneZMGybBBmgk7
+khVplAQbpZ2wIxmThsmvYRoKO6KaNE56jdNS2BHFpIGya6Cmwn7IIo2UXCO1FfZDMmmo3Bqq
+sbAfW5PGSq2xWgv7sTZpsMwarLmwH2lkjxAJokgje4RIEMZk0qXvDdyH8VoMu5FGLUd/iASR
+pGE9QiQIJI15WvdkzFbDTqQxy9EfIkEsw+bTsA0HiASRAAJAJIAAEAkgAEQCCACRAAJAJIAA
+EAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACR
+AAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkg
+AEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJA
+JIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQC
+CACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAA
+EAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACR
+AAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkg
+AEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJA
+JIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQC
+CACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAA
+EAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACRAAJAJIAAEAkgAEQCCACR
+AAJAJIAAEAkgAEQCCACRAAJAJIAA/g+gZ2XonO9siQAAAABJRU5ErkJggg==" />
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Code was tweaked to pull just one petal as well. Afterwards everything was thrown together in paint.NET with the final result below!
+<img src="../img/coffee/final.png" style="width: 800px;" /></p>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> exploratory data analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/pandas.html">
+                            pandas
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/cleaning.html">
+                            Cleaning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>

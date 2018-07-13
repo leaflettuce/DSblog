@@ -1,0 +1,7 @@
+Title: Nightingale Rose in R
+Slug: coffee_rose
+Date: 2018-07-13 8:00
+Category: Data Visualization
+Tags: visualizing, R, Data Collection
+author: Andrew Trick
+Summary: I recently tracked my daily coffee consumption and thought it would be interesting to find a fun way to visual it. After some exploration of options in R, I decided to give a Nightingale Rose Diagram a try.
