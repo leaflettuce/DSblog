@@ -1,0 +1,7 @@
+Title: Character Co-occurrence Network Diagram w/ NetworkX in Python
+Slug: stormlight_network
+Date: 2018-08-04 8:00
+Category: Data Visualization
+Tags: visualizing, Python, networkx, nlp, pandas 
+author: Andrew Trick
+Summary: Being a big fan of fantasy novels, I've always had an interest in how characters within books with massive character lists all interweave and connect together. I've also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson's Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not perfect for representing direct 'co-occurrences', I found the resulting visual to be an interesting look at relationships seen throughout the book.
