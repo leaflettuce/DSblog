@@ -1,0 +1,7 @@
+Title: Titanic Survival Classification w/ XGBoost
+Slug: titanic revisited
+Date: 2018-08-17 8:00
+Category: Data Visualization
+Tags: classification, Python, XGBoost, ensemble, manipulation, modeling, scikit learn 
+author: Andrew Trick
+Summary: It's been alittle over three years since I attempted my first ML project of classifying survival of the titanic.. A pretty famous dataset and task for this field I'd say. I achieved a accuracy of around 75% in my first attempt at this (I believe with a random forest model). I though it would be nice to revisit this and give it another go now that I'm a little more experienced. Additionally, I've wanted to explore ensemble learned some more, particularly XGBoost. Let's dive in!
