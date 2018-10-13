@@ -2,7 +2,7 @@ Date: 2018-04-22 08:53
 Author: Andrew Trick 
 Title: Nigerian Airline Frequency Analysis
 Name: Nigerian Airline Frequency Analysis
-Category: exploratory data analysis
+Category: Exploratory Data Analysis
 Tags: modeling, reporting, dashboard, r, SQL, tableau, cleaning
 Summary: A summary report of work I did for a Data Analytics II course at SNHU. Fictional company, Austin Air, is looking to enter the international airline industry with a goal of capturing a significant market share of business focused around Nigeria. Analysis will provide a look at the current industry and suggest strategies towards implementing a pilot program for the company to introduce to the market and achieve their goal. 
 
