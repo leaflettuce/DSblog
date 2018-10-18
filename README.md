@@ -1,4 +1,4 @@
-#My Data Science / Resume Website
+# Data Science Blog
+## Portfolio of Machine Learning, Analytics, and Visualization projects I have worked on.
 
--- AndrewTrick.com --
-Collection of data science and visualization projects I have worked on in this past.
+Available at [andrewtrick.com](http://andrewtrick.com).
