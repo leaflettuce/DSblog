@@ -58,13 +58,13 @@ provides a method of exporting the data- albeit in a method optimized for human 
 or very organized format.The remainder of this post will focus on the decisions, processes, and code used to aggregate 
 and clean this atvenue data into three relational formats- one for each specific goal above. 
 <br>
-
+<br>
 #### Raw Data Format
 ###### <b>sales reports</b>
 Data was exported into csv format and came in three different versions. First is 'sales reports' which display the
 overall sales of each merch item for a tour. ie: the gross sales of a design and how the distribution of sales by 
-size. Example head of excel view. <i>(Some columns are shortened to keep some information confidential.(/i)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/sales_report_raw.png" style="width: 600px;"/>
+size. Example head of excel view. <i>(Some columns are shortened to keep some information confidential.)</i>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/sales_report_raw.png" style="width: 600px;"/><br>
 Obviously not a great format to work with.. 
 
 <br>
@@ -73,7 +73,7 @@ Next up are 'tour summaries'. Again, this exported in a format better for human 
 for analyzing. Plenty of work needed to reset these into a useable format. Rather than the overall tour-wide reports
 like above, these focus on the total merch sales per show of a tour- disregarding how the income was generated. This
 will primarily be used for the forecasting goal listed above. 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/tour_summaries_raw.png" style="width: 800px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/tour_summaries_raw.png" style="width: 800px;"/><br>
 Missing data abounds.
 
 <br>
@@ -82,8 +82,42 @@ Lastly from atvenue are are the 'daily reports'. By the far most difficult to us
 revolves around per show sale counts by size. Expectedly, this will be msot useful in exploring how unit sales change based 
 ongeo, tour type, season, day of week, etc. Each day was a separate spreadsheet, so work is also done to collect each of these
 into one table per tour. 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/daily_raw.png" style="width: 400px;"/>
-SO moast of the table is unfilled. Manual calcuations needed to figure sales counts for some reason.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/daily_raw.png" style="width: 400px;"/><br>
+Most of the table is unfilled. Manual calculations needed to figure sales counts.
 
 <br>
+###### <b>External Data</b>
+Lastly, data collection also called for descriptions of the tour and merchandise. Each of these were manually created by myself. I
+opted to keep these relatively simple and as objective as possible. As such, tour data includes temporal and geo information primarily-
+season, year, country, etc. Additionally, It also has a binary value to indicate between support and headline tours.
+The merchandise csv on the other hand revoles around the looks and design of each merch design. This includes color of shirt,
+number of printed colors, etc. I also included numerous bool values to indicate if the design has our logo on it, lyrics, etc.
+<br>
+<br>
 ## Processing Raw Data
+As mentioned the primary goal when processing data was to achieve an organized and relational format, with missing and erroneous 
+data accounted for. Again, this is split into different cleaner files based on the data being worked with. Primary difficulties
+revolved around ensuring the code could work for each csv file. With this in mind, I used a method of iterating through directories
+to ensure the code was run on all appropriate files. I also joined the tour and merch datasets I created to each of these -as needed-
+to provide all needed data into the final versions. This took two steps- first creating a dataset optimized for MySQL input, and a secon
+which will be used for either analysis or modeling. 
+Scripts were then written which, when the raw data is properly loaded into their directories, I can simply run the appropriate
+bat file and all data will process/update. (All code viewable at my [GitHub](https://github.com/leaflettuce/tdwpDB).) 
+<br>
+As an example, one can see this set the data into a much more usable format. Below is the aggregate of sales reports:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/processes_example.png" style="width: 800px;"/><br>
+
+<br>
+## MySQL
+Last step for initializing this process was to upload the data into a MySQL server for storage and querying. While I'll probably
+do most of my work on the csv's set out for analysis and modeling, I find the option to run a quick query to be extremely valuable.
+I also wanted some more practice setting up a SQL DB. This step was pretty straightforward, and I'm not able to run SQL queries on 
+the data, as in the example below I ran to test it with: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../img/tdwp_merch/query_example.png" style="width: 400px;"/>
+
+<br>
+## Next Steps
+So, with everything collected, processed, and stored efficiently, the next steps are to start EDA on the datasets. I plan to do this
+in three different steps as well- one for each of the above goals. I'll use Tableau to explore patterns in Geo and temporal
+variables, whille R will be utilized for most other exploration. Lastly, I'll also be looking to forecast sales of future tours,
+so Python will be used as well. I upload Part II once these three steps are realized. 
