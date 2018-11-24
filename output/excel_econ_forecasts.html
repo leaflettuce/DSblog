@@ -137,28 +137,28 @@ Each of the models were relatively simple. The main goal was to find an accurate
 <br></p>
 <h2>Gross Domestic Product</h2>
 <p>First up is GDP. As mentioned, this is at an annual interval and the model is relatively simple. I opted to work with percentile yearly change differentials over constant real values because of the noticeable non-stationarity when exploring the aggregate 10 year change averages. In the end, I ended up using a 15-year moving average percentile growth model. I originally attempted a 10 year version of this but I felt the 08-09 drop due to the recession was overly influential on such a small time frame. 
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/GDP_table.png" style="width: 800px;"/>
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/GDP_forecast.png" style="width: 800px;"/>
 <br><br></p>
 <h2>Consumer Price Index</h2>
 <p>This model process was almost identical to the GDP one above. I'll spare the details as it was simply a matter of checking for stationarity, setting the percentile change function and then averaging (windowed averages) in the growth model. The precise formula I used is listed at the end of this post.
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/CPI_table.png" style="width: 800px;"/>
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/CPI_forecast.png" style="width: 800px;"/>
 <br><br></p>
 <h2>Unemployment Rate</h2>
 <p>This last model process was a little more interesting. While this one also called for a percentile over constant real value growth (or decline in this case), there was also the issue of seasonality. To account for the monthly up and down cycles of employment seen every year I thought the best route would be to add a season multiplier into the equation. I ran a normal 10-year moving average percentile change model with multiplier value based on the month. This seasonality multiplier was figured by dividing the 10 year month's average over the aggregate 10 year average. In this way, I could get a 1.02 multipler for one month and a 0.98 for another- indicating the average change this month sees typically compared to the overall average. While definately not a perfect model, I think it does decently well for something done quickly in excel. 
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/unemp_table.png" style="width: 800px;"/>
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/unemp_forecast.png" style="width: 800px;"/>
 <br><br></p>
 <h2>Models</h2>
 <p>So I'll end this post with the actual formulas I ended up using for each variable. Simple and overly generalized, I'd argue they do well to estimate the near future for these econ variables. While tossing this data into Python and running sklearn on them would undoubtedly uncover better models for predicting future values, I thought this was not only great practice in Excel, but also forced me to do more of the underlying reasoning and math myself- which I found quite enjoyable.
-<br>
+<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/excel_ts_imgs/models.png" style="width: 600px;"/>
 <br><br></p>
 <p>-Andy</p>
@@ -208,8 +208,8 @@ Each of the models were relatively simple. The main goal was to find an accurate
             <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="/tag/tableau.html">
-                            Tableau
+                        <a href="/tag/eda.html">
+                            EDA
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -223,18 +223,18 @@ Each of the models were relatively simple. The main goal was to find an accurate
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/eda.html">
-                            EDA
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/tableau.html">
+                            Tableau
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
                         <a href="/tag/visualizing.html">
                             visualizing
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="/tag/python.html">
-                            Python
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
