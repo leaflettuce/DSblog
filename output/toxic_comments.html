@@ -14,13 +14,13 @@
 
         <meta name="author" content="Andrew Trick" />
         <meta name="keywords" content="modeling,natural language processing,Python,classification" />
-        <meta name="description" content="I&#39;ve wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of &#39;toxic&#39;, &#39;severe toxic&#39;, &#39;obscene&#39;, &#39;insult&#39;, &#39;threat&#39;, &#39;hate&#39;. Here&#39;s the process I took to create a model which identifies these particular classsifications of future comments! First is to import libraries we&#39;ll be using" />
+        <meta name="description" content="I&#39;ve wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of &#39;toxic&#39;, &#39;severe toxic&#39;, &#39;obscene&#39;, &#39;insult&#39;, &#39;threat&#39;, &#39;hate&#39;. Here&#39;s the process I took to create a model which identifies these particular classifications of future comments! First is to import libraries we&#39;ll be using" />
 
         <meta property="og:site_name" content="Andrew Trick" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Classifying Comment Toxicity w/ NLTK and NB"/>
         <meta property="og:url" content="/toxic_comments.html"/>
-        <meta property="og:description" content="I&#39;ve wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of &#39;toxic&#39;, &#39;severe toxic&#39;, &#39;obscene&#39;, &#39;insult&#39;, &#39;threat&#39;, &#39;hate&#39;. Here&#39;s the process I took to create a model which identifies these particular classsifications of future comments! First is to import libraries we&#39;ll be using"/>
+        <meta property="og:description" content="I&#39;ve wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of &#39;toxic&#39;, &#39;severe toxic&#39;, &#39;obscene&#39;, &#39;insult&#39;, &#39;threat&#39;, &#39;hate&#39;. Here&#39;s the process I took to create a model which identifies these particular classifications of future comments! First is to import libraries we&#39;ll be using"/>
         <meta property="article:published_time" content="2018-07-13" />
             <meta property="article:section" content="Machine Learning" />
             <meta property="article:tag" content="modeling" />
@@ -1099,7 +1099,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I've wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of 'toxic', 'severe toxic', 'obscene', 'insult', 'threat', 'hate'. Here's the process I took to create a model which identifies these particular classsifications of future comments!</p>
+<p>I've wanted to get more practice with natural language processing, so I grabbed a dataset of Wikipedia comments from a past Kaggle challenge to attempt to classify toxicity of each comment. Train data was a collection of over 150k comments connected to user-defined classifications of 'toxic', 'severe toxic', 'obscene', 'insult', 'threat', 'hate'. Here's the process I took to create a model which identifies these particular classifications of future comments!</p>
 <p>First is to import libraries we'll be using</p>
 </div>
 </div>
@@ -1156,7 +1156,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>So first step for the actual preprocessing is to create a corpus of the words from each comment. I iterate through kine of the csv, grab the comment, cut the punctionation, split into a list, stem each word, connect them back into a str, and finally append it to the corpus.</p>
+<p>So first step for the actual preprocessing is to create a corpus of the words from each comment. I iterate through each line of the csv, grab the comment, cut the punctuation, split into a list, stem each word, connect them back into a str, and finally append it to the corpus.</p>
 <p>NOTE: The data was too large for my comp to deal with all at once. I kept running into memory issues, so I ended up cutting the data and using about 1/3 of it to train.</p>
 </div>
 </div>
@@ -1195,7 +1195,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I next took the corpus and vectorized it into a sparse matrix. This provides the matrix to train off of which is suitable for NB or most other classifiers.  Of course an idenetifer is required for the train, so I also bring in each classification in here as well.</p>
+<p>I next took the corpus and vectorized it into a sparse matrix. This provides the matrix to train off of which is suitable for NB or most other classifiers.  Of course an identifier is required for the train, so I also bring in each classification in here as well.</p>
 </div>
 </div>
 </div>
@@ -1259,7 +1259,7 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally for the training of the model, I iterate through each target classification and train the sparse matrix(X) against them.</p>
-<p>While I'm not bringing the data into this notebook, the accuracy aonfusion matrix values were pretty solid. Of the six classifications, NB averages an accuracy or around .94.</p>
+<p>While I'm not bringing the data into this notebook, the accuracy confusion matrix values were pretty solid. Of the six classifications, NB averages an accuracy or around .94.</p>
 </div>
 </div>
 </div>
@@ -1332,7 +1332,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As (again) we're predicting 6 target possibilities, I ran a for each loop to hit each model and predict the expected binary yes/no of each comment classificaiton. Predictions were stored in another dictionary for the same reasons as all the others.</p>
+<p>As (again) we're predicting 6 target possibilities, I ran a for each loop to hit each model and predict the expected binary yes/no of each comment classification. Predictions were stored in another dictionary for the same reasons as all the others.</p>
 </div>
 </div>
 </div>
@@ -1364,8 +1364,8 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>And with that, all that remains is to write the rewritten sample_sub into a csv and upload to Kaggle. Fun Fact: I kept running into memory issues on my comp running this, so I had run the transforming and prediction steps in 4 different segments... each of these taking about 45 minutes to run.</p>
-<p>Kaggle results were decent but nothing special. Then again, I fit only one model, didn;'t compare it to any others, and didn't attempt any param tuning, dimensionality reduction, standardization, or other steps which could have helped out here.  Again, it was to practice nlp (mainly with the nltk kit). With that in mind, I fele quite sucessful in this project.</p>
+<p>And with that, all that remains is to write the rewritten sample_sub into a csv and upload to Kaggle. Fun Fact: Due to memory issues I had run the transforming and prediction steps in 4 different segments... each of these taking about 45 minutes to run.</p>
+<p>Kaggle results were decent but nothing special. Then again, I fit only one model, didn't compare it to any others, and didn't attempt any param tuning, dimensionality reduction, standardization, or other steps which could have helped out here.  Again, it was to practice nlp (mainly with the nltk kit). With that in mind, I feel quite successful in this project.</p>
 </div>
 </div>
 </div>
@@ -1445,13 +1445,13 @@ h6:hover .anchor-link {
             <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="/tag/reporting.html">
-                            reporting
+                        <a href="/tag/eda.html">
+                            EDA
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/visualizing.html">
-                            visualizing
+                        <a href="/tag/python.html">
+                            Python
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -1465,28 +1465,28 @@ h6:hover .anchor-link {
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/eda.html">
-                            EDA
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="/tag/python.html">
-                            Python
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
                         <a href="/tag/r.html">
                             R
                         </a>
                     </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/classification.html">
-                            classification
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
                         <a href="/tag/cleaning.html">
                             Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
                         </a>
                     </li>
                     <li class="list-group-item tag-2">

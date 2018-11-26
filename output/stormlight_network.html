@@ -14,13 +14,13 @@
 
         <meta name="author" content="Andrew Trick" />
         <meta name="keywords" content="visualizing,Python,networkx,nlp,pandas" />
-        <meta name="description" content="Being a big fan of fantasy novels, I&#39;ve always had an interest in how characters within books with massive character lists all interweave and connect together. I&#39;ve also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson&#39;s Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not perfect for representing direct &#39;co-occurrences&#39;, I found the resulting visual to be an interesting look at relationships seen throughout the book." />
+        <meta name="description" content="Being a big fan of fantasy novels, I&#39;ve always had an interest in how characters within books with massive character lists all interweave and connect together. I&#39;ve also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson&#39;s Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not be perfect for representing direct &#39;co-occurrences&#39;, I found the resulting visual to be an interesting look at relationships seen throughout the book." />
 
         <meta property="og:site_name" content="Andrew Trick" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Character Co-occurrence Network Diagram w/ NetworkX in Python"/>
         <meta property="og:url" content="/stormlight_network.html"/>
-        <meta property="og:description" content="Being a big fan of fantasy novels, I&#39;ve always had an interest in how characters within books with massive character lists all interweave and connect together. I&#39;ve also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson&#39;s Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not perfect for representing direct &#39;co-occurrences&#39;, I found the resulting visual to be an interesting look at relationships seen throughout the book."/>
+        <meta property="og:description" content="Being a big fan of fantasy novels, I&#39;ve always had an interest in how characters within books with massive character lists all interweave and connect together. I&#39;ve also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson&#39;s Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not be perfect for representing direct &#39;co-occurrences&#39;, I found the resulting visual to be an interesting look at relationships seen throughout the book."/>
         <meta property="article:published_time" content="2018-08-04" />
             <meta property="article:section" content="Data Visualization" />
             <meta property="article:tag" content="visualizing" />
@@ -1102,7 +1102,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Being a big fan of fantasy novels, I've always had an interest in how characters within books with massive character lists all interweave and connect together. I've also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson's Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not perfect for representing direct 'co-occurrences', I found the resulting visual to be an interesting look at relationships seen throughout the book.</p>
+<p>Being a big fan of fantasy novels, I've always had an interest in how characters within books with massive character lists all interweave and connect together. I've also had interest for awhile now in visualizing some type of complex network with networkX in Python. Oathbringer is the most recent book from Brandon Sanderson's Stormlight Archive series and it was a perfect option for me to combine both of these interests. The following is the code I used to parse through the etext of the novel and create a character co-occurence network diagram. Although certain decisions made throughout the process may not be perfect for representing direct 'co-occurrences', I found the resulting visual to be an interesting look at relationships seen throughout the book.</p>
 </div>
 </div>
 </div>
@@ -1145,7 +1145,7 @@ Now, onto the code!</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Networkx works off of matplotlib, so both imports were required above.  Additionally, I end up using a bit of regex to filter some text and use pandas to create the origional co-occurrence matrix that helped formulate the network.</p>
+<p>Networkx works off of matplotlib, so both imports were required above.  Additionally, I end up using a bit of regex to filter some text and use pandas to create the original co-occurrence matrix that helped formulate the network.</p>
 <p>So with that, the first step was to import the data in .txt format. This is a direct text file from the ebook.</p>
 </div>
 </div>
@@ -1166,7 +1166,7 @@ Now, onto the code!</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Simple enough to read the text file in. I next use the astrisks to split the text document up into a list of text blocks.  I additionally use '-From' to break it apart as well. Each of these indicate either a new chapter or a new Point of view within the book.</p>
+<p>Simple enough to read the text file in. I next use the asterisks to split the text document up into a list of text blocks.  I additionally use '-From' to break it apart as well. Each of these indicate either a new chapter or a new Point of view within the book.</p>
 <p>This was one of the major decision points for this project- How to indicate a 'co-occurrence'.  I opted for counting a co-occurrence as any time someone is in the same POV as another person.. While using some nlp and n-gram length checks could have been a more accurate method to figuring 'co-occurrences', I worried it would be too inaccurate.  As such, I chose this method that errs towards inclusion.</p>
 </div>
 </div>
@@ -1214,7 +1214,7 @@ Now, onto the code!</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I manually created a list of all the 'important' chatracters in the book. Basically I went through the wiki page and included anyone of interest.</p>
+<p>I manually created a list of all the 'important' characters in the book. Basically I went through the wiki page and included anyone of interest.</p>
 </div>
 </div>
 </div>
@@ -1312,7 +1312,7 @@ Now, onto the code!</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Using this matrix, I am able to create two lists- One for the cedges for the diagram represented in a tuple of form: (char1, char2, co-occurrence weight).  I decided to make each weight a decimal in relation to the max occurence  seen: Which was Dalinar's count at 464.</p>
+<p>Using this matrix, I am able to create two lists- One for the edges for the diagram represented in a tuple of form: (char1, char2, co-occurrence weight).  I decided to make each weight a decimal in relation to the max occurrence  seen: Which was Dalinar's count at 464.</p>
 <p>I also create the node list below by, more or less, the same method. This is a duple though containing: (char, total occurrences).</p>
 </div>
 </div>
@@ -1420,7 +1420,7 @@ Now, onto the code!</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>With the sizes and edges in correct order, all that was left was to draw out the graph. This step required a lot of trial and error. The original sizes and weights were wayyyy too small, so I added scalars to explore possibilities with. The values below were the result of the trial runs.</p>
-<p>Similarlly, The default graph was inappropriate for such a large network. I played around with the splring_layout(K, iterations) params to find a happy-medium between edge distance and iterations of graphing. These two values below result (typically) in a nice looking network. It's randomized so the visual will display a different version each time it is ran.  The nodes and edge sizes remain the same, yet the locations of the nodes within the graph will be randomly placed.</p>
+<p>Similarly, The default graph was inappropriate for such a large network. I played around with the splring_layout(K, iterations) params to find a happy-medium between edge distance and iterations of graphing. These two values below result (typically) in a nice looking network. It's randomized so the visual will display a different version each time it is ran.  The nodes and edge sizes remain the same, yet the locations of the nodes within the graph will be randomly placed.</p>
 </div>
 </div>
 </div>
@@ -1533,13 +1533,13 @@ Now, onto the code!</p>
             <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="/tag/reporting.html">
-                            reporting
+                        <a href="/tag/eda.html">
+                            EDA
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/visualizing.html">
-                            visualizing
+                        <a href="/tag/python.html">
+                            Python
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -1553,28 +1553,28 @@ Now, onto the code!</p>
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/eda.html">
-                            EDA
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="/tag/python.html">
-                            Python
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
                         <a href="/tag/r.html">
                             R
                         </a>
                     </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/classification.html">
-                            classification
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
                         <a href="/tag/cleaning.html">
                             Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
                         </a>
                     </li>
                     <li class="list-group-item tag-2">

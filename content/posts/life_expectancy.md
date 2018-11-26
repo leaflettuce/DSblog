@@ -8,7 +8,7 @@ Summary: A few visuals I created in Tableau displaying some trends in life expec
 
 # Life Expectancy Exploration and Visualization
 
-A few visuals I created in Tableau displaying some trends in life expectancy by country. Data was sources from the World Bank Open Data website and includes life expectancy at birth of around 200 countries from between 1968 and 2014. Originally conducted for SNHU Data Visualization homework assignment in which to express data in five different method classifications: comparison, hierarchical, temporal, correlation, and geo-spatial. 
+A few visuals I created in Tableau displaying some trends in life expectancy by country. Data was sourced from the World Bank Open Data website and includes life expectancy at birth of around 200 countries from between 1968 and 2014. Originally conducted for SNHU Data Visualization homework assignment in which to express data in five different method classifications: comparison, hierarchical, temporal, correlation, and geo-spatial. 
 
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/life_exp/compare.png" style="width: 800px;"/>

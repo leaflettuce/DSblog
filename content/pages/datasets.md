@@ -32,3 +32,6 @@ Final csv from the cleaned and manipulated dataset NCAA Season Data (2003-2017) 
 
 <a href="../data/popular kids.csv" download>Michigan Student (4th- 6th graders) Survey</a><br>
 Survey data used for the Qlikview dashbaord I created for DAT 320 class. Asking students their most important goals in school. Originally from Carnegie Mellow University<br>
+
+<a href="../data/coffee_survey.csv" download>Coffee Buyer Survey</a><br>
+Personally collected results from 3-day survey (distributed on social media) focused on coffee purchasing habits. I used this data within the Coffee Buyer Survey Post located <a href="../coffee_survey.html"> here</a>.<br>
