@@ -1,7 +1,7 @@
 Title: Parallel Coordinates Plot using Plotly  
 Slug: charity_coords
 Date: 2019-01-11 12:30
-Category: Exploratory Data Analysis
+Category: Data Visualization
 Tags: visualizing, plotly, EDA, charities, python
 author: Andrew Trick
 Summary: Over the holiday season I heard several discussions on which charities are best to donate to and why some are better than others. With this in mind, I thought it would be interesting to examine the stats which set one charity over another and find a way to visualize these in an effective manner. With some help from Charity Navigator, I was able to source and collect the appropriate information and thought it a great time to finally give Plotly a go. 
