@@ -77,6 +77,13 @@ Andrew Trick            </a>
     <div class="row">
         <div class="col-sm-9">
             <article>
+                <h2><a href="/tree_selection.html">Model Selection of Tree Classifiers in R</a></h2>
+                <div class="summary"><p>A recent lab for my machine learning class involved fitting and tuning decision tree models in R to find the 'best' option for predicting if a loan will default given historic loan data. I work through the process of: processing the data for modeling, fitting it to a C5.0 decision tree model, comparing it to an 10-trial adaptive boosted version, and finally tuning the ensemble model to find the parameters which result in the highest accuracy.</p>
+                    <a class="btn btn-default btn-xs" href="/tree_selection.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="/excel_mult_regression.html">Multiple Linear Regression to Predict Consumer Spending</a></h2>
                 <div class="summary"><p>As in the last post, here's some more work in excel with economic variables. This time I use value forecasts of 30y mortgage, unemployment, and personal income rates, figured in a similar manner as before (annual growth/change rates - 10y moving averages) to predict future levels of personal consumption expenditures. I run a multilinear regression analysis to forecast PCE based upon the three independent variables and end up with some pretty strong results and an adjusted R-squared of .974.</p>
                     <a class="btn btn-default btn-xs" href="/excel_mult_regression.html">more ...</a>
@@ -132,13 +139,6 @@ Andrew Trick            </a>
                 </div>
             </article>
             <hr/>
-            <article>
-                <h2><a href="/nigerian-airline-frequency-analysis.html">Nigerian Airline Frequency Analysis</a></h2>
-                <div class="summary"><p>A summary report of work I did for a Data Analytics II course at SNHU. Fictional company, Austin Air, is looking to enter the international airline industry with a goal of capturing a significant market share of business focused around Nigeria. Analysis will provide a look at the current industry and suggest strategies towards implementing a pilot program for the company to introduce to the market and achieve their goal.</p>
-                    <a class="btn btn-default btn-xs" href="/nigerian-airline-frequency-analysis.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
 
         <ul class="pagination">
                 <li class="prev disabled"><a href="#">&laquo;</a></li>
@@ -190,13 +190,18 @@ Andrew Trick            </a>
             <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                 <ul class="list-group " id="tags">
                     <li class="list-group-item tag-1">
-                        <a href="/tag/tableau.html">
-                            Tableau
+                        <a href="/tag/eda.html">
+                            EDA
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/reporting.html">
-                            reporting
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/classification.html">
+                            classification
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -205,13 +210,8 @@ Andrew Trick            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/eda.html">
-                            EDA
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-1">
-                        <a href="/tag/r.html">
-                            R
+                        <a href="/tag/reporting.html">
+                            reporting
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
@@ -220,23 +220,23 @@ Andrew Trick            </a>
                         </a>
                     </li>
                     <li class="list-group-item tag-1">
-                        <a href="/tag/visualizing.html">
-                            visualizing
+                        <a href="/tag/r.html">
+                            r
                         </a>
                     </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/classification.html">
-                            classification
-                        </a>
-                    </li>
-                    <li class="list-group-item tag-2">
-                        <a href="/tag/manipulation.html">
-                            manipulation
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/tableau.html">
+                            Tableau
                         </a>
                     </li>
                     <li class="list-group-item tag-2">
                         <a href="/tag/cleaning.html">
                             Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/manipulation.html">
+                            manipulation
                         </a>
                     </li>
                 </ul>
@@ -252,7 +252,7 @@ Andrew Trick            </a>
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2018 Andrew Trick
+         <div class="col-xs-10">&copy; 2019 Andrew Trick
             &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
