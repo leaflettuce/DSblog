@@ -1,14 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2019-01-28T15:30:00-06:00</updated><entry><title>Model Selection of Tree Classifiers in R</title><link href="/tree_selection.html" rel="alternate"></link><published>2019-01-28T15:30:00-06:00</published><updated>2019-01-28T15:30:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2019-01-28:tree_selection.html</id><summary type="html">&lt;h1&gt;Model Selection of Tree Classifiers in R (w/ parameter tuning)&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2019-01-28T15:30:00-06:00</updated><entry><title>Model Selection of Tree Classifiers in R</title><link href="/tree_selection.html" rel="alternate"></link><published>2019-01-28T15:30:00-06:00</published><updated>2019-01-28T15:30:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2019-01-28:tree_selection.html</id><summary type="html">&lt;h1&gt;Model Selection of Tree Classifiers in R&lt;/h1&gt;
 &lt;p&gt;&lt;br&gt;
-A recent lab for my machine learning class involved fitting and tuning decision tree models in R to find the 'best' option for predicting if a loan will default given fictional historic loan data. I work through the process of: processing the data for modeling, fitting it to a C5.0 decision tree model, comparing it to an 10-trial adaptive boosted version, and finally tuning the ensemble model to find the parameters which result in the highest accuracy.&lt;br&gt;&lt;br&gt;
-&lt;br&gt;
-As most of my past work with machine learning has been done with scikit-learn in Python, I am finding this course to be extremely useful and interesting. Not only has it given me a deeper understanding of the strengths and weaknesses inherent in each type of model, but it also included plenty of practice working in R. The textbook for this course is &lt;em&gt;"Machine Learning with R"&lt;/em&gt; by Brett Lantz, and much of this process is taken from the book.
-Data for this project is located at the &lt;a href="https://archive.ics.uci.edu/ml/index.php"&gt;UCI Machine Learning Repository&lt;/a&gt;.&lt;/p&gt;
+A recent lab for my machine learning class involved fitting and tuning decision tree models in R to find the 'best' option for predicting if a loan will default given fictional historic loan data. I work through the process of: processing the data for modeling, fitting it to a C5.0 decision tree model, comparing it to an 10-trial adaptive boosted version, and finally tuning the ensemble model to find the parameters which result in the highest accuracy.&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;As most of my past work with machine learning has been done with scikit-learn in Python, I am finding this course to be extremely useful. Not only has it given me a deeper understanding of the strengths and weaknesses inherent in each type of algorithm, but it also included plenty of practice working in R. The textbook for this course is &lt;em&gt;"Machine Learning with R"&lt;/em&gt; by Brett Lantz, and much of this process is taken from the book.
+Data for this project is located at the &lt;a href="https://archive.ics.uci.edu/ml/index.php"&gt;UCI Machine Learning Repository&lt;/a&gt;.
+&lt;br&gt;&lt;/p&gt;
 &lt;h2&gt;Data Preprocessing&lt;/h2&gt;
 &lt;p&gt;As this post is focused on model creation and results analysis, I've elected to not report the importing, exploring, and processing steps for this project. Complete code for this project can be found at my &lt;a href="https://github.com/leaflettuce/IT460-Coursework/blob/master/week_four/lab_4-2.R"&gt;GitHub&lt;/a&gt;.
+&lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/dt_selection/ROC.png" style="width: 800px;"/&gt;&lt;/p&gt;</summary><category term="modeling"></category><category term="classification"></category><category term="r"></category><category term="caret"></category><category term="trees"></category></entry><entry><title>Multiple Linear Regression to Predict Consumer Spending</title><link href="/excel_mult_regression.html" rel="alternate"></link><published>2018-12-08T15:00:00-06:00</published><updated>2018-12-08T15:00:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-12-08:excel_mult_regression.html</id><summary type="html">&lt;h1&gt;Regression Analysis to Predict Personal Consumption Expenditure&lt;/h1&gt;
+&lt;h2&gt;Data Modeling&lt;/h2&gt;
+&lt;h4&gt;C5.0 Decision Tree&lt;/h4&gt;
+&lt;p&gt;I first attempted to fit a standard C5.0 tree through the C50 library. This involves no parameter tuning to provide a base line of how accurate a tree is predicting given the inputs.
+All models will be evaluated by their overall accuracy, kappa score, and ROC/AUC. The gmodels library gives an ease way to report all of these with the confusion matrix.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;######&lt;/span&gt;
+&lt;span class="c1"&gt;# C5 #   &lt;/span&gt;
+&lt;span class="c1"&gt;######&lt;/span&gt;
+
+&lt;span class="c1"&gt;#train&lt;/span&gt;
+c5_model &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; C5.0&lt;span class="p"&gt;(&lt;/span&gt;X_train&lt;span class="p"&gt;,&lt;/span&gt; y_train&lt;span class="o"&gt;$&lt;/span&gt;default&lt;span class="p"&gt;)&lt;/span&gt;
+c5_model
+&lt;span class="c1"&gt;# Model Results&lt;/span&gt;
+&lt;span class="kp"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;c5_model&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Predict&lt;/span&gt;
+c5_pred &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; predict&lt;span class="p"&gt;(&lt;/span&gt;c5_model&lt;span class="p"&gt;,&lt;/span&gt; X_test&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# probability&lt;/span&gt;
+c5_prob &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;&lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;predict&lt;span class="p"&gt;(&lt;/span&gt;c5_model&lt;span class="p"&gt;,&lt;/span&gt; X_test&lt;span class="p"&gt;,&lt;/span&gt; type &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;prob&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+
+&lt;span class="c1"&gt;# matrix&lt;/span&gt;
+confusionMatrix&lt;span class="p"&gt;(&lt;/span&gt;c5_pred&lt;span class="p"&gt;,&lt;/span&gt; y_test&lt;span class="o"&gt;$&lt;/span&gt;default&lt;span class="p"&gt;,&lt;/span&gt; positive &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;no&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The following results in around 74% overall accuracy, 35% kappa and around 67% AUC. Not great but not terrible either. 
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;10-Trial Adaptive Boosting&lt;/h4&gt;
+&lt;p&gt;With these results, the next reasonable step is to attempt a boosted version of the C5.0 algorithm. The C5.0 library has this option built in and the number of trials can be specified. This is an ensemble method which trains on subsets of the data and iteratively trains the model based on results of previous fits, weighting error prone observations higher. Once a set number of trials are complete all of the 'weak' trees vote on the outcome of each test observation.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;###############&lt;/span&gt;
+&lt;span class="c1"&gt;# AdaBoost 10 #   &lt;/span&gt;
+&lt;span class="c1"&gt;###############&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Train&lt;/span&gt;
+ada10_model &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; C5.0&lt;span class="p"&gt;(&lt;/span&gt;X_train&lt;span class="p"&gt;,&lt;/span&gt; y_train&lt;span class="o"&gt;$&lt;/span&gt;default&lt;span class="p"&gt;,&lt;/span&gt; trials &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ada10_model
+&lt;span class="c1"&gt;# Summary&lt;/span&gt;
+&lt;span class="kp"&gt;summary&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;ada10_model&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Predict&lt;/span&gt;
+ada10_pred &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; predict&lt;span class="p"&gt;(&lt;/span&gt;ada10_model&lt;span class="p"&gt;,&lt;/span&gt; X_test&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# probability&lt;/span&gt;
+ada10_prob &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;&lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;predict&lt;span class="p"&gt;(&lt;/span&gt;ada10_model&lt;span class="p"&gt;,&lt;/span&gt; X_test&lt;span class="p"&gt;,&lt;/span&gt; type &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;prob&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# matrix&lt;/span&gt;
+confusionMatrix&lt;span class="p"&gt;(&lt;/span&gt;ada10_pred&lt;span class="p"&gt;,&lt;/span&gt; y_test&lt;span class="o"&gt;$&lt;/span&gt;default&lt;span class="p"&gt;,&lt;/span&gt; positive &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;no&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The results are looking a little better from the original single tree:
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/dt_selection/ada_results.png" style="width: 500px;"/&gt;
+&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h4&gt;Parameter Tuning with Caret&lt;/h4&gt;
+&lt;p&gt;Finally, one last method will be explored to see if we can boost the accuracy any higher by tweaking the parameters. The caret library provides ways to attempt this in R. 
+I opted to use Cross Validation to evaluate the model in the parameter gird search:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Custom                   &lt;/span&gt;
+ctrl &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; trainControl&lt;span class="p"&gt;(&lt;/span&gt;method &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;cv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; number &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; selectionFunction &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;best&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+grid &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;expand.grid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;.&lt;/span&gt;model &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;tree&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rules&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                    &lt;span class="m"&gt;.&lt;/span&gt;trials &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;25&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;30&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="m"&gt;35&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                    &lt;span class="m"&gt;.&lt;/span&gt;winnow &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+m_cust &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; train&lt;span class="p"&gt;(&lt;/span&gt;default &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="m"&gt;.&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; data &lt;span class="o"&gt;=&lt;/span&gt; df&lt;span class="p"&gt;,&lt;/span&gt; method &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;C5.0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
+                metric &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Kappa&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                trControl &lt;span class="o"&gt;=&lt;/span&gt; ctrl&lt;span class="p"&gt;,&lt;/span&gt;
+                tuneGrid &lt;span class="o"&gt;=&lt;/span&gt; grid&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# results&lt;/span&gt;
+m_cust
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/dt_selection/caret_results_2.png" style="width: 650px;"/&gt;
+&lt;br&gt;
+Interestingly, grid search with cross validation returns a similar accuracy yet slightly lower kappa score than the original 10-trial adaboost.
+It seems like we're hitting the upper bound of accuracy given this input data and a tree model.. An ROC visual can show us how this model trades off True positives with False positives:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;#ROC&lt;/span&gt;
+ada10_roc_pred &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; prediction&lt;span class="p"&gt;(&lt;/span&gt;predictions &lt;span class="o"&gt;=&lt;/span&gt; ada10_prob&lt;span class="o"&gt;$&lt;/span&gt;yes&lt;span class="p"&gt;,&lt;/span&gt; labels &lt;span class="o"&gt;=&lt;/span&gt; y_test&lt;span class="p"&gt;)&lt;/span&gt;
+ada10_perf &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; performance&lt;span class="p"&gt;(&lt;/span&gt;ada10_roc_pred&lt;span class="p"&gt;,&lt;/span&gt; measure &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;tpr&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; x.measure &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;fpr&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# plot&lt;/span&gt;
+plot&lt;span class="p"&gt;(&lt;/span&gt;ada10_perf&lt;span class="p"&gt;,&lt;/span&gt; main &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ROC surve for ada10 model of defaults&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+     col &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;blue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; lwd &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+abline&lt;span class="p"&gt;(&lt;/span&gt;a &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; b &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; lwd &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; lty &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/dt_selection/ROC.png" style="width: 500px;"/&gt;
+&lt;br&gt;
+Given the data and the difficulty involved in predicting loan default likelihood, I think this is a pretty solid model. Other tree or ensemble methods (such as bagging methods or JRip) may be able to squeeze out a slightly higher accuracy, but I expect not by a very significant amount.&lt;/p&gt;</summary><category term="modeling"></category><category term="classification"></category><category term="r"></category><category term="caret"></category><category term="trees"></category></entry><entry><title>Multiple Linear Regression to Predict Consumer Spending</title><link href="/excel_mult_regression.html" rel="alternate"></link><published>2018-12-08T15:00:00-06:00</published><updated>2018-12-08T15:00:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2018-12-08:excel_mult_regression.html</id><summary type="html">&lt;h1&gt;Regression Analysis to Predict Personal Consumption Expenditure&lt;/h1&gt;
 &lt;p&gt;&lt;br&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;As in the last post, here's some more work in excel with economic variables. This time I use value forecast of 30y mortgage, unemployment, and personal income rates, figured in a similar manner as before (annual growth/change rates - 10y moving averages) to predict future levels of personal consumption expenditures. I stick with a pretty simple multilinear regression throughout this and, while exploring interactions between variables or non-linearity could have been beneficial, the linear model performed extremely well.
 &lt;br&gt;&lt;br&gt;
