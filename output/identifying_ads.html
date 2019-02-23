@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Identifying Advertisements with ANN's - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/identifying_ads.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="modeling,classification,r,caret,ann,nb,knn" />
+        <meta name="description" content="I pull data from the UCI Machine Learning Repo and use it to train a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Identifying Advertisements with ANN&#39;s"/>
+        <meta property="og:url" content="/identifying_ads.html"/>
+        <meta property="og:description" content="I pull data from the UCI Machine Learning Repo and use it to train a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language."/>
+        <meta property="article:published_time" content="2019-02-18" />
+            <meta property="article:section" content="Machine Learning" />
+            <meta property="article:tag" content="modeling" />
+            <meta property="article:tag" content="classification" />
+            <meta property="article:tag" content="r" />
+            <meta property="article:tag" content="caret" />
+            <meta property="article:tag" content="ann" />
+            <meta property="article:tag" content="nb" />
+            <meta property="article:tag" content="knn" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/machine-learning.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Machine Learning ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/identifying_ads.html"
+                       rel="bookmark"
+                       title="Permalink to Identifying Advertisements with ANN's">
+                        Identifying Advertisements with ANN's
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2019-02-18T15:30:00-06:00"> Mon 18 February 2019</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/machine-learning.html">Machine Learning</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/modeling.html">modeling</a>
+        /
+	<a href="/tag/classification.html">classification</a>
+        /
+	<a href="/tag/r.html">r</a>
+        /
+	<a href="/tag/caret.html">caret</a>
+        /
+	<a href="/tag/ann.html">ann</a>
+        /
+	<a href="/tag/nb.html">nb</a>
+        /
+	<a href="/tag/knn.html">knn</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h1>Identifying Advertisements with ANN's</h1>
+<p>I pull data from the UCI Machine Learning Repo and use it to form a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
+<br></p>
+<h2>Data Description</h2>
+<p>Data for this project is located at the <a href="https://archive.ics.uci.edu/ml/datasets/Internet+Advertisements">UCI Machine Learning Repository</a>. The dataset contains 3297 observations and 1558 attributes. Three of the columns represent imaage size; hieght, weight, and aspect ratio. The dependent in this dataset is a categorical column specifying ad or non-ad. The remaining 1554 form a sparse, document-term matrix of binary values indicating URL terminology used for each image URL. 
+<br></p>
+<h2>Exploration</h2>
+<div class="highlight"><pre><span></span><span class="c1">#############################</span>
+<span class="c1"># Library Imports and Setup #</span>
+<span class="c1">#############################</span>
+<span class="c1"># Working Dir</span>
+<span class="kp">setwd</span><span class="p">(</span><span class="s">&#39;e:/projects/it460/final&#39;</span><span class="p">)</span>
+
+<span class="c1"># Data Import</span>
+df <span class="o">&lt;-</span> read.csv<span class="p">(</span><span class="s">&quot;../data/final/ad.csv&quot;</span><span class="p">)</span>
+
+
+<span class="c1">###############</span>
+<span class="c1"># Exploration #</span>
+<span class="c1">###############</span>
+str<span class="p">(</span>df<span class="p">)</span>
+
+<span class="kp">summary</span><span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="p">])</span>
+<span class="kp">summary</span><span class="p">(</span>df<span class="p">[</span><span class="m">2</span><span class="p">])</span>
+<span class="kp">summary</span><span class="p">(</span>df<span class="p">[</span><span class="m">3</span><span class="p">])</span>
+
+<span class="c1"># histograms of size vars</span>
+hist<span class="p">(</span>df<span class="o">$</span>X125<span class="p">)</span>
+hist<span class="p">(</span>df<span class="o">$</span>X125.1<span class="p">)</span>
+hist<span class="p">(</span>df<span class="o">$</span>X1.0<span class="p">)</span>
+
+<span class="c1"># scatter of size to width</span>
+plot<span class="p">(</span>df<span class="p">[</span><span class="m">0</span><span class="o">:</span><span class="m">2</span><span class="p">])</span>
+</pre></div>
+
+
+<p>An example of some of the output: 
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/aratio_sum.png" style="width: 250px;"/><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/width_sum.png" style="width: 500px;"/><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/height_width_scatter.png" style="width: 500px;"/>
+<br>
+I thought to then attempt a heatmap of the sparse matrix:</p>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>reshape2<span class="p">)</span>
+test_m <span class="o">&lt;-</span> melt<span class="p">(</span>df<span class="p">[</span><span class="m">4</span><span class="o">:</span><span class="m">1558</span><span class="p">])</span>
+ggplot<span class="p">(</span>test_m<span class="p">,</span> aes<span class="p">(</span>X1<span class="p">,</span> variable<span class="p">,</span> fill <span class="o">=</span> value<span class="p">))</span> <span class="o">+</span> geom_raster<span class="p">()</span> <span class="o">+</span>
+  scale_fill_gradient<span class="p">(</span>low <span class="o">=</span> <span class="s">&quot;white&quot;</span><span class="p">,</span> high <span class="o">=</span> <span class="s">&quot;red&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/matrix_heat.png" style="width: 500px;"/>
+<br>
+This doesn't tell us much outside the fact that the URL terms come in groupings in the data.. Not too useful aside from highlighting the importance to randomize the rows when splitting the train and test apart.
+<br>
+And finally, a quick histogram of ad vs non-ad in the dataset:</p>
+<div class="highlight"><pre><span></span>ggplot(aes(x = ad.), data = df) + 
+  geom_histogram(stat = &quot;count&quot;)
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/ad_hist.png" style="width: 500px;"/>
+<br>
+About 15% of the observations are ads.
+<br>
+<br></p>
+<h2>Data Preprocessing</h2>
+<h4>Cleaning &amp; Missing Values</h4>
+<p>Coming from the UCI repo, the data is relatively clean and ready to go. Just a few minor edits here. I start by setting the binary values into factors and the size variables into numeric type.
+I opted to remove the missing values rather than impute a mean or mode values. I chose this primarily due to the disparity of each size variable. They each have a large range and little pattern. Any replacement with mean or mode, I worried, would have biased the data and caused more damage than any benefit gained from having a larger training set.</p>
+<div class="highlight"><pre><span></span><span class="c1">############</span>
+<span class="c1"># Cleaning #</span>
+<span class="c1">############</span>
+<span class="c1"># Set all vars as factors</span>
+df<span class="p">[]</span> <span class="o">&lt;-</span> <span class="kp">lapply</span><span class="p">(</span>df<span class="p">,</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="kp">as.factor</span><span class="p">(</span>x<span class="p">))</span>
+
+
+<span class="c1"># Missing Values </span>
+df<span class="p">[</span> df <span class="o">==</span> <span class="s">&quot;   ?&quot;</span> <span class="p">]</span> <span class="o">&lt;-</span> <span class="kc">NA</span>
+df<span class="p">[</span> df <span class="o">==</span> <span class="s">&quot;     ?&quot;</span> <span class="p">]</span> <span class="o">&lt;-</span> <span class="kc">NA</span>
+df<span class="p">[</span> df <span class="o">==</span> <span class="s">&quot;?&quot;</span> <span class="p">]</span> <span class="o">&lt;-</span> <span class="kc">NA</span>
+
+
+
+<span class="c1"># set numeric</span>
+df<span class="o">$</span>X125 <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>X125<span class="p">))</span>
+df<span class="o">$</span>X125.1 <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>X125.1<span class="p">))</span>
+df<span class="o">$</span>X1.0 <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>X1.0<span class="p">))</span>
+
+
+<span class="c1"># replace NA&#39;s in terminology</span>
+df<span class="o">$</span>X1<span class="p">[</span><span class="kp">is.na</span><span class="p">(</span>df<span class="o">$</span>X1<span class="p">)]</span> <span class="o">&lt;-</span> <span class="m">0</span>
+df<span class="o">$</span>X1 <span class="o">&lt;-</span> <span class="kp">droplevels</span><span class="p">(</span>df<span class="o">$</span>X1<span class="p">)</span>
+
+<span class="c1"># remove missing size data</span>
+df <span class="o">&lt;-</span> na.omit<span class="p">(</span>df<span class="p">)</span>
+
+<span class="c1">############################</span>
+<span class="c1"># Clean classification var #</span>
+<span class="c1">############################</span>
+<span class="kp">summary</span><span class="p">(</span>df<span class="o">$</span>ad.<span class="p">)</span>
+df<span class="o">$</span>ad. <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>df<span class="o">$</span>ad. <span class="o">==</span> <span class="s">&quot;ad.&quot;</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+df<span class="o">$</span>ad. <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>df<span class="o">$</span>ad.<span class="p">)</span>
+</pre></div>
+
+
+<p>I also normalized the size data here. I chose normalization over standardization because it fits more nicely with the 0-1 scale of the binary variables. Any distance based ML algorithms will benefit from all inputs being on a similar scale like this.</p>
+<div class="highlight"><pre><span></span><span class="c1">#################</span>
+<span class="c1"># Normalization #</span>
+<span class="c1">#################</span>
+<span class="c1"># min max normalization</span>
+min_max_normalize <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="p">{</span>
+  <span class="kr">return</span><span class="p">((</span>x <span class="o">-</span> <span class="kp">min</span><span class="p">(</span>x<span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="kp">max</span><span class="p">(</span>x<span class="p">)</span> <span class="o">-</span> <span class="kp">min</span><span class="p">(</span>x<span class="p">)))</span>
+<span class="p">}</span>
+
+<span class="c1"># apply to numeric columns</span>
+df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span><span class="kp">lapply</span><span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">],</span> min_max_normalize<span class="p">))</span>
+
+<span class="c1"># check it</span>
+<span class="kp">head</span><span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">])</span>
+<span class="kp">summary</span><span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">])</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/scale_check.png" style="width: 800px;"/>
+<br> Normalization looks like it worked just fine.
+<br></p>
+<h2>Comparison Models</h2>
+<p>Although my original assumption was that a neural network would perform best with this data, I started off with two baseline models that I thought would be fun to explore and interesting to compare:</p>
+<h4>Naive Bayes</h4>
+<p>So NB can perform pretty solid with sparse matrix data like most of this input. While I think its safe to say the assumption of input variable independence is broken, I've had a track record of it still working pretty well.</p>
+<p>Some additional preprocessing is needed for NB: The following code allowed me to examine the distribution of the size var values, then I binned out each of these numeric vars by quantiles.</p>
+<div class="highlight"><pre><span></span><span class="c1">#set factor</span>
+df<span class="o">$</span>ad. <span class="o">&lt;-</span> <span class="kp">factor</span><span class="p">(</span>df<span class="o">$</span>ad.<span class="p">)</span>
+df<span class="p">[</span><span class="m">4</span><span class="o">:</span><span class="m">1558</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="kp">lapply</span><span class="p">(</span>df<span class="p">[</span><span class="m">4</span><span class="o">:</span><span class="m">1558</span><span class="p">],</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="kp">as.factor</span><span class="p">(</span>x<span class="p">))</span>
+
+str<span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
+str<span class="p">(</span>df<span class="p">[</span><span class="m">1555</span><span class="o">:</span><span class="m">1559</span><span class="p">])</span>
+
+hist<span class="p">(</span>df<span class="o">$</span>X125<span class="p">,</span> breaks <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">.025</span><span class="p">,</span> <span class="m">.05</span><span class="p">,</span> <span class="m">.1</span><span class="p">,</span> <span class="m">.2</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+hist<span class="p">(</span>df<span class="o">$</span>X125.1<span class="p">,</span> breaks <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">.05</span><span class="p">,</span> <span class="m">.1</span><span class="p">,</span> <span class="m">.2</span><span class="p">,</span> <span class="m">.3</span><span class="p">,</span> <span class="m">.4</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+hist<span class="p">(</span>df<span class="o">$</span>X1.0<span class="p">,</span> breaks <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">.01</span><span class="p">,</span> <span class="m">.015</span><span class="p">,</span> <span class="m">.02</span><span class="p">,</span> <span class="m">.03</span><span class="p">,</span> <span class="m">.035</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+
+<span class="kp">summary</span><span class="p">(</span>df<span class="o">$</span>X125<span class="p">)</span>
+
+
+<span class="c1">############</span>
+<span class="c1"># Bin Data #</span>
+<span class="c1">############</span>
+
+df<span class="o">$</span>X125 <span class="o">&lt;-</span> <span class="kp">with</span><span class="p">(</span>df<span class="p">,</span> <span class="kp">cut</span><span class="p">(</span>X125<span class="p">,</span> 
+                        breaks<span class="o">=</span>quantile<span class="p">(</span>X125<span class="p">,</span> probs<span class="o">=</span><span class="kp">seq</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span> by<span class="o">=</span><span class="m">0.25</span><span class="p">),</span> na.rm<span class="o">=</span><span class="kc">TRUE</span><span class="p">),</span> 
+                        include.lowest<span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span>
+
+df<span class="o">$</span>X125.1 <span class="o">&lt;-</span> <span class="kp">with</span><span class="p">(</span>df<span class="p">,</span> <span class="kp">cut</span><span class="p">(</span>X125.1<span class="p">,</span> 
+                          breaks<span class="o">=</span>quantile<span class="p">(</span>X125.1<span class="p">,</span> probs<span class="o">=</span><span class="kp">seq</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span> by<span class="o">=</span><span class="m">0.25</span><span class="p">),</span> na.rm<span class="o">=</span><span class="kc">TRUE</span><span class="p">),</span> 
+                          include.lowest<span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span>
+
+df<span class="o">$</span>X1.0 <span class="o">&lt;-</span> <span class="kp">with</span><span class="p">(</span>df<span class="p">,</span> <span class="kp">cut</span><span class="p">(</span>X1.0<span class="p">,</span> 
+                        breaks<span class="o">=</span>quantile<span class="p">(</span>X1.0<span class="p">,</span> probs<span class="o">=</span><span class="kp">seq</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span> by<span class="o">=</span><span class="m">0.25</span><span class="p">),</span> na.rm<span class="o">=</span><span class="kc">TRUE</span><span class="p">),</span> 
+                        include.lowest<span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span>
+
+
+str<span class="p">(</span>df<span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">])</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/binned_size.png" style="width: 800px;"/>
+<br>
+Above screenshot gives a view of the new data structure for the binned vairables. All looks good and the data is ready, I then tossed it into a pretty generic NB model with the e1071 library:</p>
+<div class="highlight"><pre><span></span><span class="c1">###############</span>
+<span class="c1"># train model #</span>
+<span class="c1">###############</span>
+
+nb_model <span class="o">&lt;-</span> naiveBayes<span class="p">(</span>X_train<span class="p">,</span> y_train<span class="p">,</span> laplace <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+test_pred <span class="o">&lt;-</span> predict<span class="p">(</span>nb_model<span class="p">,</span> X_test<span class="p">,</span> type <span class="o">=</span> <span class="s">&quot;class&quot;</span><span class="p">)</span>
+
+<span class="c1"># Evaluate</span>
+confusionMatrix<span class="p">(</span><span class="kp">as.factor</span><span class="p">(</span>test_pred<span class="p">),</span> <span class="kp">as.factor</span><span class="p">(</span>y_test<span class="p">),</span> positive <span class="o">=</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nb_one.png" style="width: 650px;"/>
+<br>
+Results are pretty solid. Accuracy of .967 and a kappa of close to .86 indicate it's pretty effective at predicting the test data. Sensitivity could perform better but he false positive rate is extremely low which could be good in real life application of this model. It would be mistakenly blocking very few non-ads. 
+<br>
+I attempted another NB model and introduces a laplace parameter, but the results were on par with above so I'll skip it here.
+<br><br></p>
+<h4>K Nearest Neighbor</h4>
+<p>I next thought to give K-nn a go. I find this model fun to work with and thought it could be an effective classifier for data which includes a sparse matrix like this one. I also though it would be able to account for the <em>expected</em> complex relationships between input variables (The URL terms relating). 
+I brought in the data from the original cleaning process for this one. K-nn requires evenly-scaled numeric input data for its distance function to work properly, and this has already been done. I do print out the split proportions to make sure I'm close to even in the train and test splits (something I forgot to do earlier):
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/split_prop.png" style="width: 300px;"/>
+<br>
+Close enough for me. I use caret to perform 10-fold cross validation and tune the number of k.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Custom          </span>
+ctrl <span class="o">&lt;-</span> trainControl<span class="p">(</span>method <span class="o">=</span> <span class="s">&quot;repeatedcv&quot;</span><span class="p">,</span> number <span class="o">=</span> <span class="m">10</span><span class="p">,</span> repeats <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+
+m_cust <span class="o">&lt;-</span> train<span class="p">(</span>ad. <span class="o">~</span> <span class="m">.</span><span class="p">,</span> data <span class="o">=</span> train<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;knn&quot;</span><span class="p">,</span> 
+                trControl<span class="o">=</span>ctrl<span class="p">,</span>
+                preProcess <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="s">&quot;scale&quot;</span><span class="p">),</span>
+                tuneLength <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+
+<span class="c1"># results</span>
+m_cust
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/grid_fit_knn.png" style="width: 650px;"/>
+<br>
+Looks like k = 5 is the best fit for this. Lets test it:</p>
+<div class="highlight"><pre><span></span><span class="c1"># predict</span>
+m_pred <span class="o">&lt;-</span> predict<span class="p">(</span>m_cust<span class="p">,</span> newdata <span class="o">=</span> test<span class="p">)</span>
+
+<span class="c1"># Evaluate</span>
+confusionMatrix<span class="p">(</span><span class="kp">as.factor</span><span class="p">(</span>m_pred<span class="p">),</span> <span class="kp">as.factor</span><span class="p">(</span>y_test<span class="p">),</span> positive <span class="o">=</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/knn_results.png" style="width: 400px;"/>
+<br>
+A decent 96% accuracy and 78% kappa. Not too bad, but not performing as well as the NB model above. Again we have a great specificity, but maybe too many false negatives- which would equal ads bypassing a filter in our applications of this model.
+<br>
+<br></p>
+<h2>Artificial Neural Network</h2>
+<h4>Default Model</h4>
+<p>Finally, to the ANN. As mentioned earlier, I think ANN will work best with this data due to its complex relationships and neural net's abilities to work well with absurd connections in input data. I also just wanted more practice with NN's in R, soooo here we go. I start by fitting the default parameters in the neuralnet package.
+Also of note: I create a feature here as well that I'm calling 'keyword_count'. This is simply the total number of url keywords for each observation.</p>
+<div class="highlight"><pre><span></span><span class="c1"># add feature</span>
+train<span class="o">$</span>keyword_count <span class="o">&lt;-</span> <span class="kp">rowSums</span><span class="p">(</span>train<span class="p">[</span><span class="m">4</span><span class="o">:</span><span class="m">1558</span><span class="p">]</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span>
+test<span class="o">$</span>keyword_count <span class="o">&lt;-</span> <span class="kp">rowSums</span><span class="p">(</span>test<span class="p">[</span><span class="m">4</span><span class="o">:</span><span class="m">1558</span><span class="p">]</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span>
+
+<span class="c1"># prep</span>
+predictors <span class="o">&lt;-</span> <span class="kp">colnames</span><span class="p">(</span>train<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">1558</span><span class="p">,</span> <span class="m">1560</span><span class="p">)])</span> 
+fit_details <span class="o">&lt;-</span> as.formula<span class="p">(</span><span class="kp">paste</span><span class="p">(</span><span class="s">&#39;ad. ~ &#39;</span> <span class="p">,</span><span class="kp">paste</span><span class="p">(</span>predictors<span class="p">,</span>collapse<span class="o">=</span><span class="s">&#39;+&#39;</span><span class="p">)))</span>
+
+<span class="c1">#  BASIC</span>
+basic <span class="o">&lt;-</span> neuralnet<span class="p">(</span>fit_details<span class="p">,</span> data <span class="o">=</span>train<span class="p">,</span> hidden <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+
+<span class="c1"># basic     // acc - 94, kappa - 78  </span>
+basic_results <span class="o">&lt;-</span> compute<span class="p">(</span>basic<span class="p">,</span> test<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">1558</span><span class="p">,</span> <span class="m">1560</span><span class="p">)])</span>
+basic_pred <span class="o">&lt;-</span> basic_results<span class="o">$</span>net.result
+cor<span class="p">(</span>basic_pred<span class="p">,</span> test<span class="o">$</span>ad.<span class="p">)</span>
+
+confusionMatrix<span class="p">(</span><span class="kp">as.factor</span><span class="p">(</span><span class="kp">round</span><span class="p">(</span>basic_pred<span class="p">)),</span> <span class="kp">as.factor</span><span class="p">(</span>test<span class="o">$</span>ad.<span class="p">),</span> positive <span class="o">=</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_one.png" style="width: 650px;"/>
+<br>
+So the default ANN model performs about on par with the NB. The main difference here is that it sees a slightly higher kappa and trades off some specificity for sensitivity. This is the first model to have fewer false negatives than false positives. The use and applications of the final model would determine which error rate is more important.. For now I'll stick with overall accuracy and kappa for evaluation. </p>
+<p><br></p>
+<h4>Parameter Tuning (Trends in Variations)</h4>
+<p>I next worked on tuning parameters within neuralnet to see what might have some effect and increase performance of the network. Caret grid tuning was out of the question for me with the amount of processing power that would require, so I started by manually tweaking the network size to see how that would effect results.
+Increasing the network layer and neuron size showed an interesting insight: A significant trend towards overfitting. The default neuron network for this library is c(1) - indicating one hidden neuron in one layer. I worked my way up from to this c(5), c(3,1), and c(5,3,1). Each increase in the network size resulted in lower accuracy and predictive power. It appears the model begins to overfit very quickly with this training data. While increasing the volume of the data may have resolved this problem, that was not an option. 
+So.. I opted to keep the one hidden neuron network and work on tweaking other parameters to see what might happen. This revolved primarily around switching out activation functions (neuralnet() by default uses a logistic activation with sum of squares error function to fit and backpropogate). I manually tuned these in different patterns, while also switching out the backprop method from weighted backtracking to non-weighted. 
+Lastly, I cut the 'threshold' value in half from 0.01 to 0.005. This parameter indicates what minimum partial derivative limit of the error function the fitting process should stop at. This step was able to squeeze out a little more accuracy from the model, without any noticeable problem of overfitting. </p>
+<p><br></p>
+<h4>Final Model</h4>
+<p>So after param tuning, I ended with the following model. It uses a tangent hyperbolic function as the activation function, while still using SSE as the error funct. This change in act funct would result in a stronger gradient descent, allowing the algorithm to traverse more quickly to the optimum.  </p>
+<div class="highlight"><pre><span></span><span class="c1"># REFIT</span>
+refit_model <span class="o">&lt;-</span> neuralnet<span class="p">(</span>fit_details<span class="p">,</span> data <span class="o">=</span> train<span class="p">,</span> hidden <span class="o">=</span> <span class="m">1</span><span class="p">,</span>
+                             lifesign <span class="o">=</span> <span class="s">&quot;full&quot;</span><span class="p">,</span> stepmax <span class="o">=</span> <span class="m">50000</span><span class="p">,</span>
+                             act.fct <span class="o">=</span> <span class="s">&quot;tanh&quot;</span><span class="p">,</span> err.fct <span class="o">=</span> <span class="s">&#39;sse&#39;</span><span class="p">,</span> 
+                             algorithm <span class="o">=</span> <span class="s">&quot;rprop-&quot;</span><span class="p">,</span> threshold <span class="o">=</span> <span class="m">0.005</span><span class="p">)</span>
+
+<span class="c1"># refit     // acc - 97, kappa - 89</span>
+refit_results <span class="o">&lt;-</span> compute<span class="p">(</span>refit_model<span class="p">,</span> test<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">1558</span><span class="p">,</span> <span class="m">1560</span><span class="p">)])</span>
+refit_pred <span class="o">&lt;-</span> refit_results<span class="o">$</span>net.result
+cor<span class="p">(</span>refit_pred<span class="p">,</span> test<span class="o">$</span>ad.<span class="p">)</span>
+
+confusionMatrix<span class="p">(</span><span class="kp">as.factor</span><span class="p">(</span><span class="kp">round</span><span class="p">(</span>refit_pred<span class="p">)),</span> <span class="kp">as.factor</span><span class="p">(</span>test<span class="o">$</span>ad.<span class="p">),</span> positive <span class="o">=</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_two.png" style="width: 700px;"/>
+<br>
+So parameter tuning did little to increase the overall accuracy of the model.. It dropped it actually, indicating the simple logistic model is probably the best option for the given data. The reason I kept working on this, even with the loss of overall accuracy is its slight increase in sensitivity.  Given the business goals of the project, an overall decrease in accuracy may be worth ensuring all actual trues are caught. </p>
+<div class="highlight"><pre><span></span><span class="c1"># ROC</span>
+roc_pred <span class="o">&lt;-</span> prediction<span class="p">(</span>predictions <span class="o">=</span> refit_pred<span class="p">,</span> labels <span class="o">=</span> test<span class="o">$</span>ad.<span class="p">)</span>
+refit_perf <span class="o">&lt;-</span> performance<span class="p">(</span>roc_pred<span class="p">,</span> measure <span class="o">=</span> <span class="s">&#39;tpr&#39;</span><span class="p">,</span> x.measure <span class="o">=</span> <span class="s">&#39;fpr&#39;</span><span class="p">)</span>
+
+<span class="c1"># plot</span>
+plot<span class="p">(</span>refit_perf<span class="p">,</span> main <span class="o">=</span> <span class="s">&quot;ROC surve for Refit ANN&quot;</span><span class="p">,</span>
+     col <span class="o">=</span> <span class="s">&quot;blue&quot;</span><span class="p">,</span> lwd <span class="o">=</span> <span class="m">3</span><span class="p">)</span>
+abline<span class="p">(</span>a <span class="o">=</span> <span class="m">0</span><span class="p">,</span> b <span class="o">=</span> <span class="m">1</span><span class="p">,</span> lwd <span class="o">=</span> <span class="m">2</span><span class="p">,</span> lty <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/ROC.png" style="width: 500px;"/>
+<br>
+The ROC shows the relationship between true positives and false positives for the model. This plot shows a pretty good trade off with an AUC of around 94%.</p>
+<h2>Results and Further Considerations</h2>
+<p>In review, a K-NN algorithm works surprisingly well and should be used if false positives are severely damaging in application- This model had, by far, the lowest count of these in the test. If overall accuracy is the goal on the other hand, the basic ANN fit from neuralnet is able to predict over 97% of all test observations correctly and would be arguably the 'best' option. It all comes down to how the system would be implemented. 
+<br><br>This model would also require constant upkeep to be useful for anything like a ad blocker though. The fact that it trains on URL keywords is its primary weakness; Ad companies would probably be able to quickly pick up on this bias and switch them up. To combat this, a system could be set up that grabs new training data every week to keep the keyword dictionary up to date and new keywords accounted for in the model. 
+<br><br>Outside of these considerations, I'm happy with this project and excited to see that even a simple ANN can be extremely effective at capturing complex, sparse input data.  </p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/r.html">
+                            r
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            EDA
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/tableau.html">
+                            Tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/classification.html">
+                            classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/cleaning.html">
+                            Cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/pandas.html">
+                            pandas
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2019 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>

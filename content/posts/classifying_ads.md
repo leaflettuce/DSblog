@@ -4,10 +4,10 @@ Date: 2019-02-18 15:30
 Category: Machine Learning
 Tags: modeling, classification, r, caret, ann, nb, knn
 author: Andrew Trick
-Summary: I pull data from the UCI repo and use it to form a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
+Summary: I pull data from the UCI Machine Learning Repo and use it to train a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
 
 # Identifying Advertisements with ANN's
-I pull data from the UCI repo and use it to form a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
+I pull data from the UCI Machine Learning Repo and use it to form a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
 <br>
 ## Data Description
 Data for this project is located at the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Internet+Advertisements). The dataset contains 3297 observations and 1558 attributes. Three of the columns represent imaage size; hieght, weight, and aspect ratio. The dependent in this dataset is a categorical column specifying ad or non-ad. The remaining 1554 form a sparse, document-term matrix of binary values indicating URL terminology used for each image URL. 
@@ -41,9 +41,10 @@ hist(df$X1.0)
 # scatter of size to width
 plot(df[0:2])
 ```
-An example of some of the output:
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/aratio_sum.png" style="width: 500px;"/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/width_sum.png" style="width: 500px;"/>
+An example of some of the output: 
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/aratio_sum.png" style="width: 180px;"/><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/width_sum.png" style="width: 500px;"/><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/height_width_scatter.png" style="width: 500px;"/>
 <br>
 I thought to then attempt a heatmap of the sparse matrix:
@@ -55,6 +56,7 @@ ggplot(test_m, aes(X1, variable, fill = value)) + geom_raster() +
   scale_fill_gradient(low = "white", high = "red")
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/matrix_heat.png" style="width: 500px;"/>
+<br>
 This doesn't tell us much outside the fact that the URL terms come in groupings in the data.. Not too useful aside from highlighting the importance to randomize the rows when splitting the train and test apart.
 <br>
 And finally, a quick histogram of ad vs non-ad in the dataset:
@@ -63,7 +65,8 @@ ggplot(aes(x = ad.), data = df) +
   geom_histogram(stat = "count")
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/ad_hist.png" style="width: 500px;"/>
-About XX% of the observations are ads.
+<br>
+About 15% of the observations are ads.
 <br>
 <br>
 ## Data Preprocessing
@@ -123,8 +126,8 @@ df[1:3] <- as.data.frame(lapply(df[1:3], min_max_normalize))
 head(df[1:3])
 summary(df[1:8])
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/scale_check.png" style="width: 500px;"/>
-<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/scale_check.png" style="width: 800px;"/>
+<br> Normalization looks like it worked just fine.
 <br>
 ## Comparison Models
 Although my original assumption was that a neural network would perform best with this data, I started off with two baseline models that I thought would be fun to explore and interesting to compare:
@@ -167,7 +170,8 @@ df$X1.0 <- with(df, cut(X1.0,
 
 str(df[1:5])
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/binned_size.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/binned_size.png" style="width: 800px;"/>
+<br>
 Above screenshot gives a view of the new data structure for the binned vairables. All looks good and the data is ready, I then tossed it into a pretty generic NB model with the e1071 library:
 
 ```
@@ -181,7 +185,8 @@ test_pred <- predict(nb_model, X_test, type = "class")
 # Evaluate
 confusionMatrix(as.factor(test_pred), as.factor(y_test), positive = "1")
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nb_one.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nb_one.png" style="width: 650px;"/>
+<br>
 Results are pretty solid. Accuracy of .967 and a kappa of close to .86 indicate it's pretty effective at predicting the test data. Sensitivity could perform better but he false positive rate is extremely low which could be good in real life application of this model. It would be mistakenly blocking very few non-ads. 
 <br>
 I attempted another NB model and introduces a laplace parameter, but the results were on par with above so I'll skip it here.
@@ -189,7 +194,7 @@ I attempted another NB model and introduces a laplace parameter, but the results
 #### K Nearest Neighbor
 I next thought to give K-nn a go. I find this model fun to work with and thought it could be an effective classifier for data which includes a sparse matrix like this one. I also though it would be able to account for the *expected* complex relationships between input variables (The URL terms relating). 
 I brought in the data from the original cleaning process for this one. K-nn requires evenly-scaled numeric input data for its distance function to work properly, and this has already been done. I do print out the split proportions to make sure I'm close to even in the train and test splits (something I forgot to do earlier):
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/split_prop.png" style="width: 500px;"/>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/split_prop.png" style="width: 300px;"/>
 <br>
 Close enough for me. I use caret to perform 10-fold cross validation and tune the number of k.
 ```
@@ -204,7 +209,8 @@ m_cust <- train(ad. ~ ., data = train, method = "knn",
 # results
 m_cust
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/grid_fit_knn.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/grid_fit_knn.png" style="width: 650px;"/>
+<br>
 Looks like k = 5 is the best fit for this. Lets test it:
 
 ```
@@ -214,7 +220,8 @@ m_pred <- predict(m_cust, newdata = test)
 # Evaluate
 confusionMatrix(as.factor(m_pred), as.factor(y_test), positive = "1")
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/knn_results.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/knn_results.png" style="width: 400px;"/>
+<br>
 A decent 96% accuracy and 78% kappa. Not too bad, but not performing as well as the NB model above. Again we have a great specificity, but maybe too many false negatives- which would equal ads bypassing a filter in our applications of this model.
 <br>
 <br>
@@ -242,7 +249,7 @@ cor(basic_pred, test$ad.)
 
 confusionMatrix(as.factor(round(basic_pred)), as.factor(test$ad.), positive = "1")
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_one.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_one.png" style="width: 650px;"/>
 <br>
 So the default ANN model performs about on par with the NB. The main difference here is that it sees a slightly higher kappa and trades off some specificity for sensitivity. This is the first model to have fewer false negatives than false positives. The use and applications of the final model would determine which error rate is more important.. For now I'll stick with overall accuracy and kappa for evaluation. 
 
@@ -270,7 +277,8 @@ cor(refit_pred, test$ad.)
 
 confusionMatrix(as.factor(round(refit_pred)), as.factor(test$ad.), positive = "1")
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_two.png" style="width: 500px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/nn_two.png" style="width: 700px;"/>
+<br>
 So parameter tuning did little to increase the overall accuracy of the model.. It dropped it actually, indicating the simple logistic model is probably the best option for the given data. The reason I kept working on this, even with the loss of overall accuracy is its slight increase in sensitivity.  Given the business goals of the project, an overall decrease in accuracy may be worth ensuring all actual trues are caught. 
 
 ```
@@ -285,9 +293,9 @@ abline(a = 0, b = 1, lwd = 2, lty = 2)
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/ROC.png" style="width: 500px;"/>
 <br>
-explain ROC
+The ROC shows the relationship between true positives and false positives for the model. This plot shows a pretty good trade off with an AUC of around 94%.
 
 ## Results and Further Considerations
 In review, a K-NN algorithm works surprisingly well and should be used if false positives are severely damaging in application- This model had, by far, the lowest count of these in the test. If overall accuracy is the goal on the other hand, the basic ANN fit from neuralnet is able to predict over 97% of all test observations correctly and would be arguably the 'best' option. It all comes down to how the system would be implemented. 
-This model would be require constant upkeep to be useful for anything like a ad blocker though. The fact that it trains on URL keywords is its primary weakness; Ad companies would probably be able to quickly pick up on this bias and switch them up. To combat this, a system could be set up that grabs new training data every week to keep the keyword dictionary up to date and new keywords accounted for in the model. 
-Outside of these considerations, I'm happy with this project and excited to see that even a simple ANN can be extremely effective at capturing complex, sparse input data.  
+<br><br>This model would also require constant upkeep to be useful for anything like a ad blocker though. The fact that it trains on URL keywords is its primary weakness; Ad companies would probably be able to quickly pick up on this bias and switch them up. To combat this, a system could be set up that grabs new training data every week to keep the keyword dictionary up to date and new keywords accounted for in the model. 
+<br><br>Outside of these considerations, I'm happy with this project and excited to see that even a simple ANN can be extremely effective at capturing complex, sparse input data.  

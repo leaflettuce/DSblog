@@ -2823,7 +2823,7 @@ AAJAJIAAEAkgAEQCCACRAAJAJIAA/g+gZ2XonO9siQAAAABJRU5ErkJggg==" /&gt;
 &lt;br&gt;&lt;br&gt;
 The second phase of this project was to pull the stored data into another python file and form a word cloud from it. Thankfully, the actually visualization was pretty easy thanks to the wordcloud library. The tedious part was using nltk to stem and process the words of the lyrics. This included removing typical stopwords from the file (and the artist's name as well). Additionally, I wrote manual code to remove the punctuation and any other issues which arose.&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;
-I'm not going to include the code on this page- I'd rather just focus on the final results which were the visuals. Feel free to link over to my github to see the full code though!
+I'm not going to include the code on this page- I'd rather just focus on the final results which were the visuals. Feel free to link over to my &lt;a href="https://github.com/leaflettuce/lyric_analysis"&gt;github&lt;/a&gt; to see the full code though!
 &lt;br&gt; &lt;/p&gt;
 &lt;p&gt;So, Here are the resulting word clouds:&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;

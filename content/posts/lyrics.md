@@ -12,7 +12,7 @@ Inspired a bit by Pudding.cool and the great API from genius.com, I wrote some P
 The second phase of this project was to pull the stored data into another python file and form a word cloud from it. Thankfully, the actually visualization was pretty easy thanks to the wordcloud library. The tedious part was using nltk to stem and process the words of the lyrics. This included removing typical stopwords from the file (and the artist's name as well). Additionally, I wrote manual code to remove the punctuation and any other issues which arose.
 
 <br>
-I'm not going to include the code on this page- I'd rather just focus on the final results which were the visuals. Feel free to link over to my github to see the full code though!
+I'm not going to include the code on this page- I'd rather just focus on the final results which were the visuals. Feel free to link over to my [github](https://github.com/leaflettuce/lyric_analysis) to see the full code though!
 <br> 
 
 So, Here are the resulting word clouds:
