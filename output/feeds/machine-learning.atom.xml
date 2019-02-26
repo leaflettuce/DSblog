@@ -37,7 +37,7 @@ plot&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="p"&gt;[&lt;/span&gt;&l
 
 &lt;p&gt;An example of some of the output: 
 &lt;br&gt;
-&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/aratio_sum.png" style="width: 250px;"/&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/aratio_sum.png" style="width: 180px;"/&gt;&lt;br&gt;
 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/width_sum.png" style="width: 500px;"/&gt;&lt;br&gt;
 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/height_width_scatter.png" style="width: 500px;"/&gt;
 &lt;br&gt;
@@ -123,7 +123,7 @@ df&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;sp
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/scale_check.png" style="width: 800px;"/&gt;
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/it460_final/scale_check.png" style="width: 650px;"/&gt;
 &lt;br&gt; Normalization looks like it worked just fine.
 &lt;br&gt;&lt;/p&gt;
 &lt;h2&gt;Comparison Models&lt;/h2&gt;

@@ -126,7 +126,7 @@ df[1:3] <- as.data.frame(lapply(df[1:3], min_max_normalize))
 head(df[1:3])
 summary(df[1:8])
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/scale_check.png" style="width: 800px;"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/it460_final/scale_check.png" style="width: 650px;"/>
 <br> Normalization looks like it worked just fine.
 <br>
 ## Comparison Models
