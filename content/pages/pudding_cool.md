@@ -1,7 +1,7 @@
 Date: 2017-09-04 18:53 
 Author: Andrew Trick 
 Title: Ideas for Pudding Cool
-Slug: Pudding
+Slug: pudding
 status: hidden
 
 Thanks for visiting! As you guys at The Pudding know, visuals can convey an idea much more quicker and simpler than words. With this in mind, here are some quick sketches of possible visuals for each of the stories I suggested: <br>
