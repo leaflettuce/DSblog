@@ -14,7 +14,7 @@ Teammates: [Christine Rizzo](https://www.linkedin.com/in/christinerizzo1/) and [
 ## TEAM DATA SNHUPERS
 SNHU provided the opportunity to take an experiential learning class focused on taking part of Teradata University Network's 2019 Data Challenge. This project worked with non-profit Hire Heroes USA and provided their client, marketing, interaction, and numerous other data sets for students to analyze. The open-ended goal was to select one or two business problems proposed by HH USA and mine the data for answers. My team conducts this project in a typical data life-cycle approach: Source Data, Clean, EDA, Analyze, Model, Visualize, Communicate, and Iterate these where needed. Our final presentation leverages not only trends found in HH USA data but also external sources to provide suggestions to continued growth in the near future.
 <br>
-NOTE: This Project Summary will be vague in regard to the data and results to ensure confidentiality of Hire Heroes USA.
+<br>NOTE: This Project Summary will be vague in regard to the data and results to ensure confidentiality of Hire Heroes USA.
 <br><br>
 
 ## Background 
@@ -79,6 +79,7 @@ After data was processed my team worked through focused Exploratory Data Analysi
 ### Modeling
 Some machine learning modeling was also run to attempt to predict the likelihood of a client successfully find work throughout the program. While a teammate Christine worked with Naive Bayes, I prepped the data and trained a logistic regression model with demographic data as input. Each input variable was dummied out and the entire input matrix consisted of binary variables. Final results of this model were better than expected and though only a 8 demographic factors a client's success could be predicted at 70% accuracy:
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/tun/log_reg.png" style="width: 600px;"/><br>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/tun/log_res.png" style="width: 350px;"/><br>
 <br>
 ## Results and Visualizing 
 ### Findings
