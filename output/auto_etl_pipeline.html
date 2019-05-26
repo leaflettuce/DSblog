@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Automating an ETL Pipeline w/ Python and MySQL - Andrew Trick</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="/img/favicon.ico" rel="icon">
+
+<link rel="canonical" href="/auto_etl_pipeline.html">
+
+        <meta name="author" content="Andrew Trick" />
+        <meta name="keywords" content="pandas,Python,cleaning,etl,sql,manipulation" />
+        <meta name="description" content="I find myself often working with data that is updated on a regular basis. Rather than manually run through the etl process every time I wish to update my locally stored data, I thought it would be beneficial to work out a system to update the data through an automated script. I use python and MySQL to automate this etl process using the city of Chicago&#39;s crime data." />
+
+        <meta property="og:site_name" content="Andrew Trick" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Automating an ETL Pipeline w/ Python and MySQL"/>
+        <meta property="og:url" content="/auto_etl_pipeline.html"/>
+        <meta property="og:description" content="I find myself often working with data that is updated on a regular basis. Rather than manually run through the etl process every time I wish to update my locally stored data, I thought it would be beneficial to work out a system to update the data through an automated script. I use python and MySQL to automate this etl process using the city of Chicago&#39;s crime data."/>
+        <meta property="article:published_time" content="2019-05-26" />
+            <meta property="article:section" content="Exploratory Data Analysis" />
+            <meta property="article:tag" content="pandas" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:tag" content="cleaning" />
+            <meta property="article:tag" content="etl" />
+            <meta property="article:tag" content="sql" />
+            <meta property="article:tag" content="manipulation" />
+            <meta property="article:author" content="Andrew Trick" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/friendly.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link href="/static/custom.css" rel="stylesheet">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick ATOM Feed"/>
+
+
+
+        <link href="/feeds/exploratory-data-analysis.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Andrew Trick Exploratory Data Analysis ATOM Feed"/>
+<script src="../js/d3.v3.min.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/respond.min.js"></script>
+</head>
+<body>
+  
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Andrew Trick            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/datasets.html">
+                             Datasets
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/auto_etl_pipeline.html"
+                       rel="bookmark"
+                       title="Permalink to Automating an ETL Pipeline w/ Python and MySQL">
+                        Automating an ETL Pipeline w/ Python and MySQL
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2019-05-26T08:30:00-05:00"> Sun 26 May 2019</time>
+    </span>
+
+
+
+        <span class="label label-default">Category</span>
+        <a href="/category/exploratory-data-analysis.html">Exploratory Data Analysis</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/pandas.html">pandas</a>
+        /
+	<a href="/tag/python.html">Python</a>
+        /
+	<a href="/tag/cleaning.html">cleaning</a>
+        /
+	<a href="/tag/etl.html">etl</a>
+        /
+	<a href="/tag/sql.html">sql</a>
+        /
+	<a href="/tag/manipulation.html">manipulation</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>GitHub Repo: <a href="https://github.com/leaflettuce/chicago_crime">leaflettuce/chicago_crime</a><br></p>
+<h1>Automating an ETL Pipeline w/ Python and MySQL</h1>
+<p>NOTE: These are only highlights of the full code, please go to above repo and clone for full version.
+<br></p>
+<h3>Background</h3>
+<p>The city of Chicago has a wonderful data portal that constantly updates data on different aspects of the city. I've been interesting in exploring and analyzing the crime data set available in this portal for quite some time now. While extracts of the data can be pulled directly into csv format off the site, I wanted to find a way to create a pipeline which is able to automatically update the local version of this data on a daily basis. Rather than manually re-pull the csv each day, they have an option to connect to an API which I use. This process also allows for the cleaning and feature generation to be conducted during data import rather than manually run after updating the csv file.
+<br></p>
+<h3>Connecting to the Data</h3>
+<p>The first step is to connect to the data. Chicago uses Saleforce to provide API connectivity to their data. Once obtaining credentials through their portal we can use requests in Python to connect to and query this data.</p>
+<div class="highlight"><pre><span></span>URL = &quot;https://data.cityofchicago.org/resource/ijzp-q8t2.json?&quot;
+
+API_TOKEN = os.environ.get(&quot;CHI_API_TOKEN&quot;)
+if not API_TOKEN:
+    print(&quot;You need to get an City of Chicago API token! Exiting..&quot;)
+    sys.exit(1)
+
+for year in range(2001, 2020):    
+    # set parameters
+    print(&#39;querying year: &#39; + str(year))
+    param = {&#39;$$app_token&#39; : API_TOKEN,
+             #&#39;$select&#39; : &#39;date, COUNT(date)&#39;,   #example query
+             #&#39;$group&#39; : &#39;date&#39;,    # example query
+             &#39;$limit&#39; : &#39;1000000&#39;,
+             &#39;$where&#39; : &#39;year = &#39; +  str(year)}
+
+    # API call 
+    response = requests.get(URL, params = param)
+    data = json.loads(response.text)
+
+    # set to df
+    df = json_normalize(data)
+
+    # write out
+    upload_dir = &#39;E:/projects/chi_crime/data/raw/&#39;
+    upload_file = &#39;raw_&#39; + str(year)
+df.to_csv(upload_dir + upload_file + &#39;.csv&#39;, index = False)
+</pre></div>
+
+
+<p>Notice the loop iterating through each year and querying off this. While the full data set could be requests at once, running in smaller queries like this greatly speeds up the process.
+<br></p>
+<h3>Processing the Data</h3>
+<p>Chicago keeps the data sets relatively complete and clean. There was little to do here in ways of data cleaning and imputation- any missing data was due to early versions not tracking all the variables later versions have. As such, I focus more on feature generation in this step.
+<br><br>The analysis I'd like to complete on this data is focused on exploring trends in chi crime rates over temporal elements. So, I focus mostly on splitting up the datetime var into specific elements which will be beneficial later on when visualizing the data.</p>
+<div class="highlight"><pre><span></span><span class="c1"># AGGREGATE DATA</span>
+<span class="s s-Atom">df_agg</span> <span class="o">=</span> <span class="s s-Atom">pd</span><span class="p">.</span><span class="nv">DataFrame</span><span class="p">()</span>
+<span class="s s-Atom">for</span> <span class="s s-Atom">year</span> <span class="s s-Atom">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="mi">2020</span><span class="p">)</span><span class="s s-Atom">:</span> <span class="s s-Atom">#</span> <span class="s s-Atom">iterate</span> <span class="s s-Atom">through</span> <span class="s s-Atom">each</span> <span class="s s-Atom">year</span><span class="p">,</span> <span class="s s-Atom">pulling</span> <span class="s s-Atom">in</span> <span class="s s-Atom">raw</span> <span class="s s-Atom">data</span> <span class="s s-Atom">and</span> <span class="s s-Atom">adding</span> <span class="s s-Atom">to</span> <span class="s s-Atom">final</span> <span class="s s-Atom">aggregate</span> <span class="s s-Atom">df</span>
+    <span class="s s-Atom">temp_df</span> <span class="o">=</span> <span class="s s-Atom">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="s s-Atom">&#39;../../data/raw/raw_&#39;</span> <span class="o">+</span> <span class="nf">str</span><span class="p">(</span><span class="s s-Atom">year</span><span class="p">)</span> <span class="o">+</span> <span class="s s-Atom">&#39;.csv&#39;</span><span class="p">)</span>
+    <span class="s s-Atom">if</span> <span class="s s-Atom">year</span> <span class="o">==</span> <span class="mi">2001</span><span class="s s-Atom">:</span>
+        <span class="s s-Atom">df_agg</span> <span class="o">=</span> <span class="s s-Atom">temp_df</span>
+    <span class="nn">else</span><span class="p">:</span>
+        <span class="s s-Atom">df_agg</span> <span class="o">=</span> <span class="s s-Atom">pd</span><span class="p">.</span><span class="nf">concat</span><span class="p">([</span><span class="s s-Atom">df_agg</span><span class="p">,</span> <span class="s s-Atom">temp_df</span><span class="p">])</span>
+
+<span class="s s-Atom">df_agg</span> <span class="o">=</span> <span class="s s-Atom">df_agg</span><span class="p">.</span><span class="nf">reset_index</span><span class="p">(</span><span class="s s-Atom">drop</span><span class="o">=</span><span class="nv">True</span><span class="p">)</span> 
+
+
+<span class="c1"># FEATURE GENERATION</span>
+<span class="c1"># set time</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
+<span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span><span class="p">.</span><span class="s s-Atom">str</span><span class="p">[</span><span class="mi">11</span><span class="p">:-</span><span class="mi">7</span><span class="p">]</span>
+
+<span class="c1"># set date</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;full_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span>
+<span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span><span class="p">.</span><span class="s s-Atom">str</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">10</span><span class="p">]</span>
+
+<span class="c1"># set hours</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">hour</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">.</span><span class="s s-Atom">str</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="s s-Atom">int</span><span class="p">)</span>
+
+<span class="c1"># set month</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span><span class="p">.</span><span class="s s-Atom">str</span><span class="p">[</span><span class="mi">5</span><span class="s s-Atom">:</span><span class="mi">7</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="s s-Atom">int</span><span class="p">)</span> 
+
+<span class="c1"># set day of month</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span><span class="p">.</span><span class="s s-Atom">str</span><span class="p">[</span><span class="mi">8</span><span class="s s-Atom">:</span><span class="mi">10</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="s s-Atom">int</span><span class="p">)</span> 
+
+<span class="c1"># set hour bins</span>
+<span class="s s-Atom">conditions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="p">(</span><span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="p">(</span><span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="p">(</span><span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">),</span>
+    <span class="p">(</span><span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">)]</span>
+<span class="s s-Atom">choices</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">&#39;0 - 8&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;8 - 16&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;16 - 24&#39;</span><span class="p">]</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;hour_bin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">np</span><span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="s s-Atom">conditions</span><span class="p">,</span> <span class="s s-Atom">choices</span><span class="p">,</span> <span class="s s-Atom">default=&#39;0&#39;</span><span class="p">)</span>
+
+<span class="c1"># add day of week</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;datetime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">pd</span><span class="p">.</span><span class="nf">to_datetime</span><span class="p">(</span><span class="s s-Atom">df</span><span class="p">.</span><span class="s s-Atom">date</span><span class="p">)</span> <span class="s s-Atom">#</span> <span class="s s-Atom">helper</span> <span class="s s-Atom">col</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;day_of_week&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;datetime&#39;</span><span class="p">].</span><span class="s s-Atom">dt</span><span class="p">.</span><span class="nf">day_name</span><span class="p">()</span>
+
+<span class="c1"># add week number</span>
+<span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;week_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">[</span><span class="s s-Atom">&#39;datetime&#39;</span><span class="p">].</span><span class="s s-Atom">dt</span><span class="p">.</span><span class="s s-Atom">week</span>
+
+<span class="c1"># Prune features</span>
+<span class="s s-Atom">df</span> <span class="o">=</span> <span class="s s-Atom">df</span><span class="p">.</span><span class="nf">drop</span><span class="p">([</span><span class="s s-Atom">&#39;datetime&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;full_date&#39;</span><span class="p">],</span> <span class="s s-Atom">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="s s-Atom">#</span> <span class="s s-Atom">drop</span> <span class="s s-Atom">helper</span>
+</pre></div>
+
+
+<p><br></p>
+<h3>Loading into MySQL</h3>
+<p>While SQL Server or any other number of storage environments would be suitable for this data, I opted for MySQL as I already had to running on my localhost. I use the mysql.connector module for this process.
+<br><br>Pretty standard loading process. I had error with some of the data types so did a broad strokes varchar and int rather than fine-tune.. While not the best decision its a trade off with time and my analysis needs are simple so this should not result in any difficulties down the road.
+<br><br>This creates the DB, table, and then loads the data in 10,000 rows at a time. I initially tried to load all 7m at once and my computer decided it didn't like this.. :/  Splitting it like this just smooths the loading process for the CPU a bit.</p>
+<div class="highlight"><pre><span></span><span class="n">MYSQL_PASS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MYSQL_PASS&quot;</span><span class="p">)</span>
+
+<span class="c1"># import data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../../data/processed/crime.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># connect to db</span>
+<span class="n">cnx</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">MYSQL_PASS</span><span class="p">,</span>  <span class="c1"># set pass to API envi</span>
+                              <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="n">cursor</span> <span class="o">=</span> <span class="n">cnx</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="c1"># create new DB for storage</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE DATABASE chicago_crime&quot;</span><span class="p">)</span>  
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;USE chicago_crime;&#39;</span><span class="p">)</span>
+
+<span class="c1"># create table for crime data</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE crime (arrest VARCHAR(255), beat VARCHAR(64), block VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    case_number VARCHAR(255), community VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    date VARCHAR(255), description VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    district VARCHAR(255), domestic VARCHAR(255), fbi_code VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    id INT(64) PRIMARY KEY, iucr VARCHAR(255), latitude VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    address VARCHAR(255), latitude_2 VARCHAR(255), longitude_2 VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    loc_description VARCHAR(255), longitude VARCHAR(255), primary_type VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    updated_on VARCHAR(255), ward VARCHAR(255), x_coord VARCHAR(255), y_coord VARCHAR(255), </span><span class="se">\</span>
+<span class="s2">                                    year INT(64), time TIME, hour INT(64), month INT(64), day INT(64), </span><span class="se">\</span>
+<span class="s2">                                    hour_bin VARCHAR(255), day_of_week VARCHAR(255), week_number INT(64))&quot;</span><span class="p">)</span>
+
+<span class="c1"># helper function to insert data rows into table</span>
+<span class="k">def</span> <span class="nf">insert_crime</span><span class="p">(</span><span class="n">crime</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO crime (arrest, beat, block, case_number, community, date, description, district, domestic, fbi_code,</span><span class="se">\</span>
+<span class="s2">                                id, iucr, latitude, address, latitude_2, longitude_2, loc_description, longitude, primary_type, </span><span class="se">\</span>
+<span class="s2">                                updated_on, ward, x_coord, y_coord, year, time, hour, month, day, hour_bin, day_of_week, week_number) </span><span class="se">\</span>
+<span class="s2">             VALUES(</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">)&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">crime</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error:&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="c1"># set pandas df to list </span>
+<span class="n">crimes_list</span> <span class="o">=</span> <span class="n">df_null</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="c1"># crimes_list = crimes_list[:100]   # for testing</span>
+
+<span class="c1"># insert list into table with helper function</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;loading into SQL 10,000 rows at a time.&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">crimes_list</span><span class="p">),</span> <span class="mi">10000</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">crimes_list</span><span class="p">))</span>
+    <span class="n">insert_crime</span><span class="p">(</span><span class="n">crimes_list</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">10000</span><span class="p">])</span>
+
+<span class="c1"># commit additions</span>
+<span class="n">cnx</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+
+
+<p><br></p>
+<h3>Bringing the System Together</h3>
+<p>With the initial data import query, aggregation, and processing complete, I then move on to combining each of them into a batch script to make this easy to run. Not only can I run this from the console and collect the entire dataset, but I can now simply git pull this repo and be able to load the entire data set (cleaned and processed) onto any machine I want. 
+<br><br>Similarly, anyone else who would like this same processed data set should be able to do the same as long as they acquire an API key. 
+<br>NOTE: I added in a requirements.txt check in the batch file to make sure no errors occur when running py files. The get_requs.py file also checks for data directories and creates them if needed.</p>
+<div class="highlight"><pre><span></span>REM pip install -r requirements.txt
+
+python get_requs.py
+
+echo Querying crime data (2001 to current) from City of Chicago by year...
+python pull_raw_data.py
+
+echo Raw data imported successfully! 
+echo Aggregating data into complete data set...
+python aggregate_data.py
+
+echo Aggregation complete! 
+echo Cleaning data and processing model requirements...
+python clean.py
+
+echo Data processing complete! :)
+echo Creating MySQL Storage and uploading...
+python load_into_sql.py
+
+echo SQL storage successful!
+echo ALL DONE! Have a good day :)
+</pre></div>
+
+
+<p><br></p>
+<h3>Updating the System</h3>
+<p>While data is able to be loaded fine, it's a bit redundant and wasteful to load all 7 million rows of data in every time we want to update the new crimes. To deal with this problem, we need to create a method of storing the last crime datetime included in our most recent data pull (either in inital load or in an update).
+<br><br>A simple way of dealing with this is to create a txt file which stores the last datetime within the dataset whenever querying the API. This is the route I took, and you can see in both the initial loading and the updating files that I call for the MAX(datetime) in the pandas df and print it to the txt file.</p>
+<div class="highlight"><pre><span></span># in initial pull
+with open(&#39;last_update.txt&#39;, &#39;w&#39;) as f:
+f.write(max(df.iloc[:, 5]))
+
+# and to pull it in for updating
+txt_file = open(&quot;last_update.txt&quot;, &quot;r&quot;)
+last_update_datetime = txt_file.read()
+</pre></div>
+
+
+<p><br>
+As stated, a rather simple solution. Once this is done, we can use this tracked datetime when querying for updates to ensure we pull only data that has been uploaded to Chi's system since our last import.
+<br><br>The most significant change is the API query off the stored datetime:</p>
+<div class="highlight"><pre><span></span>param = {&#39;$$app_token&#39; : API_TOKEN,
+         &#39;$limit&#39; : &#39;1000000&#39;,
+         &#39;$where&#39; : &#39;date &gt; \&#39;&#39; + last_update_datetime + &#39;\&#39;&#39;}
+</pre></div>
+
+
+<p><br>
+This extract, aggregate, clean, and loading process for the updater is very similar to the initial loading and a lot of copy-paste is used. The main difference is in the filenames and store process locally.
+<br><br> I thought it also important to keep the last version of the data in a backup on local as well in case of any loading or processing errors. This is taken care of by simply writing out the old csv before concating the new data to it:</p>
+<div class="highlight"><pre><span></span># store old data in backup
+upload_dir = &#39;E:/projects/chi_crime/data/interim/&#39;
+upload_file = &#39;BACKUP-previous_version&#39;
+df_old.to_csv(upload_dir + upload_file + &#39;.csv&#39;, index = False)
+
+# update working df
+df = pd.concat([df_old, df])     
+df = df.reset_index(drop=True) 
+</pre></div>
+
+
+<p><br>Once all the necessary files were complete, I formed a second batch file which runs all the code to import, process, and load the new data into the MySQL table.</p>
+<div class="highlight"><pre><span></span><span class="n">echo</span> <span class="n">Updating</span> <span class="n">crime</span> <span class="n">data</span> <span class="n">based</span> <span class="n">on</span> <span class="n">last</span> <span class="kn">import</span> <span class="nn">or</span> <span class="nn">update.</span>
+<span class="n">echo</span> <span class="n">Please</span> <span class="n">wait</span> <span class="p">;)</span>
+<span class="n">python</span> <span class="n">updater</span><span class="o">.</span><span class="n">py</span>
+
+<span class="n">echo</span> <span class="n">Data</span> <span class="n">Successfully</span> <span class="n">updated</span><span class="err">!</span>
+<span class="n">echo</span> <span class="n">Cleaning</span> <span class="n">new</span> <span class="n">version</span> <span class="n">of</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">processing</span> <span class="n">model</span> <span class="n">requirements</span><span class="o">...</span>
+<span class="n">python</span> <span class="n">clean</span><span class="o">.</span><span class="n">py</span>
+<span class="n">python</span> <span class="n">clean_new_data</span><span class="o">.</span><span class="n">py</span>
+
+<span class="n">echo</span> <span class="n">Data</span> <span class="n">processing</span> <span class="n">complete</span><span class="err">!</span> <span class="p">:)</span>
+<span class="n">echo</span> <span class="n">Inserting</span> <span class="n">new</span> <span class="n">files</span> <span class="n">into</span> <span class="n">MySQL</span> <span class="n">storage</span><span class="o">...</span>
+<span class="n">python</span> <span class="n">update_sql</span><span class="o">.</span><span class="n">py</span>
+
+<span class="n">echo</span> <span class="n">SQL</span> <span class="n">storage</span> <span class="n">successful</span><span class="err">!</span>
+<span class="n">echo</span> <span class="n">ALL</span> <span class="n">DONE</span><span class="err">!</span> <span class="n">Have</span> <span class="n">a</span> <span class="n">good</span> <span class="n">day</span> <span class="p">:)</span>
+</pre></div>
+
+
+<p><br></p>
+<h3>Final Considerations</h3>
+<p>As it stands now, I can import the cleaned and processed data onto any machine by pulling this repo and running the batch file. Similarly, I can keep the data up to date by running the updater batch script every day or so.
+<br><br>The only step after this to full automate the process would be to set up an event scheduler to run the updater batch script on a regular schedule. While rather simple to do, I plan to skip this step as I work primarily off a laptop and will not have the constant uptime best suited for such scheduler. 
+<br><br>It's a simple system (running a bat from console) and I'm quite happy just running the script right before running analysis or visualization- Which will be my next post here! </p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="mailto:andyjtrick@gmail.com"><i class="fa fa-envelope-o fa-lg"></i> email</a></li>
+                <li class="list-group-item"><a href="https://www.linkedin.com/in/andrew-trick-916011134"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+                <li class="list-group-item"><a href="https://github.com/leaflettuce"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+                <li class="list-group-item"><a href="https://www.kaggle.com/leaflettuce"><i class="fa fa-database fa-lg"></i> kaggle</a></li>
+                <li class="list-group-item"><a href="https://www.instagram.com/andyjtrick/"><i class="fa fa-instagram fa-lg"></i> instagram</a></li>
+                <li class="list-group-item"><a href="https://www.meetup.com/members/13019733/"><i class="fa fa-meetup fa-lg"></i> meetup</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="/category/data-visualization.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Data Visualization
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/exploratory-data-analysis.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Exploratory Data Analysis
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/category/machine-learning.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Machine Learning
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group " id="tags">
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/cleaning.html">
+                            cleaning
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/python.html">
+                            Python
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/modeling.html">
+                            modeling
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/eda.html">
+                            eda
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/visualizing.html">
+                            visualizing
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/r.html">
+                            R
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/tableau.html">
+                            tableau
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-1">
+                        <a href="/tag/reporting.html">
+                            reporting
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/classification.html">
+                            classification
+                        </a>
+                    </li>
+                    <li class="list-group-item tag-2">
+                        <a href="/tag/manipulation.html">
+                            manipulation
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+    </ul>
+</section>            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2019 Andrew Trick
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <script src="/theme/js/bodypadding.js"></script>
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-106731472-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+</body>
+</html>
