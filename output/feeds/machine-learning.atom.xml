@@ -1,5 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2019-02-18T15:30:00-06:00</updated><entry><title>Identifying Advertisements with ANN's</title><link href="/identifying_ads.html" rel="alternate"></link><published>2019-02-18T15:30:00-06:00</published><updated>2019-02-18T15:30:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2019-02-18:identifying_ads.html</id><summary type="html">&lt;h1&gt;Identifying Advertisements with ANN's&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Andrew Trick</title><link href="/" rel="alternate"></link><link href="/feeds/machine-learning.atom.xml" rel="self"></link><id>/</id><updated>2019-06-12T12:30:00-05:00</updated><entry><title>Forecasting Chicago Crime Rates with SARIMA</title><link href="/crime_forecaster.html" rel="alternate"></link><published>2019-06-12T12:30:00-05:00</published><updated>2019-06-12T12:30:00-05:00</updated><author><name>Andrew Trick</name></author><id>tag:,2019-06-12:crime_forecaster.html</id><summary type="html">&lt;p&gt;GitHub Repo: &lt;a href="https://github.com/leaflettuce/chicago_crime"&gt;leaflettuce/chicago_crime&lt;/a&gt;&lt;br&gt;
+Resources Used for Project: &lt;a href="https://www.datasciencecentral.com/profiles/blogs/tutorial-forecasting-with-seasonal-arima"&gt;Data Science Central&lt;/a&gt;, &lt;a href="https://towardsdatascience.com/time-series-forecasting-arima-models-7f221e9eee06"&gt;Towards Data Science&lt;/a&gt;, &lt;a href="https://www.digitalocean.com/community/tutorials/a-guide-to-time-series-forecasting-with-arima-in-python-3"&gt;Digital Ocean&lt;/a&gt;&lt;br&gt; &lt;/p&gt;
+&lt;h1&gt;Forecasting Chicago Crime Rates with SARIMA&lt;/h1&gt;
+&lt;p&gt;NOTE: These are only highlights of the full code, please go to above repo and clone for full version.
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Background&lt;/h3&gt;
+&lt;p&gt;My last post defined the process of importing and updating Chicago crime data into a MySQL DB and local csv's through an automated system. I move on to the next step of this project by using the up-to-date data to forecast future crime rates for the city. I use a SARIMA model to projectg weekly rates and then break this value up into a location by time matrix to give a more granular look at how crime is distributed throughout Chicago.
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Time-Series Modeling with SARIMA&lt;/h3&gt;
+&lt;p&gt;Seasonal Auto-Regressive Integrated Moving Average (ARIMA) modeling allows for us to not just use historic weekly rates to estimate futures ones, but can do so while accounting for cycle, trend, season, and lagged features. EDA conducted in Tableau gave the first visual clue that this type of model is appropriate, although I confirm this by running some quick visual eval in Python as well. 
+&lt;br&gt;
+A quick overview of what the SARIMA model looks like:&lt;Br&gt;
+                        SARIMA(p,d,q)(P, D, Q)m
+         p- auto-regressive, d- differencing, q- moving average,
+  m- number of periods in season, (P, D, Q) - (p,d,q) for the seasonal part of the time series&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+The first step is to pull in the data, set it into series format and use the index as the week number in the series with the crime rate as the value. I then plot a simple line chart to display the cycle and overall trend within:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# import
+df = pd.read_csv(&amp;#39;../../data/processed/weekly_counts.csv&amp;#39;)
+df.head()
+
+# reset index to overall week number
+df = df[df.week_number != 53]
+df = df.reset_index()
+df[&amp;#39;order&amp;#39;] = df.index + 1
+df.index = df.order
+series = df[&amp;#39;count&amp;#39;]
+
+# quick visualize
+plt.plot(series)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/print_out_head.png" style="width: 800px;"/&gt;&lt;br&gt;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/first.png" style="width: 800px;"/&gt;&lt;br&gt;
+&lt;br&gt;
+The plot show clear downward trend and a seasonal cycle (52 week intervals for our interest). We can also see a clear non-stationarity of the overall data, indicating we'll need to differentiate to achieve stationarity- an assumption and requirement for ARIMA modeling.  With this identified, lets split out the test and train sets which will be necessary for evaluation later, and also differentiate the data.&lt;br&gt;
+NOTE: There appears to be a slight multiplicative seasonality in the visual, which would typically indicate a log should be applied to the data. While this was attempted, the multiplicative trend is slight enough that standard non-log values resulted in a better model.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# split test and train
+df_train = series[:850]
+df_test = series[850:]
+
+# set differencing period
+df_train_diff = df_train.diff(periods=1).values[1:]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;
+We'll now plot the differential, ACF and PACF plots to visual explore if further differentiation is necessary and to determine what kind of parameter values may be appropriate for the auto-regressive and moving average terms in the model:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;###############
+# EVAL SERIES #
+###############
+# plot it out to check
+plt.plot(df_train_diff)
+plt.title(&amp;#39;differential over time&amp;#39;)
+plt.xlabel(&amp;#39;weeks&amp;#39;)
+plt.ylabel(&amp;#39;crime rate differential&amp;#39;)
+
+# get diff stats
+lag_acf = acf(df_train_diff, nlags = 120)
+lag_pacf = pacf(df_train_diff, nlags = 120, method = &amp;#39;ols&amp;#39;)
+
+# splot acf
+plt.figure(figsize=(15,5))
+plt.subplot(121)
+plt.stem(lag_acf)
+plt.axhline(y=0, linestyle=&amp;#39;-&amp;#39;, color = &amp;#39;black&amp;#39;)
+plt.axhline(y=-1.96/np.sqrt(len(df_train)), linestyle=&amp;#39;--&amp;#39;, color = &amp;#39;grey&amp;#39;)
+plt.axhline(y=1.96/np.sqrt(len(df_train)), linestyle=&amp;#39;--&amp;#39;, color = &amp;#39;grey&amp;#39;)
+plt.xlabel(&amp;#39;lag&amp;#39;)
+plt.ylabel(&amp;#39;acf&amp;#39;)
+
+# plot pacf
+plt.subplot(122)
+plt.stem(lag_pacf)
+plt.axhline(y=0, linestyle=&amp;#39;-&amp;#39;, color = &amp;#39;black&amp;#39;)
+plt.axhline(y=-1.96/np.sqrt(len(df_train)), linestyle=&amp;#39;--&amp;#39;, color = &amp;#39;grey&amp;#39;)
+plt.axhline(y=1.96/np.sqrt(len(df_train)), linestyle=&amp;#39;--&amp;#39;, color = &amp;#39;grey&amp;#39;)
+plt.xlabel(&amp;#39;lag&amp;#39;)
+plt.ylabel(&amp;#39;pacf&amp;#39;)
+plt.tight_layout()
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/diff_over_time.png" style="width: 425px;"/&gt;&lt;br&gt;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/acf_pacf.png" style="width: 800px;"/&gt;&lt;br&gt;
+&lt;br&gt;
+The differential plot shows is relatively even and non patterned, indicating an Integration parameters value of 1 is appropriate. ACF and PACF both show a lag of one (or maybe two for the MA). We can also clearly see the seasonal cycle of 52 in these plots.
+&lt;br&gt;
+Moving forwards, lets get on to the modeling!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#########
+# MODEL #
+#########
+# fit model
+model = SARIMAX(df_train, order = (1, 1, 2), seasonal_order = (1, 0, 1, 52), 
+                enforce_stationarity=False, enforce_invertibility=False)
+
+model_fit = model.fit(disp=False)
+
+# forecast it out
+forecast_len = len(df_test)
+forecast = model_fit.forecast(forecast_len)
+#forecast = np.exp(forecast)                          # for log correction
+
+# eval metrics
+rmse = np.sqrt(((forecast - df_test) ** 2).mean())
+p_rmse = (rmse / df_test.mean())*100
+
+# plot it again
+plt.figure(figsize=(20,10))
+plt.plot(series, &amp;#39;b&amp;#39;)
+plt.plot(forecast, &amp;#39;r&amp;#39;)
+
+plt.title(&amp;#39;RMSE: %.2f     Percent Avg Error: %.2f&amp;#39;%(rmse, p_rmse))
+plt.xlabel(&amp;#39;Weeks&amp;#39;)
+plt.ylabel(&amp;#39;Weekly Rates&amp;#39;)
+plt.autoscale(enable=True, axis = &amp;#39;x&amp;#39;, tight=True)
+plt.axvline(x=series.index[len(df_train)], color=&amp;#39;black&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/eval.png" style="width: 800px;"/&gt;&lt;br&gt;
+So this was a very trial-and-error, multiple iteration type of modeling process. I initially attempted a grid search method for the parameter inputs, but the exponential explosion of so many factors made it quite infeasible. at only a range of 0-2 for each factor, there would be over 600 fits with each taking over 3 minutes. Rather than kill my CPU attempting to run this for over 30 hours, I did some educated filtering.
+&lt;br&gt;
+First, The I term was already identified confidently as one level of differentiation. Similarly, we could tell from initial time-series plot that the seasonal trend is more or less stable over time we can set seasonal I to 0. Based on the ACF and PACF plots we determined that AR should be 1 and MA 1 or 2. The seasonal lag also suggest values of no more than 1 for AR and MA in the seasonal section. Finally, the season is quite obviously 52, (52 weeks per year). 
+&lt;br&gt;
+With these values we can place a high level of certainty in the parameters (1, 1, q)(P, 0, Q)52. I started here and attempted different fits while swapping values for parameters q, P and Q. The best fitting version of these resulted in the final model plotted out above:
+&lt;br&gt;
+Final SARIMA model: (1, 1, 2)(1, 0, 1)52
+&lt;br&gt;
+An RMSE of 346 averages out to a typical weekly error of only 6.87%! Pretty solid for predicting something like a city's crime rate. 
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Predicting Future Rates and Visualizing&lt;/h3&gt;
+&lt;p&gt;The next step was to use this model to predict the nextg 6 months of weekly crime rates for the city. I use the following code to achieve this fit, print out the results, and finally plot it out!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;##############
+# prediction #
+##############
+# predict out for 52
+model = SARIMAX(series, order = (1, 1, 2), seasonal_order = (1, 0, 1, 52), 
+                enforce_stationarity=False, enforce_invertibility=False)
+
+model_fit = model.fit(disp=False)
+
+# forecast it out
+forecast = model_fit.forecast(52)   #.predicted_mean
+forecast.to_csv(&amp;#39;../../data/processed/arima_2_preds.csv&amp;#39;)
+
+# visualize forecast
+# Get forecast 52 steps ahead in future
+pred_uc = model_fit.get_prediction(start=955, end=1047, dynamic=True, full_results=True)
+pred_ci = pred_uc.conf_int()
+
+year_pred = pred_uc.predicted_mean
+
+
+# pplot them out
+ax = series.plot(label=&amp;#39;Actual&amp;#39;, figsize=(20, 15))
+pred_uc.predicted_mean.plot(ax=ax, label=&amp;#39;Forecast&amp;#39;)
+ax.fill_between(pred_ci.index,
+                pred_ci.iloc[:, 0],
+                pred_ci.iloc[:, 1], color=&amp;#39;k&amp;#39;, alpha=.25)
+ax.set_xlabel(&amp;#39;Date&amp;#39;)
+ax.set_ylabel(&amp;#39;Weekly Rates&amp;#39;)
+plt.title(&amp;#39;Weekly Crime Rates for Chicago&amp;#39;, fontsize = &amp;#39;32&amp;#39;)
+plt.axvline(x=955, color=&amp;#39;black&amp;#39;, linewidth = &amp;#39;2.5&amp;#39;)
+plt.legend()
+plt.show()
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/forecast.png" style="width: 800px;"/&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Splitting up the Predictions into Area and Time&lt;/h3&gt;
+&lt;p&gt;The final step was to split up the weekly preds into a more granular look at their distribution. I created a matrix of city neighborhood by 8-hour interval for the week to split the overall rates into.. Tableau was used to filter and average out these typical rates per location-time intersect and a proportional matrix was then exported out into Excel before being converted into a CSV for importing into Py. 
+&lt;br&gt;
+I then use scalar multiplication of the matrix to distribute the predicted weekly rate by each element in the matrix to result in an estimate of how many crimes will occur in each neighborhood by day and time. This gives a nice look at the trends and peak times/areas of crime throughout the city.
+&lt;br&gt;
+One major step in this process was mapping out the neighborhood names to their 'community number' as given by the Chicago data source. I manually created a dataframe to connect the two of these for mapping purposes and replace the original matrix index with these name values.
+&lt;br&gt;
+Finally, the resulting predicted matrix was compared to the actual for evaluation. A process of subtracting the actual week matrix from the predicted one was used to identify the error rate of each location-time intersect. The root of the sum of square error of each matrix element was then used to ensure integration into the matrix was appropriate. This resulted in the expected 351 as given by the weekly RMSE. The average error per matrix element was only 0.2, indicating an accurate prediction of where and when crime is occurring throughout the city for each forecasted week. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c c-Singleline"&gt;# setwd&lt;/span&gt;
+&lt;span class="n"&gt;os&lt;/span&gt;.&lt;span class="n"&gt;chdir&lt;/span&gt;(&lt;span class="s"&gt;&amp;#39;E:/projects/chi_crime/src/visuals/&amp;#39;&lt;/span&gt;)
+
+&lt;span class="c c-Singleline"&gt;# import&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt; = &lt;span class="n"&gt;pd&lt;/span&gt;.&lt;span class="n"&gt;read_csv&lt;/span&gt;(&lt;span class="s"&gt;&amp;#39;../../reports/NEXT_WEEKS_PRED_MATRIX.csv&amp;#39;&lt;/span&gt;, &lt;span class="n"&gt;index_col&lt;/span&gt; = &lt;span class="s"&gt;&amp;#39;Community Area&amp;#39;&lt;/span&gt;)
+
+&lt;span class="c c-Singleline"&gt;# map community numnber to area name&lt;/span&gt;
+&lt;span class="n"&gt;comm_numbers&lt;/span&gt; = &lt;span class="n"&gt;np&lt;/span&gt;.&lt;span class="n"&gt;array&lt;/span&gt;([&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;range&lt;/span&gt;(&lt;span class="mi"&gt;1&lt;/span&gt;, &lt;span class="mi"&gt;78&lt;/span&gt;)]) &lt;span class="c c-Singleline"&gt;# get comm numbers&lt;/span&gt;
+
+&lt;span class="n"&gt;comm_names&lt;/span&gt; = &lt;span class="n"&gt;np&lt;/span&gt;.&lt;span class="n"&gt;array&lt;/span&gt;([&lt;span class="s"&gt;&amp;#39;Rogers Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Ridge&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Uptown&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Lincoln Square&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;North Center&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Lake View&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Lincoln Park&amp;#39;&lt;/span&gt;, &lt;span class="c c-Singleline"&gt;# get names (in order))&lt;/span&gt;
+                       &lt;span class="s"&gt;&amp;#39;Near North Side&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Edison Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Norwood Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Jefferson Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Forest Glen&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;North Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Albany Park&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Portage Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Irving Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Dunning&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Montclair&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Belmont Cragin&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Hermosa&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Avondale&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Logan Square&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Humbolt Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Town&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Austin&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Garfield Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;East Garfield Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Near West Side&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;North Lawndale&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;South Lawndale&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Lower West Side&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Loop&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Near South Side&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Armour Square&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Douglas&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Oakland&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Fuler Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Grand Boulevard&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Kenwood&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Washington Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Hyde Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Woodlawn&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;South Shore&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Chatham&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Avion Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;South Chicago&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Burnside&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Calumet Heights&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Roseland&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Pullman&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;South Deering&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;East Side&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Pullman&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Riverdale&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Hedgewisch&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Garfield Ridge&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Archer Heights&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Brighton Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;McKinley Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Bridgheport&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;New City&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Edison&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Gage Park&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Clearing&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Lawn&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Chicago Lawn&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;West Englewood&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Englewood&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Greater Grand Crossing&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Ashburn&amp;#39;&lt;/span&gt;,
+                       &lt;span class="s"&gt;&amp;#39;Auburn Gresham&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Beverly&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Washington Heights&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Mount Greenwood&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Morgan Park&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;O\&amp;#39;Hare&amp;#39;&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Edgewater&amp;#39;&lt;/span&gt;])
+
+&lt;span class="n"&gt;connector_df&lt;/span&gt; = &lt;span class="n"&gt;pd&lt;/span&gt;.&lt;span class="n"&gt;DataFrame&lt;/span&gt;({&lt;span class="s"&gt;&amp;#39;numbers&amp;#39;&lt;/span&gt; : &lt;span class="n"&gt;comm_numbers&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;names&amp;#39;&lt;/span&gt; : &lt;span class="n"&gt;comm_names&lt;/span&gt;}) &lt;span class="c c-Singleline"&gt;# create df&lt;/span&gt;
+
+
+&lt;span class="c c-Singleline"&gt;# replace df community area number with name&lt;/span&gt;
+&lt;span class="n"&gt;connector_df&lt;/span&gt;.&lt;span class="nb"&gt;index&lt;/span&gt; = &lt;span class="n"&gt;connector_df&lt;/span&gt;.&lt;span class="n"&gt;numbers&lt;/span&gt; &lt;span class="c c-Singleline"&gt;# map out&lt;/span&gt;
+
+&lt;span class="n"&gt;df&lt;/span&gt;[&lt;span class="s"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;] = &lt;span class="n"&gt;connector_df&lt;/span&gt;.&lt;span class="n"&gt;names&lt;/span&gt; &lt;span class="c c-Singleline"&gt;# add to df&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt;.&lt;span class="nb"&gt;index&lt;/span&gt; = &lt;span class="n"&gt;df&lt;/span&gt;.&lt;span class="nb"&gt;name&lt;/span&gt; &lt;span class="c c-Singleline"&gt;# replace index&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt; = &lt;span class="n"&gt;df&lt;/span&gt;.&lt;span class="n"&gt;drop&lt;/span&gt;([&lt;span class="s"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;], &lt;span class="n"&gt;axis&lt;/span&gt; = &lt;span class="mi"&gt;1&lt;/span&gt;) &lt;span class="c c-Singleline"&gt;# drop helper&lt;/span&gt;
+
+
+&lt;span class="c c-Singleline"&gt;# helper dates&lt;/span&gt;
+&lt;span class="nb"&gt;from&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;datetime&lt;/span&gt;, &lt;span class="n"&gt;timedelta&lt;/span&gt;
+
+&lt;span class="c c-Singleline"&gt;# get sunday&lt;/span&gt;
+&lt;span class="n"&gt;idx&lt;/span&gt; = (&lt;span class="n"&gt;datetime&lt;/span&gt;.&lt;span class="n"&gt;today&lt;/span&gt;().&lt;span class="n"&gt;weekday&lt;/span&gt;() + &lt;span class="mi"&gt;1&lt;/span&gt;) % &lt;span class="mi"&gt;7&lt;/span&gt; &lt;span class="c c-Singleline"&gt;# MON = 0, SUN = 6 -&amp;gt; SUN = 0 .. SAT = 6&lt;/span&gt;
+&lt;span class="n"&gt;sun&lt;/span&gt; = &lt;span class="n"&gt;datetime&lt;/span&gt;.&lt;span class="n"&gt;today&lt;/span&gt;() - &lt;span class="n"&gt;timedelta&lt;/span&gt;(&lt;span class="n"&gt;idx&lt;/span&gt;)
+&lt;span class="n"&gt;start_date_str&lt;/span&gt; = &lt;span class="n"&gt;sun&lt;/span&gt;.&lt;span class="n"&gt;strftime&lt;/span&gt;(&lt;span class="s"&gt;&amp;quot;%B %d&amp;quot;&lt;/span&gt;)
+
+&lt;span class="n"&gt;end_date&lt;/span&gt; = &lt;span class="n"&gt;sun&lt;/span&gt; + &lt;span class="n"&gt;timedelta&lt;/span&gt;(&lt;span class="n"&gt;days&lt;/span&gt; = &lt;span class="mi"&gt;6&lt;/span&gt;)
+&lt;span class="n"&gt;end_date_str&lt;/span&gt; = &lt;span class="n"&gt;end_date&lt;/span&gt;.&lt;span class="n"&gt;strftime&lt;/span&gt;(&lt;span class="s"&gt;&amp;quot;%d&amp;quot;&lt;/span&gt;)
+
+
+&lt;span class="c c-Singleline"&gt;# visualize&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;.&lt;span class="n"&gt;figure&lt;/span&gt;(&lt;span class="n"&gt;figsize&lt;/span&gt;=(&lt;span class="mi"&gt;46&lt;/span&gt;,&lt;span class="mi"&gt;52&lt;/span&gt;))
+&lt;span class="n"&gt;sns&lt;/span&gt;.&lt;span class="n"&gt;set&lt;/span&gt;(&lt;span class="n"&gt;font_scale&lt;/span&gt;=&lt;span class="mf"&gt;1.25&lt;/span&gt;)
+&lt;span class="n"&gt;ax&lt;/span&gt; = &lt;span class="n"&gt;sns&lt;/span&gt;.&lt;span class="n"&gt;heatmap&lt;/span&gt;(&lt;span class="n"&gt;df&lt;/span&gt;, &lt;span class="n"&gt;annot&lt;/span&gt;=&lt;span class="nb"&gt;True&lt;/span&gt;, &lt;span class="n"&gt;linewidths&lt;/span&gt;=&lt;span class="mf"&gt;.6&lt;/span&gt;, &lt;span class="n"&gt;cmap&lt;/span&gt;=&lt;span class="s"&gt;&amp;quot;Reds&amp;quot;&lt;/span&gt;, &lt;span class="n"&gt;vmin&lt;/span&gt; = &lt;span class="mi"&gt;0&lt;/span&gt;, &lt;span class="n"&gt;vmax&lt;/span&gt; = &lt;span class="mi"&gt;9&lt;/span&gt;, &lt;span class="n"&gt;cbar&lt;/span&gt;=&lt;span class="nb"&gt;False&lt;/span&gt;)
+&lt;span class="n"&gt;plt&lt;/span&gt;.&lt;span class="n"&gt;yticks&lt;/span&gt;(&lt;span class="n"&gt;rotation&lt;/span&gt;=&lt;span class="mi"&gt;0&lt;/span&gt;, &lt;span class="n"&gt;fontsize&lt;/span&gt; = &lt;span class="mi"&gt;18&lt;/span&gt;)
+&lt;span class="n"&gt;plt&lt;/span&gt;.&lt;span class="n"&gt;xticks&lt;/span&gt;(&lt;span class="n"&gt;rotation&lt;/span&gt;=&lt;span class="mi"&gt;90&lt;/span&gt;, &lt;span class="n"&gt;fontsize&lt;/span&gt; = &lt;span class="mi"&gt;22&lt;/span&gt;)
+&lt;span class="n"&gt;ax&lt;/span&gt;.&lt;span class="n"&gt;set_xlabel&lt;/span&gt;(&lt;span class="s"&gt;&amp;#39;Day - Time&amp;#39;&lt;/span&gt;, &lt;span class="n"&gt;fontsize&lt;/span&gt; = &lt;span class="mi"&gt;26&lt;/span&gt;)
+&lt;span class="n"&gt;ax&lt;/span&gt;.&lt;span class="n"&gt;set_ylabel&lt;/span&gt;(&lt;span class="s"&gt;&amp;#39;Neighborhood&amp;#39;&lt;/span&gt;, &lt;span class="n"&gt;fontsize&lt;/span&gt; = &lt;span class="mi"&gt;26&lt;/span&gt;)
+&lt;span class="n"&gt;plt&lt;/span&gt;.&lt;span class="n"&gt;text&lt;/span&gt;(-&lt;span class="mf"&gt;0.1&lt;/span&gt;, -&lt;span class="mi"&gt;1&lt;/span&gt;, &lt;span class="s"&gt;&amp;#39;Predicted Crime Rates for Chicago Neighborhoods by 8-Hour Interval (%s - %s)&amp;#39;&lt;/span&gt; %(&lt;span class="n"&gt;start_date_str&lt;/span&gt;, &lt;span class="n"&gt;end_date_str&lt;/span&gt;), 
+          &lt;span class="n"&gt;fontsize&lt;/span&gt; = &lt;span class="mi"&gt;78&lt;/span&gt;)
+
+&lt;span class="c c-Singleline"&gt;# write it&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;.&lt;span class="n"&gt;savefig&lt;/span&gt;(&lt;span class="s"&gt;&amp;#39;../../reports/visuals/updated/pred_matrix.png&amp;#39;&lt;/span&gt;)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src="../img/chi_crime/pred_matrix.png" style="width: 1050px;"/&gt;&lt;br&gt;&lt;/p&gt;</summary><category term="Python"></category><category term="SARIMA"></category><category term="time-series"></category><category term="forecasting"></category><category term="heatmap"></category><category term="pandas"></category><category term="Tableau"></category><category term="matplotlib"></category><category term="seaborn"></category></entry><entry><title>Identifying Advertisements with ANN's</title><link href="/identifying_ads.html" rel="alternate"></link><published>2019-02-18T15:30:00-06:00</published><updated>2019-02-18T15:30:00-06:00</updated><author><name>Andrew Trick</name></author><id>tag:,2019-02-18:identifying_ads.html</id><summary type="html">&lt;h1&gt;Identifying Advertisements with ANN's&lt;/h1&gt;
 &lt;p&gt;I pull data from the UCI Machine Learning Repo and use it to form a model which can identify advertisements based upon their image size and URL terminology. I work through cleaning the data, attempting a few different fitting algorithms, and end with some parameter-tuning of an ANN. My final model results in over 97% accuracy in classifying advertisements in testing. Originally conducted for a Machine Learning course as SHHU focused on the R language. 
 &lt;br&gt;&lt;/p&gt;
 &lt;h2&gt;Data Description&lt;/h2&gt;
