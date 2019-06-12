@@ -248,4 +248,4 @@ plt.text(-0.1, -1, 'Predicted Crime Rates for Chicago Neighborhoods by 8-Hour In
 # write it
 plt.savefig('../../reports/visuals/updated/pred_matrix.png')
 ```
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/chi_crime/pred_matrix.png" style="width: 1050px;"/><br>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../img/chi_crime/pred_matrix_first.png" style="width: 1050px;"/><br>
