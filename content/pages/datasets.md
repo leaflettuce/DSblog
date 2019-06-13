@@ -35,3 +35,7 @@ Survey data used for the Qlikview dashbaord I created for DAT 320 class. Asking 
 
 <a href="../data/coffee_survey.csv" download>Coffee Buyer Survey</a><br>
 Personally collected results from 3-day survey (distributed on social media) focused on coffee purchasing habits. I used this data within the Coffee Buyer Survey Post located <a href="../coffee_survey.html"> here</a>.<br>
+
+
+<a href="../data/weekly_counts.csv" download>Weekly Chicago Crime Rates</a><br>
+Aggregate weekly crime rate totals for Chicago from Jan 1, 2001 to Jun 8, 2019. Used in my Chicago <a href="../crime_forecaster.html">Crime Forecaster</a>.<br>
