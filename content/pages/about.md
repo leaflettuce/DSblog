@@ -9,7 +9,7 @@ Title: About
  
 ####About Me
 
-My name is Andy and I'm based out of Chicago, IL. I'm a founding member and the bassist for metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and for the past 13 years have been touring internationally playing music. 
+My name is Andy and I'm based out of Chicago, IL. I'm a founding member and bassist of metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and for the past 14 years I've been touring internationally playing music. 
 <br><br>
 I get excited about numbers in any form and have spent the past five years gaining knowledge and experience in the world of data science; focusing in particular on statistics, data visualization, and machine learning. Professionally, I'm adept at analyzing and interpreting data to support decision-making and solve business problems. Personally, I spend my free time looking into hidden patterns found in different types of data and visualizing these in stimulating ways. I am a firm believer that sharing and highlighting the unapparent trends and inequalities found in societal data can lead to a more understanding and egalitarian world. 
 <br><br>
