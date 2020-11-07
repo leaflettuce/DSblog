@@ -9,13 +9,13 @@ Title: About
  
 ####About Me
 
-My name is Andy and I'm based out of Chicago, IL. I'm a founding member and bassist of metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and for the past 14 years I've been touring internationally playing music. 
+Hi, I'm Andy Trick - a Developer and Data Analyst based out of Chicago, IL. Prior to diving into the world of tech I was a founding member and bassist of metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and spent 14 years touring internationally playing music. 
 <br><br>
-I get excited about numbers in any form and have spent the past five years gaining knowledge and experience in the world of data science; focusing in particular on statistics, data visualization, and machine learning. Professionally, I'm adept at analyzing and interpreting data to support decision-making and solve business problems. Personally, I spend my free time looking into hidden patterns found in different types of data and visualizing these in stimulating ways. I am a firm believer that sharing and highlighting the unapparent trends and inequalities found in societal data can lead to a more understanding and egalitarian world. 
+I'm a big fan of numbers and have spent the past six years gaining knowledge and experience in the world of data science; focusing in particular on statistics, data visualization, and machine learning. Professionally, I'm adept at building analytics applications to support decision-making and improve business operations. Personally, I spend my free time looking into hidden patterns found in societal/cultural data and visualizing these in stimulating ways. I am a firm believer that sharing and highlighting the unapparent trends and inequalities found in societal data can lead to a more understanding and egalitarian world. 
 <br><br>
-Outside of data and music, I also enjoy the sci-fi/fantasy genre, running, yoga, and training <a href="http://www.japaneseculturecenter.com/">Aikido</a>.
+Outside of data and music, I also enjoy the sci-fi/fantasy genre, running, yoga, and training in <a href="http://www.japaneseculturecenter.com/">Aikido</a>.
  
 <br>
 ####About This Website
 
-I created this blog to have a location to aggregate all my past, current, and future undertakings into the subjects of data science. As such, this site holds a collection of personal projects, past assignments for school/certificate programs, and anything else that seems to fit with this goal. 
+I created this blog to have a location to aggregate my past, current, and future undertakings into the subjects of data science. As such, this site holds a collection of my past personal projects which focus on these areas. Please reach out if you have any questions on the work or would like to collaborate on any future projects!
