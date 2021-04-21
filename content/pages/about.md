@@ -9,11 +9,11 @@ Title: About
  
 ####About Me
 
-Hi, I'm Andy Trick - a Developer and Data Analyst based out of Chicago, IL. Prior to diving into the world of tech I was a founding member and bassist of metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and spent 14 years touring internationally playing music. 
+Hi, my name is Andy Trick and I'm a Software Developer and Data Analyst based out of Chicago, IL. I currently work on a Data & Analytics team as an Application Developer building data-driven web application to support the decision making and business intelligence of employee performance management. Prior to diving into the world of tech I was a founding member and bassist of metal band, <a href="https://www.tdwpband.com/">The Devil Wears Prada</a>, and spent 14 years touring internationally playing music. 
 <br><br>
-I'm a big fan of numbers and have spent the past six years gaining knowledge and experience in the world of data science; focusing in particular on statistics, data visualization, and machine learning. Professionally, I'm adept at building analytics applications to support decision-making and improve business operations. Personally, I spend my free time looking into hidden patterns found in societal/cultural data and visualizing these in stimulating ways. I am a firm believer that sharing and highlighting the unapparent trends and inequalities found in societal data can lead to a more understanding and egalitarian world. 
+I'm a big fan of numbers and tend to spend my free time exploring the world of data science; focusing in particular on statistics, data visualization, and machine learning. Professionally, I'm adept at building analytics applications to support and improve business operations. Academically, I'm a graduate student as Arizona State University pursuing a Master of Computer Science (Big Data systems). Personally, I spend my free time looking into hidden patterns found in societal/cultural data and visualizing these in stimulating ways. I am a firm believer that sharing and highlighting the unapparent trends and inequalities found in societal data can lead to a more understanding and egalitarian world. 
 <br><br>
-Outside of data and music, I also enjoy the sci-fi/fantasy genre, running, yoga, and training in <a href="http://www.japaneseculturecenter.com/">Aikido</a>.
+Outside of data and music, I also enjoy the sci-fi/fantasy genre, tabletop gaming, running, yoga, and training in <a href="http://www.japaneseculturecenter.com/">Aikido</a>.
  
 <br>
 ####About This Website
